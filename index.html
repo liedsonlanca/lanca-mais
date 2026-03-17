@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LANÇA+ | Agência de Marketing Estratégico</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --preto:#0D0D0B;
+  --bege:#E8E4D9;
+  --bege-light:#F2EFE7;
+  --branco:#F9F8F5;
+  --musgo:#3A3D1C;
+  --musgo-mid:#4d5124;
+  --musgo-light:rgba(58,61,28,0.85);
+  --salmon:#D97B45;
+  --salmon-dark:#b8622e;
+  --mid:rgba(232,228,217,0.45);
+  --border:rgba(232,228,217,0.09);
+  --border-bege:rgba(13,13,11,0.1);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--preto);color:var(--bege);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;}
+
+/* ─── PAGE SYSTEM ─── */
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+
+/* ─── NAV ─── */
+nav{
+  position:sticky;top:0;z-index:200;
+  background:var(--bege-light);
+  border-bottom:1px solid rgba(13,13,11,0.1);
+  padding:0 3rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:68px;
+}
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:1.7rem;letter-spacing:-0.01em;color:var(--preto);
+  text-decoration:none;cursor:pointer;display:flex;align-items:baseline;
+}
+.nav-logo span{color:var(--salmon);}
+.nav-links{list-style:none;display:flex;gap:1.75rem;align-items:center;}
+.nav-links a{
+  color:rgba(13,13,11,0.45);text-decoration:none;
+  font-size:0.82rem;letter-spacing:0.03em;font-weight:400;
+  transition:color 0.2s;cursor:pointer;
+}
+.nav-links a:hover{color:var(--preto);}
+.nav-cta{
+  background:var(--salmon);color:var(--branco) !important;
+  padding:0.55rem 1.4rem;border-radius:100px;
+  font-weight:600 !important;font-size:0.82rem;
+  transition:background 0.2s !important;
+}
+.nav-cta:hover{background:var(--salmon-dark) !important;}
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.nav-burger span{width:22px;height:2px;background:var(--preto);border-radius:2px;transition:0.3s;}
+
+/* ─── HERO (estilo mnmlst: fundo bege, foto central, texto sobreposto) ─── */
+.hero{
+  background:var(--bege-light);
+  min-height:calc(100vh - 68px);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Texto grande esquerda-baixo */
+.hero-text-left{
+  position:absolute;
+  bottom:3rem;left:3rem;
+  z-index:10;
+  max-width:340px;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--salmon);margin-bottom:0.875rem;font-weight:600;
+}
+.hero-eyebrow::before{content:'';width:16px;height:1px;background:var(--salmon);}
+.hero-text-left p.hero-desc{
+  font-size:0.88rem;color:rgba(13,13,11,0.5);line-height:1.7;
+  margin-bottom:1.25rem;font-weight:300;max-width:280px;
+}
+.hero-actions{display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;}
+
+/* Título grande direita */
+.hero-title-right{
+  position:absolute;
+  bottom:3rem;right:3rem;
+  z-index:10;text-align:right;
+}
+.hero-title-right h1{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:clamp(3.5rem,7vw,7.5rem);
+  line-height:0.92;letter-spacing:-0.03em;
+  color:var(--preto);
+}
+.hero-title-right h1 em{font-style:italic;color:var(--salmon);}
+
+/* Redes sociais flutuantes esquerda */
+.hero-socials{
+  position:absolute;
+  left:2.5rem;top:50%;transform:translateY(-50%);
+  z-index:10;
+  display:flex;flex-direction:column;gap:0.75rem;
+}
+.hero-soc{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(13,13,11,0.08);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;transition:background 0.2s;
+}
+.hero-soc:hover{background:var(--salmon);}
+.hero-soc svg{width:15px;height:15px;fill:var(--preto);}
+.hero-soc:hover svg{fill:var(--branco);}
+
+/* Localização direita */
+.hero-location{
+  position:absolute;
+  right:2.5rem;top:50%;transform:translateY(-50%);
+  z-index:10;
+  writing-mode:vertical-rl;text-orientation:mixed;
+  font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(13,13,11,0.35);font-weight:500;
+}
+
+/* Círculo central com foto */
+.hero-center{
+  position:relative;
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero-circle-wrap{
+  position:relative;
+  width:clamp(320px,42vw,580px);
+  aspect-ratio:1;
+}
+.hero-circle-bg{
+  position:absolute;inset:0;border-radius:50%;
+  background:var(--musgo);
+  opacity:0.85;
+}
+.hero-circle-inner{
+  position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0.5rem;
+}
+/* When real photo is added via <img> inside: */
+.hero-circle-inner img{
+  width:100%;height:100%;object-fit:cover;
+  filter:grayscale(100%) contrast(1.05);
+  border-radius:50%;
+}
+.hero-circle-inner .photo-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:0.75rem;
+}
+.hero-circle-inner svg{width:56px;height:56px;opacity:0.18;fill:var(--bege);}
+.hero-circle-inner p{font-size:0.65rem;color:rgba(232,228,217,0.22);letter-spacing:0.12em;text-transform:uppercase;text-align:center;max-width:130px;line-height:1.7;}
+
+/* Pill badges */
+.hero-pill{
+  position:absolute;background:var(--salmon);color:var(--branco);
+  padding:0.5rem 1rem;border-radius:100px;
+  font-size:0.7rem;font-weight:600;letter-spacing:0.04em;white-space:nowrap;
+  z-index:6;
+}
+.hero-pill.tl{top:10%;left:-2%;}
+.hero-pill.br{bottom:12%;right:-3%;}
+
+/* ─── BUTTONS ─── */
+.btn-primary{
+  background:var(--salmon);color:var(--branco);
+  border:none;padding:0.875rem 1.875rem;border-radius:100px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.875rem;
+  cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;
+  transition:transform 0.2s,background 0.2s;letter-spacing:0.01em;
+}
+.btn-primary:hover{transform:translateY(-2px);background:var(--salmon-dark);}
+.btn-outline{
+  border:1px solid rgba(232,228,217,0.2);color:var(--bege);
+  padding:0.875rem 1.875rem;border-radius:100px;
+  font-size:0.875rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;
+  font-weight:400;transition:border-color 0.2s;cursor:pointer;
+}
+.btn-outline:hover{border-color:rgba(232,228,217,0.6);}
+.btn-musgo{
+  background:var(--musgo);color:var(--bege);
+  border:none;padding:0.875rem 1.875rem;border-radius:100px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.875rem;
+  cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;
+  transition:background 0.2s;
+}
+.btn-musgo:hover{background:var(--musgo-mid);}
+
+/* ─── SECTION SHARED ─── */
+.sec-label{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--salmon);margin-bottom:1.25rem;font-weight:600;
+}
+.sec-label::before{content:'';width:20px;height:1px;background:var(--salmon);}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:clamp(2rem,4vw,3.5rem);
+  line-height:1.05;letter-spacing:-0.02em;
+}
+
+/* ─── MANIFESTO STRIP ─── */
+.manifesto{
+  background:var(--bege-light);
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border-bege);
+}
+.manifesto-item{
+  padding:2.75rem 2.5rem;
+  border-right:1px solid var(--border-bege);
+  position:relative;
+}
+.manifesto-item:last-child{border-right:none;}
+.m-num{
+  font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;
+  color:rgba(13,13,11,0.06);line-height:1;margin-bottom:0.75rem;
+}
+.manifesto-item strong{display:block;font-size:0.95rem;font-weight:700;color:var(--preto);margin-bottom:0.5rem;}
+.manifesto-item p{font-size:0.875rem;color:rgba(13,13,11,0.5);line-height:1.6;}
+
+/* ─── SERVICES ─── */
+.services-section{padding:6rem 3rem;}
+.services-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:3rem;gap:2rem;flex-wrap:wrap;}
+.services-list{display:flex;flex-direction:column;gap:0;}
+.service-row{
+  display:flex;align-items:center;gap:1.5rem;
+  padding:1.75rem 2rem;
+  border:1px solid var(--border);border-bottom:none;
+  border-radius:0;
+  cursor:pointer;
+  transition:background 0.2s,border-color 0.2s;
+  text-decoration:none;color:inherit;
+  position:relative;overflow:hidden;
+}
+.service-row:first-child{border-radius:14px 14px 0 0;}
+.service-row:last-child{border-bottom:1px solid var(--border);border-radius:0 0 14px 14px;}
+.service-row:hover{background:rgba(255,255,255,0.04);}
+.service-row.featured{background:var(--musgo);}
+.service-row.featured:hover{background:var(--musgo-mid);}
+.svc-icon{
+  width:48px;height:48px;border-radius:12px;flex-shrink:0;
+  background:rgba(232,228,217,0.07);
+  display:flex;align-items:center;justify-content:center;
+}
+.svc-icon svg{width:22px;height:22px;stroke:var(--bege);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.service-row.featured .svc-icon{background:rgba(232,228,217,0.12);}
+.svc-body{flex:1;}
+.svc-name{font-size:1rem;font-weight:700;color:var(--bege);letter-spacing:0.01em;margin-bottom:0.25rem;}
+.svc-desc{font-size:0.85rem;color:var(--mid);line-height:1.5;}
+.svc-arrow{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(232,228,217,0.08);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background 0.2s,transform 0.2s;
+}
+.service-row:hover .svc-arrow{background:var(--salmon);transform:rotate(45deg);}
+.svc-arrow svg{width:16px;height:16px;stroke:var(--bege);fill:none;stroke-width:2;}
+
+/* ─── SERVICE DETAIL PAGE ─── */
+.svc-detail-hero{
+  padding:5rem 3rem 3rem;
+  background:var(--musgo);
+  position:relative;overflow:hidden;
+}
+.svc-detail-hero::after{
+  content:'';position:absolute;bottom:-80px;right:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(232,228,217,0.04);pointer-events:none;
+}
+.back-btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.8rem;color:rgba(232,228,217,0.5);text-decoration:none;
+  cursor:pointer;margin-bottom:2rem;transition:color 0.2s;
+  border:none;background:none;font-family:inherit;
+}
+.back-btn:hover{color:var(--bege);}
+.back-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+.svc-detail-title{
+  font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;
+  font-size:clamp(2.5rem,5vw,5rem);
+  line-height:0.95;letter-spacing:-0.025em;color:var(--bege);
+  max-width:700px;margin-bottom:1.5rem;
+}
+.svc-detail-sub{color:rgba(232,228,217,0.6);font-size:1rem;line-height:1.75;max-width:560px;font-weight:300;}
+.svc-detail-body{padding:4rem 3rem;}
+.svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-bottom:4rem;}
+.svc-detail-text h3{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:1.75rem;color:var(--bege);margin-bottom:1rem;letter-spacing:-0.015em;
+}
+.svc-detail-text p{color:var(--mid);font-size:0.95rem;line-height:1.75;margin-bottom:1rem;font-weight:300;}
+.svc-includes{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;padding:2rem;}
+.svc-includes h4{font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--salmon);margin-bottom:1.25rem;font-weight:600;}
+.svc-includes ul{list-style:none;display:flex;flex-direction:column;gap:0.7rem;}
+.svc-includes li{
+  display:flex;align-items:center;gap:0.75rem;
+  font-size:0.9rem;color:rgba(232,228,217,0.7);
+}
+.svc-includes li::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--salmon);flex-shrink:0;
+}
+.svc-cta-strip{
+  background:var(--musgo);border-radius:16px;padding:3rem;
+  display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;
+}
+.svc-cta-strip h3{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:2rem;color:var(--bege);letter-spacing:-0.02em;max-width:450px;line-height:1.1;
+}
+
+/* ─── TEAM ─── */
+.team-section{background:var(--bege-light);padding:6rem 3rem;}
+.team-section .sec-label::before{background:var(--salmon);}
+.team-section .sec-label{color:var(--salmon);}
+.team-section .sec-title{color:var(--preto);margin-bottom:3rem;}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.team-card{
+  background:var(--branco);border-radius:16px;overflow:hidden;
+  border:1px solid var(--border-bege);
+  transition:transform 0.25s,box-shadow 0.25s;
+}
+.team-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(13,13,11,0.1);}
+.team-photo{
+  width:100%;aspect-ratio:4/3;background:var(--musgo);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6rem;
+}
+.team-photo-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:rgba(232,228,217,0.12);
+  display:flex;align-items:center;justify-content:center;
+}
+.team-photo-avatar svg{width:32px;height:32px;stroke:rgba(232,228,217,0.3);fill:none;stroke-width:1.5;}
+.team-hint{font-size:0.62rem;color:rgba(232,228,217,0.25);letter-spacing:0.1em;text-transform:uppercase;}
+.team-info{padding:1.25rem 1.5rem 1.5rem;}
+.team-name{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:1.2rem;color:var(--preto);letter-spacing:-0.01em;margin-bottom:0.2rem;
+}
+.team-role{font-size:0.78rem;color:var(--salmon);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;}
+
+/* ─── CASES ─── */
+.cases-section{padding:6rem 3rem;}
+.cases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.case-card{
+  border-radius:16px;overflow:hidden;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  transition:transform 0.25s,border-color 0.25s;cursor:pointer;
+}
+.case-card:hover{transform:translateY(-4px);border-color:rgba(217,123,69,0.35);}
+.case-thumb{
+  width:100%;aspect-ratio:16/9;
+  background:var(--musgo);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.case-thumb-badge{
+  position:absolute;top:12px;left:12px;
+  background:var(--salmon);color:var(--branco);
+  font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+  padding:0.3rem 0.75rem;border-radius:100px;
+}
+.case-thumb svg{width:36px;height:36px;stroke:rgba(232,228,217,0.12);fill:none;stroke-width:1;}
+.case-body{padding:1.5rem;}
+.case-cat{font-size:0.63rem;color:var(--salmon);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.5rem;}
+.case-title{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:1.3rem;color:var(--bege);letter-spacing:-0.01em;line-height:1.2;margin-bottom:0.7rem;
+}
+.case-desc{font-size:0.855rem;color:var(--mid);line-height:1.6;}
+.case-metrics{
+  margin-top:1.25rem;padding-top:1.25rem;
+  border-top:1px solid var(--border);
+  display:flex;gap:1.5rem;
+}
+.case-metric strong{
+  display:block;font-family:'Cormorant Garamond',serif;font-size:1.5rem;
+  font-weight:700;color:var(--salmon);letter-spacing:-0.02em;
+}
+.case-metric span{font-size:0.7rem;color:var(--mid);letter-spacing:0.04em;}
+
+/* ─── SOBRE NÓS ─── */
+.sobre-section{padding:6rem 3rem;background:var(--preto);}
+.sobre-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-bottom:5rem;}
+.sobre-text .sec-title{color:var(--bege);margin-bottom:1.5rem;}
+.sobre-text p{color:var(--mid);font-size:0.95rem;line-height:1.8;font-weight:300;margin-bottom:1rem;}
+.sobre-photo{
+  aspect-ratio:4/3;border-radius:20px;
+  background:var(--musgo);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.75rem;
+}
+.sobre-photo svg{width:48px;height:48px;stroke:rgba(232,228,217,0.15);fill:none;stroke-width:1;}
+.sobre-photo p{font-size:0.65rem;color:rgba(232,228,217,0.2);letter-spacing:0.1em;text-transform:uppercase;}
+.mvv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.mvv-card{
+  padding:2rem;border:1px solid var(--border);border-radius:14px;
+  background:rgba(255,255,255,0.02);
+}
+.mvv-card h4{
+  font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--salmon);margin-bottom:0.75rem;font-weight:600;
+}
+.mvv-card p{font-size:0.875rem;color:var(--mid);line-height:1.7;font-weight:300;}
+
+/* ─── DEPOIMENTOS ─── */
+.depo-section{background:var(--musgo);padding:6rem 3rem;}
+.depo-section .sec-label::before{background:rgba(232,228,217,0.3);}
+.depo-section .sec-label{color:rgba(232,228,217,0.5);}
+.depo-section .sec-title{color:var(--bege);margin-bottom:3rem;}
+.depo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+.depo-card{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(232,228,217,0.08);
+  border-radius:16px;padding:2rem;
+}
+.depo-stars{display:flex;gap:4px;margin-bottom:1rem;}
+.depo-stars span{font-size:14px;color:var(--salmon);}
+.depo-text{font-size:0.9rem;color:rgba(232,228,217,0.75);line-height:1.7;margin-bottom:1.5rem;font-style:italic;font-weight:300;}
+.depo-author{display:flex;align-items:center;gap:0.875rem;}
+.depo-avatar{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:rgba(232,228,217,0.1);
+  display:flex;align-items:center;justify-content:center;
+}
+.depo-avatar svg{width:18px;height:18px;stroke:rgba(232,228,217,0.3);fill:none;stroke-width:1.5;}
+.depo-author-name{font-size:0.875rem;font-weight:600;color:var(--bege);}
+.depo-author-role{font-size:0.75rem;color:rgba(232,228,217,0.4);}
+
+/* ─── CONTACT ─── */
+.contact-section{background:var(--preto);padding:6rem 3rem;}
+.contact-wrapper{
+  display:grid;grid-template-columns:1fr 1.4fr;gap:5rem;align-items:start;margin-top:3rem;
+}
+.contact-left h3{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:clamp(1.6rem,3vw,2.5rem);color:var(--bege);
+  letter-spacing:-0.02em;margin-bottom:2rem;line-height:1.15;
+}
+.cinfo{display:flex;align-items:flex-start;gap:0.875rem;margin-bottom:1.375rem;}
+.cinfo-icon{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:var(--musgo);display:flex;align-items:center;justify-content:center;
+}
+.cinfo-icon svg{width:17px;height:17px;stroke:var(--bege);fill:none;stroke-width:1.75;}
+.cinfo strong{display:block;font-size:0.8rem;font-weight:600;color:var(--bege);margin-bottom:0.2rem;}
+.cinfo p,.cinfo a{font-size:0.875rem;color:var(--mid);text-decoration:none;line-height:1.5;}
+.cinfo a:hover{color:var(--salmon);}
+
+/* Form card */
+.form-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:20px;padding:2.5rem;
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.fg{display:flex;flex-direction:column;gap:0.375rem;margin-bottom:1rem;}
+.fg label{font-size:0.7rem;font-weight:700;color:rgba(232,228,217,0.45);letter-spacing:0.12em;text-transform:uppercase;}
+.fg input,.fg textarea,.fg select{
+  padding:0.875rem 1.1rem;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(232,228,217,0.1);
+  border-radius:10px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;
+  color:var(--bege);outline:none;transition:border-color 0.2s;
+}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(232,228,217,0.2);}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--salmon);}
+.fg select option{background:#1a1a0f;color:var(--bege);}
+.fg textarea{resize:vertical;min-height:130px;line-height:1.6;}
+.form-submit{
+  background:var(--musgo);color:var(--bege);
+  border:none;padding:1rem 2rem;border-radius:100px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.9rem;
+  cursor:pointer;transition:background 0.2s,transform 0.2s;
+  display:inline-flex;align-items:center;gap:0.5rem;letter-spacing:0.01em;
+  margin-top:0.5rem;
+}
+.form-submit:hover{background:var(--musgo-mid);transform:translateY(-2px);}
+.form-success{
+  display:none;background:rgba(58,61,28,0.5);color:var(--bege);
+  padding:1.25rem 1.5rem;border-radius:12px;font-size:0.9rem;line-height:1.6;
+  border:1px solid rgba(58,61,28,0.5);margin-top:1rem;
+}
+.form-success.show{display:block;}
+
+/* ─── FOOTER ─── */
+footer{background:var(--preto);border-top:1px solid var(--border);padding:4rem 3rem 2rem;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:3rem;margin-bottom:3rem;}
+.footer-brand-logo{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:1.8rem;color:var(--bege);letter-spacing:-0.01em;margin-bottom:0.875rem;
+}
+.footer-brand-logo span{color:var(--salmon);}
+.footer-brand p{font-size:0.875rem;color:var(--mid);line-height:1.7;max-width:280px;margin-bottom:1.5rem;font-weight:300;}
+.footer-socials{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.fsoc{
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(232,228,217,0.06);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;transition:background 0.2s;
+}
+.fsoc:hover{background:var(--salmon);}
+.fsoc svg{width:14px;height:14px;fill:var(--bege);}
+.footer-col h4{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(232,228,217,0.3);font-weight:600;margin-bottom:1.25rem;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:0.65rem;}
+.footer-col ul li a{color:var(--mid);text-decoration:none;font-size:0.875rem;transition:color 0.2s;cursor:pointer;}
+.footer-col ul li a:hover{color:var(--bege);}
+.footer-newsletter input{
+  width:100%;padding:0.875rem 1rem;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(232,228,217,0.1);
+  border-radius:10px;color:var(--bege);font-family:inherit;font-size:0.875rem;
+  outline:none;margin-bottom:0.75rem;
+}
+.footer-newsletter input::placeholder{color:rgba(232,228,217,0.2);}
+.footer-newsletter input:focus{border-color:var(--salmon);}
+.footer-bottom{
+  border-top:1px solid var(--border);padding-top:2rem;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.footer-bottom p{font-size:0.75rem;color:rgba(232,228,217,0.2);}
+.footer-bottom-links{display:flex;gap:1.5rem;}
+.footer-bottom-links a{font-size:0.75rem;color:rgba(232,228,217,0.2);text-decoration:none;transition:color 0.2s;}
+.footer-bottom-links a:hover{color:rgba(232,228,217,0.5);}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){
+  .hero{grid-template-columns:1fr;min-height:auto;padding:4rem 2rem 3rem;}
+  .hero-right{display:none;}
+  .manifesto{grid-template-columns:1fr;}
+  .sobre-grid,.contact-wrapper{grid-template-columns:1fr;gap:3rem;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .team-grid{grid-template-columns:repeat(2,1fr);}
+  .cases-grid{grid-template-columns:1fr 1fr;}
+  .depo-grid{grid-template-columns:1fr 1fr;}
+  .mvv-grid{grid-template-columns:1fr;}
+  nav{padding:0 1.5rem;}
+  .nav-links{display:none;}
+  .nav-burger{display:flex;}
+  .svc-detail-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  nav,.hero,.services-section,.team-section,.cases-section,.sobre-section,.depo-section,.contact-section,footer{padding-left:1.25rem;padding-right:1.25rem;}
+  .svc-detail-hero,.svc-detail-body{padding-left:1.25rem;padding-right:1.25rem;}
+  .team-grid,.depo-grid,.footer-top{grid-template-columns:1fr;}
+  .cases-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .manifesto-item{border-right:none;border-bottom:1px solid var(--border-bege);}
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.hero-eyebrow{animation:fadeUp 0.6s ease both;}
+.hero h1{animation:fadeUp 0.6s 0.1s ease both;}
+.hero-desc{animation:fadeUp 0.6s 0.2s ease both;}
+.hero-actions{animation:fadeUp 0.6s 0.3s ease both;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- EM BREVE — remova este bloco para publicar -->
+<!-- ══════════════════════════════════════════ -->
+<style>
+#coming-soon{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--preto);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem;
+  overflow-y:auto;
+}
+#coming-soon::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%,rgba(58,61,28,0.6) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 35% at 85% 100%,rgba(217,123,69,0.1) 0%,transparent 60%);
+  pointer-events:none;
+}
+.cs-inner{
+  position:relative;z-index:1;
+  max-width:560px;width:100%;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+}
+.cs-logo{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:2.5rem;letter-spacing:-0.02em;color:var(--bege);
+  margin-bottom:2.5rem;line-height:1;
+}
+.cs-logo span{color:var(--salmon);}
+.cs-tag{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--salmon);font-weight:600;margin-bottom:1.5rem;
+}
+.cs-tag::before,.cs-tag::after{content:'';width:16px;height:1px;background:var(--salmon);}
+.cs-title{
+  font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;
+  font-size:clamp(2.5rem,7vw,5rem);
+  line-height:0.95;letter-spacing:-0.03em;
+  color:var(--bege);margin-bottom:1.75rem;
+}
+.cs-title em{font-style:normal;color:var(--salmon);}
+.cs-desc{
+  font-size:0.95rem;color:rgba(232,228,217,0.5);
+  line-height:1.75;max-width:440px;margin-bottom:2.5rem;font-weight:300;
+}
+.cs-divider{
+  width:48px;height:1px;background:rgba(232,228,217,0.1);
+  margin-bottom:2rem;
+}
+.cs-channels-label{
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(232,228,217,0.25);font-weight:600;margin-bottom:1rem;
+}
+.cs-channels{
+  width:100%;display:flex;flex-direction:column;gap:0.65rem;
+  margin-bottom:2rem;
+}
+.cs-channel{
+  display:flex;align-items:center;gap:1rem;
+  padding:0.875rem 1.25rem;border-radius:14px;
+  border:1px solid rgba(232,228,217,0.08);
+  background:rgba(255,255,255,0.03);
+  text-decoration:none;color:var(--bege);
+  transition:background 0.2s,border-color 0.2s,transform 0.2s;
+}
+.cs-channel:hover{background:rgba(255,255,255,0.07);border-color:rgba(232,228,217,0.18);transform:translateY(-2px);}
+.cs-channel.highlight{background:rgba(58,61,28,0.45);border-color:rgba(58,61,28,0.7);}
+.cs-channel.highlight:hover{background:rgba(58,61,28,0.65);}
+.cs-ch-icon{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  background:rgba(232,228,217,0.07);
+  display:flex;align-items:center;justify-content:center;
+}
+.cs-channel.highlight .cs-ch-icon{background:rgba(232,228,217,0.1);}
+.cs-ch-icon svg{width:18px;height:18px;fill:var(--bege);}
+.cs-ch-text{flex:1;text-align:left;}
+.cs-ch-text strong{display:block;font-size:0.875rem;font-weight:600;color:var(--bege);}
+.cs-ch-text span{font-size:0.75rem;color:rgba(232,228,217,0.38);font-weight:300;}
+.cs-ch-arr{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(232,228,217,0.06);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background 0.2s,transform 0.2s;
+}
+.cs-channel:hover .cs-ch-arr{background:var(--salmon);transform:rotate(45deg);}
+.cs-ch-arr svg{width:12px;height:12px;stroke:var(--bege);fill:none;stroke-width:2.5;}
+.cs-socials{display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:2rem;}
+.cs-soc{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(232,228,217,0.06);border:1px solid rgba(232,228,217,0.08);
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;transition:background 0.2s,transform 0.2s;
+}
+.cs-soc:hover{background:var(--salmon);transform:translateY(-2px);}
+.cs-soc svg{width:15px;height:15px;fill:var(--bege);}
+.cs-footer{font-size:0.68rem;color:rgba(232,228,217,0.15);letter-spacing:0.04em;}
+@keyframes csFadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.cs-inner>*{animation:csFadeUp 0.6s ease both;}
+.cs-logo{animation-delay:0s;}
+.cs-tag{animation-delay:0.07s;}
+.cs-title{animation-delay:0.12s;}
+.cs-desc{animation-delay:0.18s;}
+.cs-divider{animation-delay:0.22s;}
+.cs-channels-label{animation-delay:0.25s;}
+.cs-channels{animation-delay:0.28s;}
+.cs-socials{animation-delay:0.33s;}
+.cs-footer{animation-delay:0.37s;}
+</style>
+
+<div id="coming-soon">
+  <div class="cs-inner">
+
+    <div class="cs-logo">LANÇA<span>+</span></div>
+
+    <p class="cs-tag">Em breve</p>
+
+    <h1 class="cs-title">Nosso site<br>oficial está<br><em>chegando.</em></h1>
+
+    <p class="cs-desc">
+      Enquanto finalizamos nosso novo site, entre em contato com a nossa equipe pelos canais abaixo e solicite um orçamento para o seu negócio.<br><br>
+      Será um prazer atender você e desenvolver uma solução estratégica para a sua marca.
+    </p>
+
+    <div class="cs-divider"></div>
+    <p class="cs-channels-label">Fale com nossa equipe</p>
+
+    <div class="cs-channels">
+      <a href="https://wa.me/5583991060069" class="cs-channel highlight" target="_blank" rel="noopener">
+        <div class="cs-ch-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+        <div class="cs-ch-text"><strong>WhatsApp Comercial</strong><span>(83) 99106-069 — Resposta rápida</span></div>
+        <div class="cs-ch-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+      <a href="/cdn-cgi/l/email-protection#71121e1f0510051e311d101f12101c1018025f121e1c" class="cs-channel" target="_blank" rel="noopener">
+        <div class="cs-ch-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="cs-ch-text"><strong>E-mail</strong><span><span class="__cf_email__" data-cfemail="bad9d5d4cedbced5fad6dbd4d9dbd7dbd3c994d9d5d7">[email&#160;protected]</span></span></div>
+        <div class="cs-ch-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+      <a href="https://instagram.com/lanca.mais" class="cs-channel" target="_blank" rel="noopener">
+        <div class="cs-ch-icon"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></div>
+        <div class="cs-ch-text"><strong>Instagram</strong><span>@lanca.mais</span></div>
+        <div class="cs-ch-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+    </div>
+
+    <div class="cs-socials">
+      <a href="https://instagram.com/lanca.mais" class="cs-soc" title="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+      <a href="https://tiktok.com/@lanca.mais" class="cs-soc" title="TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+      <a href="https://youtube.com/@lancamais" class="cs-soc" title="YouTube" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+      <a href="https://facebook.com/lancamais" class="cs-soc" title="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+      <a href="https://linkedin.com/company/lancamais" class="cs-soc" title="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+      <a href="https://pinterest.com/lancamais" class="cs-soc" title="Pinterest" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg></a>
+    </div>
+
+    <p class="cs-footer">© 2025 LANÇA+ — CNPJ 65.709.672/0001-96 — Cajazeiras/PB</p>
+
+  </div>
+</div>
+<!-- ══ FIM DO BLOCO EM BREVE ══ -->
+
+<!-- NAV (always visible) -->
+<nav id="mainNav">
+  <div class="nav-logo" onclick="showPage('home')">LANÇA<span>+</span></div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home');scrollTo('#services')">Serviços</a></li>
+    <li><a onclick="showPage('home');scrollTo('#sobre')">Sobre nós</a></li>
+    <li><a onclick="showPage('home');scrollTo('#cases')">Cases</a></li>
+    <li><a onclick="showPage('home');scrollTo('#depoimentos')">Depoimentos</a></li>
+    <li><a onclick="showPage('links')" style="display:inline-flex;align-items:center;gap:0.35rem;">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      Links
+    </a></li>
+    <li><a onclick="showPage('home');scrollTo('#contact')" class="nav-cta">Falar com a gente</a></li>
+  </ul>
+  <div class="nav-burger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- HOME PAGE -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <!-- Redes sociais flutuantes esquerda -->
+    <div class="hero-socials">
+      <a href="https://wa.me/5583991060069" class="hero-soc" title="WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </a>
+      <a href="https://instagram.com/lanca.mais" class="hero-soc" title="Instagram">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+      <a href="https://facebook.com/lancamais" class="hero-soc" title="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://tiktok.com/@lanca.mais" class="hero-soc" title="TikTok">
+        <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+      </a>
+    </div>
+
+    <!-- Localização direita vertical -->
+    <div class="hero-location">Cajazeiras / PB &nbsp;—&nbsp; @lanca.mais</div>
+
+    <!-- Círculo central com foto do time -->
+    <div class="hero-center">
+      <div class="hero-circle-wrap">
+        <div class="hero-circle-bg"></div>
+        <div class="hero-circle-inner">
+          <!-- SUBSTITUA A TAG ABAIXO pela foto real do time quando disponível: -->
+          <!-- <img src="sua-foto-do-time.jpg" alt="Time LANÇA+"> -->
+          <div class="photo-placeholder">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <p>Foto do time<br>aqui</p>
+          </div>
+        </div>
+        <div class="hero-pill tl">Agência de Resultado</div>
+        <div class="hero-pill br">Cajazeiras / PB</div>
+      </div>
+    </div>
+
+    <!-- Texto inferior esquerdo -->
+    <div class="hero-text-left">
+      <p class="hero-eyebrow">@lanca.mais — Marketing Estratégico</p>
+      <p class="hero-desc">Mais do que criar, lançamos marcas, vozes e narrativas com atitude e propósito.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" onclick="scrollTo('#contact')" style="background:var(--musgo);color:var(--bege);">Quero decolar ↗</a>
+      </div>
+    </div>
+
+    <!-- Título grande inferior direito -->
+    <div class="hero-title-right">
+      <h1>somos<br>movimento.<br>somos <em>lança.</em></h1>
+    </div>
+
+  </section>
+
+  <!-- MANIFESTO -->
+  <div class="manifesto">
+    <div class="manifesto-item">
+      <div class="m-num">01</div>
+      <strong>Não somos agência de promessas</strong>
+      <p>Somos agência de entrega. Cada projeto tem começo, meio e resultado mensurável.</p>
+    </div>
+    <div class="manifesto-item">
+      <div class="m-num">02</div>
+      <strong>Não seguimos tendências</strong>
+      <p>Lançamos elas. Vivemos entre o estratégico e o criativo, entre o dado e o design.</p>
+    </div>
+    <div class="manifesto-item">
+      <div class="m-num">03</div>
+      <strong>Não postamos por postar</strong>
+      <p>Criamos com intenção. Mais conteúdo com propósito. Mais tráfego com retorno.</p>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section class="services-section" id="services">
+    <div class="services-header">
+      <div>
+        <p class="sec-label">O que fazemos</p>
+        <h2 class="sec-title" style="color:var(--bege)">Soluções completas para<br>marcas que querem mais.</h2>
+      </div>
+    </div>
+    <div class="services-list">
+
+      <div class="service-row featured" onclick="showServicePage('estrategia')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Estratégia</p>
+          <p class="svc-desc">Planejamento estratégico com foco em posicionamento, crescimento e resultado real.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('audiovisual')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Audiovisual</p>
+          <p class="svc-desc">Produção de vídeos, reels e conteúdo audiovisual que conecta e converte.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('fotografia')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Fotografia</p>
+          <p class="svc-desc">Ensaios fotográficos de produto, equipe e identidade visual para sua marca.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('socialmedia')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Social Media</p>
+          <p class="svc-desc">Gestão completa das suas redes sociais com estratégia, criação e análise de dados.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('design')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Designer Gráfico</p>
+          <p class="svc-desc">Criação de peças gráficas, materiais digitais e impressos com identidade e propósito.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('branding')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Identidade Visual & Branding</p>
+          <p class="svc-desc">Construção da identidade da sua marca do zero: logo, paleta, tipografia e guia de marca.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('assessoria')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Assessoria de Marketing</p>
+          <p class="svc-desc">Consultoria estratégica contínua para empresas que precisam de um time de marketing completo.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+      <div class="service-row" onclick="showServicePage('gestao')">
+        <div class="svc-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="svc-body">
+          <p class="svc-name">Gestão Empresarial & Pessoal</p>
+          <p class="svc-desc">Estruturação de processos, metas e crescimento para empresas e profissionais.</p>
+        </div>
+        <div class="svc-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SOBRE NÓS -->
+  <section class="sobre-section" id="sobre">
+    <div class="sobre-grid">
+      <div class="sobre-text">
+        <p class="sec-label">Quem somos</p>
+        <h2 class="sec-title">Mais do que uma agência.<br>Somos seu time.</h2>
+        <p style="margin-top:1.5rem">Nascemos para romper padrões, provocar conexões e entregar presença digital de verdade. Somos movimento. Somos ideia em ação.</p>
+        <p>Vivemos entre o estratégico e o criativo. Entre o dado e o design. Acreditamos que uma boa ideia só vale se causar impacto, gerar resultado e marcar território.</p>
+        <p>LANÇA+ é uma agência de marketing estratégico para marcas que querem mais do que presença: querem impacto.</p>
+        <div style="margin-top:2rem">
+          <a class="btn-outline" onclick="scrollTo('#contact')">Falar com a gente</a>
+        </div>
+      </div>
+      <div class="sobre-photo">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <p>Foto da equipe aqui</p>
+      </div>
+    </div>
+    <div class="mvv-grid">
+      <div class="mvv-card">
+        <h4>Missão</h4>
+        <p>Integrar marketing digital e criatividade com estratégias de impacto, entregando resultados reais para marcas que querem crescer com autenticidade.</p>
+      </div>
+      <div class="mvv-card">
+        <h4>Visão</h4>
+        <p>Ser referência em marketing estratégico no Nordeste, reconhecida pela entrega, criatividade e resultados concretos que transformam marcas em movimentos.</p>
+      </div>
+      <div class="mvv-card">
+        <h4>Valores</h4>
+        <p>Criatividade com propósito. Entrega com responsabilidade. Transparência, inovação, colaboração e foco total no sucesso do cliente.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="team-section" id="team">
+    <p class="sec-label">Nosso time</p>
+    <h2 class="sec-title">As pessoas por trás<br>da LANÇA+</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-photo"><div class="team-photo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><p class="team-hint">Foto aqui</p></div>
+        <div class="team-info"><p class="team-name">Nome do Membro 1</p><p class="team-role">Função / Cargo</p></div>
+      </div>
+      <div class="team-card">
+        <div class="team-photo" style="background:var(--musgo-mid)"><div class="team-photo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><p class="team-hint">Foto aqui</p></div>
+        <div class="team-info"><p class="team-name">Nome do Membro 2</p><p class="team-role">Função / Cargo</p></div>
+      </div>
+      <div class="team-card">
+        <div class="team-photo"><div class="team-photo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><p class="team-hint">Foto aqui</p></div>
+        <div class="team-info"><p class="team-name">Nome do Membro 3</p><p class="team-role">Função / Cargo</p></div>
+      </div>
+      <div class="team-card">
+        <div class="team-photo" style="background:var(--musgo-mid)"><div class="team-photo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><p class="team-hint">Foto aqui</p></div>
+        <div class="team-info"><p class="team-name">Nome do Membro 4</p><p class="team-role">Função / Cargo</p></div>
+      </div>
+      <div class="team-card">
+        <div class="team-photo"><div class="team-photo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><p class="team-hint">Foto aqui</p></div>
+        <div class="team-info"><p class="team-name">Nome do Membro 5</p><p class="team-role">Função / Cargo</p></div>
+      </div>
+      <div class="team-card">
+        <div class="team-photo" style="background:var(--musgo-mid)"><div class="team-photo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div><p class="team-hint">Foto aqui</p></div>
+        <div class="team-info"><p class="team-name">Nome do Membro 6</p><p class="team-role">Função / Cargo</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASES -->
+  <section class="cases-section" id="cases">
+    <p class="sec-label">Resultados reais</p>
+    <h2 class="sec-title" style="color:var(--bege)">Cases de sucesso</h2>
+    <div class="cases-grid">
+      <div class="case-card">
+        <div class="case-thumb"><div class="case-thumb-badge">Branding</div><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="case-body">
+          <p class="case-cat">Identidade Visual</p>
+          <h3 class="case-title">Nome do Cliente 1</h3>
+          <p class="case-desc">Breve descrição do case: o desafio, a solução aplicada e o impacto gerado.</p>
+          <div class="case-metrics">
+            <div class="case-metric"><strong>+200%</strong><span>Engajamento</span></div>
+            <div class="case-metric"><strong>3x</strong><span>Crescimento</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-thumb" style="background:#5a3520"><div class="case-thumb-badge" style="background:var(--musgo)">Social Media</div><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="case-body">
+          <p class="case-cat">Gestão de Redes Sociais</p>
+          <h3 class="case-title">Nome do Cliente 2</h3>
+          <p class="case-desc">Breve descrição do case: o desafio, a solução aplicada e o impacto gerado.</p>
+          <div class="case-metrics">
+            <div class="case-metric"><strong>10k</strong><span>Seguidores</span></div>
+            <div class="case-metric"><strong>150%</strong><span>Alcance</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-thumb" style="background:#1c2a1c"><div class="case-thumb-badge">Tráfego Pago</div><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="case-body">
+          <p class="case-cat">Assessoria de Marketing</p>
+          <h3 class="case-title">Nome do Cliente 3</h3>
+          <p class="case-desc">Breve descrição do case: o desafio, a solução aplicada e o impacto gerado.</p>
+          <div class="case-metrics">
+            <div class="case-metric"><strong>4x</strong><span>ROI</span></div>
+            <div class="case-metric"><strong>−30%</strong><span>Custo/Lead</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section class="depo-section" id="depoimentos">
+    <p class="sec-label">O que dizem de nós</p>
+    <h2 class="sec-title">Clientes que decolaram.</h2>
+    <div class="depo-grid" style="margin-top:3rem">
+      <div class="depo-card">
+        <div class="depo-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="depo-text">"A LANÇA+ transformou completamente a presença digital da nossa marca. Entregaram além do que prometeram e com uma velocidade incrível."</p>
+        <div class="depo-author">
+          <div class="depo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div>
+          <div><p class="depo-author-name">Nome do Cliente</p><p class="depo-author-role">CEO, Empresa XYZ</p></div>
+        </div>
+      </div>
+      <div class="depo-card">
+        <div class="depo-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="depo-text">"Profissionalismo e criatividade em dose dupla. Em 3 meses triplicamos nosso engajamento e as vendas pelo Instagram explodiram."</p>
+        <div class="depo-author">
+          <div class="depo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div>
+          <div><p class="depo-author-name">Nome do Cliente</p><p class="depo-author-role">Fundador, Empresa ABC</p></div>
+        </div>
+      </div>
+      <div class="depo-card">
+        <div class="depo-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+        <p class="depo-text">"Finalmente uma agência que entende que resultado é o que importa. O branding que criaram para nós é simplesmente perfeito."</p>
+        <div class="depo-author">
+          <div class="depo-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div>
+          <div><p class="depo-author-name">Nome do Cliente</p><p class="depo-author-role">Diretora, Empresa 123</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contact">
+    <p class="sec-label">Fale conosco</p>
+    <h2 class="sec-title" style="color:var(--bege)">Pronto para decolar?</h2>
+    <div class="contact-wrapper">
+      <div class="contact-left">
+        <h3>Vamos construir<br>algo incrível juntos.</h3>
+        <div class="cinfo">
+          <div class="cinfo-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.1 1.24 2 2 0 012.1 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div><strong>WhatsApp Comercial</strong><a href="https://wa.me/5583991060069">(83) 99106-069</a></div>
+        </div>
+        <div class="cinfo">
+          <div class="cinfo-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div><strong>E-mail</strong><a href="/cdn-cgi/l/email-protection#a2c1cdccd6c3d6cde2cec3ccc1c3cfc3cbd18cc1cdcf"><span class="__cf_email__" data-cfemail="a6c5c9c8d2c7d2c9e6cac7c8c5c7cbc7cfd588c5c9cb">[email&#160;protected]</span></a></div>
+        </div>
+        <div class="cinfo">
+          <div class="cinfo-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><strong>Endereço</strong><p>Rua Epifânio Sobreira, 74, Centro<br>Cajazeiras/PB — Ao lado da Leia Livraria<br>Prédio de segundo andar</p></div>
+        </div>
+        <div class="cinfo">
+          <div class="cinfo-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><path d="M7 2v20M2 12h20"/></svg></div>
+          <div><strong>CNPJ</strong><p>65.709.672/0001-96</p></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-row">
+          <div class="fg"><label>Primeiro nome*</label><input type="text" id="fn" placeholder="Digite seu primeiro nome"></div>
+          <div class="fg"><label>Sobrenome*</label><input type="text" id="sn" placeholder="Digite seu sobrenome"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>E-mail*</label><input type="email" id="fe" placeholder="Digite seu e-mail"></div>
+          <div class="fg"><label>Telefone*</label><input type="tel" id="ft" placeholder="(83) 99999-9999"></div>
+        </div>
+        <div class="fg"><label>Empresa / Marca</label><input type="text" id="fc" placeholder="Nome da sua empresa ou marca"></div>
+        <div class="fg">
+          <label>Serviço de interesse</label>
+          <select id="fs">
+            <option value="">Selecione um serviço</option>
+            <option>Estratégia</option><option>Audiovisual</option><option>Fotografia</option>
+            <option>Social Media</option><option>Designer Gráfico</option>
+            <option>Identidade Visual & Branding</option><option>Assessoria de Marketing</option>
+            <option>Gestão Empresarial & Pessoal</option><option>Pacote completo</option>
+          </select>
+        </div>
+        <div class="fg"><label>Mensagem*</label><textarea id="fm" placeholder="Conta um pouco sobre sua marca e o que você precisa..."></textarea></div>
+        <button class="form-submit" onclick="submitForm()">Enviar ↗</button>
+        <div class="form-success" id="fs-ok">Mensagem enviada! Nossa equipe entrará em contato em breve via WhatsApp ou e-mail.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand-logo">LANÇA<span>+</span></div>
+        <p>Agência de marketing estratégico para marcas que querem mais do que presença: querem impacto.</p>
+        <div class="footer-socials">
+          <a href="https://wa.me/5583991060069" class="fsoc" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="https://instagram.com/lanca.mais" class="fsoc" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          <a href="https://facebook.com/lancamais" class="fsoc" title="Facebook"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+          <a href="https://tiktok.com/@lanca.mais" class="fsoc" title="TikTok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+          <a href="https://youtube.com/@lancamais" class="fsoc" title="YouTube"><svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+          <a href="https://pinterest.com/lancamais" class="fsoc" title="Pinterest"><svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg></a>
+          <a href="https://linkedin.com/company/lancamais" class="fsoc" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Serviços</h4>
+        <ul>
+          <li><a onclick="showServicePage('estrategia')">Estratégia</a></li>
+          <li><a onclick="showServicePage('audiovisual')">Audiovisual</a></li>
+          <li><a onclick="showServicePage('socialmedia')">Social Media</a></li>
+          <li><a onclick="showServicePage('branding')">Branding</a></li>
+          <li><a onclick="showServicePage('fotografia')">Fotografia</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Empresa</h4>
+        <ul>
+          <li><a onclick="scrollTo('#sobre')">Sobre nós</a></li>
+          <li><a onclick="scrollTo('#team')">Equipe</a></li>
+          <li><a onclick="scrollTo('#cases')">Cases</a></li>
+          <li><a onclick="scrollTo('#depoimentos')">Depoimentos</a></li>
+          <li><a onclick="scrollTo('#contact')">Contato</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Receba ideias que geram resultado.</h4>
+        <div class="footer-newsletter">
+          <input type="email" id="nl-email" placeholder="Preencha seu e-mail">
+          <button class="btn-musgo" style="width:100%;justify-content:center;" onclick="subscribeNewsletter()">Enviar ↗</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 LANÇA+ — Todos os direitos reservados. CNPJ: 65.709.672/0001-96 — Cajazeiras/PB</p>
+      <div class="footer-bottom-links">
+        <a href="#">Política de privacidade</a>
+        <a href="#">Termos de uso</a>
+      </div>
+    </div>
+  </footer>
+</div><!-- /page-home -->
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SERVICE DETAIL PAGES -->
+<!-- ══════════════════════════════════════════ -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+var serviceData = {
+  estrategia:{
+    title:"Estratégia",
+    sub:"Planejamento estratégico com foco em posicionamento, crescimento e resultado real para sua marca.",
+    about:"Desenvolvemos um plano estratégico completo baseado no seu negócio, mercado e objetivos. Nada genérico — tudo pensado especificamente para onde você quer chegar.",
+    includes:["Diagnóstico e análise de mercado","Definição de posicionamento","Plano de marketing 360°","Funil de vendas estruturado","KPIs e metas mensuráveis","Reuniões mensais de performance"]
+  },
+  audiovisual:{
+    title:"Audiovisual",
+    sub:"Produção de vídeos, reels e conteúdo audiovisual que conecta, engaja e converte.",
+    about:"Do roteiro à edição, produzimos conteúdo audiovisual que captura a essência da sua marca e comunica com impacto. Vídeos institucionais, reels, stories e muito mais.",
+    includes:["Roteiro e storyboard","Produção e direção","Edição profissional","Legendas e motion","Adaptação para todas as plataformas","Entrega em múltiplos formatos"]
+  },
+  fotografia:{
+    title:"Fotografia",
+    sub:"Ensaios fotográficos de produto, equipe e identidade visual com alma e propósito.",
+    about:"A fotografia certa transforma a percepção da sua marca. Capturamos a essência do seu negócio em imagens que vendem, inspiram e constroem autoridade.",
+    includes:["Planejamento do ensaio","Direção de arte","Fotografia de produto","Fotografia corporativa/equipe","Tratamento e edição profissional","Entrega em alta resolução"]
+  },
+  socialmedia:{
+    title:"Social Media",
+    sub:"Gestão completa das suas redes sociais com estratégia, criação e análise de dados.",
+    about:"Gerenciamos suas redes sociais de ponta a ponta: planejamento, criação de conteúdo, publicação, interação com a audiência e relatórios de resultado. Sem achismos.",
+    includes:["Planejamento editorial mensal","Criação de conteúdo (design + copy)","Gestão de Instagram, Facebook e TikTok","Interação e gestão de comentários","Relatório mensal de performance","Estratégia de hashtags e SEO social"]
+  },
+  design:{
+    title:"Designer Gráfico",
+    sub:"Criação de peças gráficas, materiais digitais e impressos com identidade e propósito.",
+    about:"Design com intenção. Criamos peças gráficas para redes sociais, campanhas, materiais impressos e digitais que comunicam a essência da sua marca com clareza e estilo.",
+    includes:["Posts e stories para redes sociais","Banners e peças para campanhas","Materiais impressos (folders, cartões)","Apresentações institucionais","Artes para eventos","Adaptações e variações de campanha"]
+  },
+  branding:{
+    title:"Identidade Visual & Branding",
+    sub:"Construção da identidade da sua marca do zero com alma, consistência e visão de futuro.",
+    about:"Marca forte começa com identidade forte. Desenvolvemos o DNA visual completo da sua empresa: logo, paleta, tipografia, guia de marca e todos os elementos que tornam sua marca inconfundível.",
+    includes:["Pesquisa e estratégia de marca","Criação de logotipo","Paleta de cores e tipografia","Manual de identidade visual","Aplicações (cartão, papel, digital)","Guia de uso da marca"]
+  },
+  assessoria:{
+    title:"Assessoria de Marketing",
+    sub:"Consultoria estratégica contínua para empresas que precisam de um time de marketing completo.",
+    about:"Para marcas que precisam de presença estratégica constante sem montar um time interno. Atuamos como seu departamento de marketing, integrando todas as frentes.",
+    includes:["Planejamento estratégico contínuo","Acompanhamento semanal","Gestão de fornecedores","Coordenação de campanhas","Relatórios e análise de dados","Reuniões de alinhamento e resultados"]
+  },
+  gestao:{
+    title:"Gestão Empresarial & Pessoal",
+    sub:"Estruturação de processos, metas e crescimento para empresas e profissionais.",
+    about:"Ajudamos empresários e profissionais a organizarem sua visão, seus processos e suas metas para crescer com consistência. Do planejamento à execução.",
+    includes:["Definição de metas e OKRs","Estruturação de processos internos","Planejamento estratégico empresarial","Gestão de tempo e produtividade","Mentoria e acompanhamento","Ferramentas e metodologias ágeis"]
+  }
+};
+</script>
+
+<!-- Service detail template (rendered dynamically) -->
+<div class="page" id="page-service">
+  <div class="svc-detail-hero" id="svc-hero">
+    <button class="back-btn" onclick="showPage('home')">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+      Voltar aos serviços
+    </button>
+    <h1 class="svc-detail-title" id="svc-title">–</h1>
+    <p class="svc-detail-sub" id="svc-sub">–</p>
+  </div>
+  <div class="svc-detail-body">
+    <div class="svc-detail-grid">
+      <div class="svc-detail-text">
+        <h3>O que fazemos</h3>
+        <p id="svc-about">–</p>
+        <p>Na LANÇA+, não entregamos soluções genéricas. Cada estratégia é desenvolvida com foco total no seu negócio, seu público e seus objetivos.</p>
+      </div>
+      <div class="svc-includes">
+        <h4>O que está incluído</h4>
+        <ul id="svc-includes-list"></ul>
+      </div>
+    </div>
+    <div class="svc-cta-strip">
+      <h3>Pronto para lançar<br>com a gente?</h3>
+      <a class="btn-primary" onclick="showPage('home');setTimeout(()=>scrollTo('#contact'),100)">Solicitar orçamento ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showServicePage(key){
+  var d=serviceData[key];
+  if(!d)return;
+  document.getElementById('svc-title').textContent=d.title;
+  document.getElementById('svc-sub').textContent=d.sub;
+  document.getElementById('svc-about').textContent=d.about;
+  var ul=document.getElementById('svc-includes-list');
+  ul.innerHTML='';
+  d.includes.forEach(function(item){
+    var li=document.createElement('li');
+    li.textContent=item;
+    ul.appendChild(li);
+  });
+  showPage('service');
+}
+
+function scrollTo(sel){
+  var el=document.querySelector(sel);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function submitForm(){
+  var fn=document.getElementById('fn').value;
+  var fe=document.getElementById('fe').value;
+  var ft=document.getElementById('ft').value;
+  if(!fn||!fe||!ft){alert('Preencha pelo menos nome, e-mail e telefone.');return;}
+  document.getElementById('fs-ok').classList.add('show');
+  ['fn','sn','fe','ft','fc','fm'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.value='';
+  });
+  document.getElementById('fs').value='';
+}
+
+function subscribeNewsletter(){
+  var em=document.getElementById('nl-email');
+  if(!em.value){return;}
+  em.value='';
+  alert('Obrigado! Você está inscrito.');
+}
+
+function toggleMenu(){
+  var ul=document.querySelector('.nav-links');
+  if(!ul)return;
+  var open=ul.style.display==='flex';
+  ul.style.cssText=open?'':'display:flex;flex-direction:column;position:absolute;top:68px;left:0;right:0;background:rgba(13,13,11,0.98);padding:1.5rem 2rem;gap:1.25rem;border-bottom:1px solid rgba(232,228,217,0.09);z-index:199;';
+  if(open)ul.style.display='';
+}
+</script>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- LINKS / BIO PAGE -->
+<!-- ══════════════════════════════════════════ -->
+<style>
+/* ─── LINKS PAGE ─── */
+#page-links{background:var(--preto);position:relative;}
+#page-links::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%,rgba(58,61,28,0.55) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 80% 100%,rgba(217,123,69,0.12) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+.links-container{
+  position:relative;z-index:1;
+  max-width:480px;margin:0 auto;
+  padding:2.5rem 1.5rem 4rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.lp-back{
+  align-self:flex-start;
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-size:0.78rem;color:rgba(232,228,217,0.35);
+  cursor:pointer;border:none;background:none;font-family:inherit;
+  margin-bottom:1.75rem;transition:color 0.2s;padding:0;
+}
+.lp-back:hover{color:var(--bege);}
+.lp-back svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;}
+.lp-avatar{position:relative;margin-bottom:1.25rem;}
+.lp-avatar-circle{
+  width:90px;height:90px;border-radius:50%;
+  background:var(--musgo);
+  border:2px solid rgba(232,228,217,0.12);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.lp-avatar-circle img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%);}
+.lp-avatar-circle svg{width:36px;height:36px;stroke:rgba(232,228,217,0.18);fill:none;stroke-width:1.25;}
+.lp-badge{
+  position:absolute;bottom:-3px;right:-3px;
+  width:24px;height:24px;border-radius:50%;
+  background:var(--salmon);border:2px solid var(--preto);
+  display:flex;align-items:center;justify-content:center;
+}
+.lp-badge svg{width:11px;height:11px;fill:white;}
+.lp-name{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:2.1rem;letter-spacing:-0.025em;
+  color:var(--bege);text-align:center;line-height:1;margin-bottom:0.2rem;
+}
+.lp-name span{color:var(--salmon);}
+.lp-handle{font-size:0.72rem;color:rgba(232,228,217,0.3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.75rem;}
+.lp-bio{font-size:0.875rem;color:rgba(232,228,217,0.45);text-align:center;line-height:1.65;max-width:300px;margin-bottom:0.5rem;font-weight:300;}
+.lp-loc{font-size:0.7rem;color:rgba(232,228,217,0.22);letter-spacing:0.07em;margin-bottom:1.75rem;display:flex;align-items:center;gap:0.4rem;}
+.lp-loc svg{width:11px;height:11px;stroke:var(--salmon);fill:none;stroke-width:2;}
+.lp-divider{width:36px;height:1px;background:rgba(232,228,217,0.1);margin-bottom:1.75rem;}
+.lp-sec{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(232,228,217,0.22);font-weight:600;align-self:flex-start;margin-bottom:0.65rem;margin-left:0.2rem;}
+.lp-links{width:100%;display:flex;flex-direction:column;gap:0.65rem;margin-bottom:1.5rem;}
+.lp-btn{
+  width:100%;display:flex;align-items:center;gap:0.875rem;
+  padding:0.825rem 1.1rem;border-radius:14px;text-decoration:none;
+  border:1px solid rgba(232,228,217,0.08);background:rgba(255,255,255,0.04);
+  color:var(--bege);transition:transform 0.18s,background 0.18s,border-color 0.18s;cursor:pointer;
+}
+.lp-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(232,228,217,0.18);transform:translateY(-2px);}
+.lp-btn.lp-musgo{background:rgba(58,61,28,0.5);border-color:rgba(58,61,28,0.75);}
+.lp-btn.lp-musgo:hover{background:rgba(58,61,28,0.7);}
+.lp-btn.lp-salmon{background:rgba(217,123,69,0.13);border-color:rgba(217,123,69,0.3);}
+.lp-btn.lp-salmon:hover{background:rgba(217,123,69,0.22);}
+.lp-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:rgba(232,228,217,0.07);display:flex;align-items:center;justify-content:center;}
+.lp-icon svg{width:18px;height:18px;fill:var(--bege);}
+.lp-btn.lp-salmon .lp-icon svg{fill:var(--salmon);}
+.lp-btn.lp-salmon .lp-icon{background:rgba(217,123,69,0.18);}
+.lp-txt{flex:1;}
+.lp-txt strong{display:block;font-size:0.875rem;font-weight:600;color:var(--bege);letter-spacing:-0.005em;}
+.lp-txt span{font-size:0.72rem;color:rgba(232,228,217,0.35);font-weight:300;}
+.lp-arr{width:26px;height:26px;border-radius:50%;background:rgba(232,228,217,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.18s,transform 0.18s;}
+.lp-btn:hover .lp-arr{background:var(--salmon);transform:rotate(45deg);}
+.lp-arr svg{width:12px;height:12px;stroke:var(--bege);fill:none;stroke-width:2.5;}
+.lp-pills{display:flex;gap:0.55rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.75rem;}
+.lp-pill{
+  display:flex;align-items:center;gap:0.45rem;padding:0.45rem 0.9rem;
+  border-radius:100px;border:1px solid rgba(232,228,217,0.08);
+  background:rgba(255,255,255,0.03);text-decoration:none;color:var(--bege);
+  font-size:0.72rem;font-weight:500;transition:background 0.18s,transform 0.18s,border-color 0.18s;
+}
+.lp-pill:hover{background:rgba(255,255,255,0.08);border-color:rgba(232,228,217,0.18);transform:translateY(-2px);}
+.lp-pill svg{width:13px;height:13px;fill:var(--bege);flex-shrink:0;}
+.lp-contact{
+  width:100%;background:rgba(58,61,28,0.28);border:1px solid rgba(58,61,28,0.55);
+  border-radius:16px;padding:1.375rem;display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2rem;
+}
+.lp-cline{display:flex;align-items:flex-start;gap:0.75rem;}
+.lp-ci{width:30px;height:30px;border-radius:8px;flex-shrink:0;background:rgba(232,228,217,0.07);display:flex;align-items:center;justify-content:center;}
+.lp-ci svg{width:13px;height:13px;stroke:var(--bege);fill:none;stroke-width:2;}
+.lp-ct strong{display:block;font-size:0.75rem;font-weight:600;color:var(--bege);margin-bottom:0.1rem;}
+.lp-ct p,.lp-ct a{font-size:0.775rem;color:rgba(232,228,217,0.38);text-decoration:none;line-height:1.5;}
+.lp-ct a:hover{color:var(--salmon);}
+.lp-footer{text-align:center;}
+.lp-footer p{font-size:0.67rem;color:rgba(232,228,217,0.13);letter-spacing:0.04em;}
+.lp-footer a{color:var(--salmon);text-decoration:none;}
+@keyframes lpFadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+#page-links.active .links-container>*{animation:lpFadeUp 0.45s ease both;}
+#page-links.active .lp-avatar{animation-delay:0s;}
+#page-links.active .lp-name{animation-delay:0.05s;}
+#page-links.active .lp-handle{animation-delay:0.07s;}
+#page-links.active .lp-bio{animation-delay:0.09s;}
+#page-links.active .lp-loc{animation-delay:0.11s;}
+#page-links.active .lp-divider{animation-delay:0.13s;}
+#page-links.active .lp-links{animation-delay:0.15s;}
+#page-links.active .lp-pills{animation-delay:0.19s;}
+#page-links.active .lp-contact{animation-delay:0.23s;}
+</style>
+
+<div class="page" id="page-links">
+  <div class="links-container">
+
+    <button class="lp-back" onclick="showPage('home')">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+      Voltar ao site
+    </button>
+
+    <!-- Avatar -->
+    <div class="lp-avatar">
+      <div class="lp-avatar-circle">
+        <!-- <img src="logo-ou-foto.jpg" alt="LANÇA+"> -->
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div class="lp-badge"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+    </div>
+
+    <h2 class="lp-name">LANÇA<span>+</span></h2>
+    <p class="lp-handle">@lanca.mais</p>
+    <p class="lp-bio">Agência de marketing estratégico. Mais conteúdo com propósito. Mais tráfego com retorno. Mais identidade com alma.</p>
+    <p class="lp-loc">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Cajazeiras / PB
+    </p>
+
+    <div class="lp-divider"></div>
+
+    <!-- Links principais -->
+    <p class="lp-sec">Acesso rápido</p>
+    <div class="lp-links">
+
+      <a href="#" onclick="showPage('home');return false;" class="lp-btn lp-musgo">
+        <div class="lp-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="lp-txt"><strong>Site Oficial</strong><span>lancamais.com.br</span></div>
+        <div class="lp-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+
+      <a href="https://wa.me/5583991060069" class="lp-btn lp-salmon" target="_blank" rel="noopener">
+        <div class="lp-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+        <div class="lp-txt"><strong>Fale no WhatsApp</strong><span>(83) 99106-069 — Resposta rápida</span></div>
+        <div class="lp-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+
+      <a href="/cdn-cgi/l/email-protection#41222e2f3520352e012d202f22202c2028326f222e2c" class="lp-btn" target="_blank" rel="noopener">
+        <div class="lp-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="lp-txt"><strong>E-mail</strong><span><span class="__cf_email__" data-cfemail="c7a4a8a9b3a6b3a887aba6a9a4a6aaa6aeb4e9a4a8aa">[email&#160;protected]</span></span></div>
+        <div class="lp-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+
+      <a href="#" onclick="showPage('home');setTimeout(()=>scrollTo('#services'),80);return false;" class="lp-btn">
+        <div class="lp-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <div class="lp-txt"><strong>Nossos Serviços</strong><span>Estratégia, Social Media, Branding e mais</span></div>
+        <div class="lp-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+
+      <a href="#" onclick="showPage('home');setTimeout(()=>scrollTo('#cases'),80);return false;" class="lp-btn">
+        <div class="lp-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="lp-txt"><strong>Cases de Sucesso</strong><span>Resultados reais dos nossos clientes</span></div>
+        <div class="lp-arr"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></div>
+      </a>
+
+    </div>
+
+    <!-- Redes sociais em pills -->
+    <p class="lp-sec">Redes sociais</p>
+    <div class="lp-pills">
+      <a href="https://instagram.com/lanca.mais" class="lp-pill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </a>
+      <a href="https://tiktok.com/@lanca.mais" class="lp-pill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+        TikTok
+      </a>
+      <a href="https://youtube.com/@lancamais" class="lp-pill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube
+      </a>
+      <a href="https://facebook.com/lancamais" class="lp-pill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </a>
+      <a href="https://linkedin.com/company/lancamais" class="lp-pill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://pinterest.com/lancamais" class="lp-pill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+        Pinterest
+      </a>
+    </div>
+
+    <!-- Contato -->
+    <p class="lp-sec">Contato & localização</p>
+    <div class="lp-contact">
+      <div class="lp-cline">
+        <div class="lp-ci"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 011.1 1.24 2 2 0 013.1 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+        <div class="lp-ct"><strong>WhatsApp</strong><a href="https://wa.me/5583991060069">(83) 99106-069</a></div>
+      </div>
+      <div class="lp-cline">
+        <div class="lp-ci"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="lp-ct"><strong>E-mail</strong><a href="/cdn-cgi/l/email-protection#5a3935342e3b2e351a363b34393b373b332974393537"><span class="__cf_email__" data-cfemail="93f0fcfde7f2e7fcd3fff2fdf0f2fef2fae0bdf0fcfe">[email&#160;protected]</span></a></div>
+      </div>
+      <div class="lp-cline">
+        <div class="lp-ci"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="
