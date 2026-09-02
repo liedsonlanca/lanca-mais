@@ -36,7 +36,10 @@ export async function POST(request: Request) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 24 * 30, // 30 dias
+    // Sem maxAge nem expires de propósito: assim o cookie é de sessão e o
+    // navegador o descarta ao ser fechado, então a senha é pedida de novo na
+    // volta. Um prazo em dias deixaria o site aberto em qualquer máquina onde
+    // ele já tivesse sido visto uma vez.
   });
 
   return resposta;

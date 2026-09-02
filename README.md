@@ -233,7 +233,8 @@ grep -rn "AJUSTAR\|INSTAGRAM\|TIKTOK\|CONFIRMAR\|Nome do cliente" lib/
 ## Pré-lançamento: a página Em breve
 
 Por padrão todo visitante cai em `/em-breve` e o site fica invisível. Quem
-acerta a senha recebe um cookie de 30 dias e passa a navegar normalmente.
+acerta a senha recebe um cookie de sessão e passa a navegar normalmente até
+fechar o navegador; na volta a senha é pedida de novo.
 
 O portão **falha fechado de propósito**: um deploy novo, sem nenhuma variável,
 nasce em pré-lançamento. Assim o conteúdo ainda de exemplo nunca vai ao ar por
