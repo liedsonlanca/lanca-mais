@@ -71,7 +71,14 @@ export default function EmBrevePage() {
   return (
     // A classe pagina-em-breve é o gancho que esconde header, rodapé e o botão
     // flutuante do WhatsApp: esta página é uma tela inteira, não uma seção.
+    //
+    // data-lenis-prevent devolve a rolagem nativa a este contêiner. Sem ele o
+    // Lenis, que é global, captura a roda e o toque para rolar a janela — que
+    // aqui está travada (body overflow hidden), então nada se movia: numa tela
+    // baixa o conteúdo passa de 900px e ninguém alcançava os contatos nem o
+    // botão de acesso.
     <section
+      data-lenis-prevent
       className={`${cormorant.variable} ${jakarta.variable} pagina-em-breve fixed inset-0 z-[100] overflow-y-auto bg-[#0D0D0B] text-[#E8E4D9]`}
       style={{ fontFamily: "var(--fonte-em-breve-texto), system-ui, sans-serif" }}
     >
