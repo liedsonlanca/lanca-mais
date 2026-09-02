@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:\\\\Users\\\\cliente\\\\Desktop\\\\LANÇA SITE\\\\.claude\" && echo done)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/palmore-vintage-rounded-serif-2026-02-05-03-11-56-utc/TTF/PalmoreRegular.ttf\" \"/c/Users/cliente/Downloads/fonts/\")",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/palmore-vintage-rounded-serif-2026-02-05-03-11-56-utc/TTF/PalmoreBold.ttf\" \"/c/Users/cliente/Downloads/fonts/\")",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/palmore-vintage-rounded-serif-2026-02-05-03-11-56-utc/TTF/PalmoreSemibold.ttf\" \"/c/Users/cliente/Downloads/fonts/\")",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/palmore-vintage-rounded-serif-2026-02-05-03-11-56-utc/TTF/PalmoreLight.ttf\" \"/c/Users/cliente/Downloads/fonts/\")",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/Google_Sans/static/GoogleSans-Regular.ttf\" \"/c/Users/cliente/Downloads/fonts/\")",
+      "PowerShell(Get-ChildItem 'C:\\\\Users\\\\cliente\\\\Downloads' -Recurse | Where-Object { $_.Extension -match '\\\\.\\(jpg|jpeg|png|webp\\)' } | Sort-Object LastWriteTime -Descending | Select-Object -First 15 | Format-Table FullName, LastWriteTime)",
+      "Bash(npx --version)",
+      "Bash(ls -la \"/c/Users/cliente/Desktop/LANÇA SITE/.claude\" 2>&1; echo \"---\"; ls -la \"/c/Users/cliente/Desktop\" 2>&1)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --use-npm --yes)",
+      "PowerShell(node -v)",
+      "PowerShell(npm -v)",
+      "Bash(command -v node.exe)",
+      "Read(//c/Program Files/nodejs/**)",
+      "Bash(npm -v)",
+      "Bash(mkdir -p public/fonts/palmore public/fonts/google-sans public/images)",
+      "Bash(cp \"/c/Users/cliente/Desktop/LANÇA+ IDV/IDV/PNG/Logo 1.png\" public/images/logo-1.png)",
+      "Bash(cp \"/c/Users/cliente/Desktop/LANÇA+ IDV/IDV/PNG/Logo 2.png\" public/images/logo-2.png)",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/palmore-vintage-rounded-serif-2026-02-05-03-11-56-utc/TTF/\"*.ttf public/fonts/palmore/)",
+      "Bash(cp \"/c/Users/cliente/Desktop/fonts_lancamais/Google_Sans/GoogleSans-VariableFont_GRAD,opsz,wght.ttf\" public/fonts/google-sans/GoogleSans-Variable.ttf)",
+      "Bash('/c/Program Files/nodejs/node.exe' -e ' *)",
+      "Bash(mkdir -p \"/c/Users/cliente/Desktop/LANÇA SITE/lib\" \"/c/Users/cliente/Desktop/LANÇA SITE/components\" \"/c/Users/cliente/Desktop/LANÇA SITE/app/sobre\" \"/c/Users/cliente/Desktop/LANÇA SITE/app/servicos\" \"/c/Users/cliente/Desktop/LANÇA SITE/app/portfolio\" \"/c/Users/cliente/Desktop/LANÇA SITE/app/blog/[slug]\" \"/c/Users/cliente/Desktop/LANÇA SITE/app/contato\")",
+      "WebFetch(domain:lps.v4company.com)",
+      "PowerShell(notepad \"C:\\\\Users\\\\cliente\\\\Desktop\\\\LAN�A CRM\\\\.env.local\")"
+    ]
+  }
+}

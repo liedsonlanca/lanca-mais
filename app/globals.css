@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+:root {
+  /* Marca */
+  --color-preto: #0a0a08;
+  --color-bege: #ede5d2;
+  --color-branco: #ffffff;
+  --color-musgo: #3c3a20;
+  --color-salmon: #dd8a55;
+
+  /* Camadas do claro — a base é branca; estas são as superfícies do corpo.
+     A banda alternada e as bordas são de baixa saturação de propósito: o bege
+     da marca (#ede5d2) fica amarelado demais encostado no branco puro. */
+  --color-papel: #ffffff;
+  --color-areia: #f7f5f0;
+  --color-linha: #e9e5dd;
+
+  /* Salmão escurecido para texto pequeno sobre claro. O salmão puro sobre
+     branco dá ~2.6:1 de contraste; este passa de 4.5:1. */
+  --color-salmon-texto: #a85c2c;
+
+  /* Camadas do escuro — reservadas ao hero, à faixa do slogan e ao rodapé */
+  --color-abismo: #050504;
+  --color-carvao: #101010;
+  --color-grafite: #171714;
+  --color-borda: #2a2a24;
+
+  /* Acento em variações */
+  --color-salmon-claro: #eaa87c;
+  --color-salmon-escuro: #b96a3a;
+
+  /* Elevação dos cards: no branco puro a borda sozinha não separa o card do fundo. */
+  --sombra-cartao: 0 1px 2px rgba(10, 10, 8, 0.04), 0 14px 36px -28px rgba(10, 10, 8, 0.3);
+
+  /* Curvas de easing — a mesma linguagem de movimento em todo o site */
+  --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-saida: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@theme inline {
+  --color-preto: var(--color-preto);
+  --color-bege: var(--color-bege);
+  --color-branco: var(--color-branco);
+  --color-musgo: var(--color-musgo);
+  --color-salmon: var(--color-salmon);
+  --color-papel: var(--color-papel);
+  --color-areia: var(--color-areia);
+  --color-linha: var(--color-linha);
+  --color-salmon-texto: var(--color-salmon-texto);
+  --color-abismo: var(--color-abismo);
+  --color-carvao: var(--color-carvao);
+  --color-grafite: var(--color-grafite);
+  --color-borda: var(--color-borda);
+  --color-salmon-claro: var(--color-salmon-claro);
+  --color-salmon-escuro: var(--color-salmon-escuro);
+
+  --font-heading: var(--font-palmore);
+  --font-sans: var(--font-google-sans);
+}
+
+html {
+  background: var(--color-papel);
+  /* Controles nativos (select, scrollbar, autofill) acompanham o tema claro. */
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-papel);
+  color: var(--color-preto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lenis controla a rolagem; sem isto o scroll nativo briga com o suave. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.font-heading {
+  letter-spacing: -0.025em;
+}
+
+/* ---------- Utilitários de composição ---------- */
+
+/* Acento tipográfico do WordReveal. O mesmo componente serve seções claras e
+   escuras, então a cor vem da superfície: escurecida no branco (contraste),
+   salmão puro no escuro. */
+.acento {
+  color: var(--color-salmon-texto);
+}
+
+.superficie-escura .acento {
+  color: var(--color-salmon);
+}
+
+/* Rótulo de seção em caixa alta espaçada, como nas três referências. */
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+/* Glow ambiente atrás de seções escuras. */
+.glow-salmon {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-salmon) 26%, transparent),
+    transparent
+  );
+}
+
+/* Textura sutil de ruído — tira o "plástico" do fundo chapado. */
+.noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Numeral dos cards (01, 02, 03…).
+   Usa a sans de propósito: a Palmore é tipografia de display e seus algarismos
+   viram quase letras em corpo pequeno — o 01 lia-se como Ol.
+   A cor fica por conta das utilitárias do Tailwind em cada uso: definida aqui,
+   fora de camada, ela venceria o group-hover e travaria os estados. */
+.numeral-fantasma {
+  font-family: var(--font-google-sans), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* A página Em breve ocupa a tela inteira: header, rodapé e o botão flutuante
+   do WhatsApp não fazem sentido nela. */
+body:has(.pagina-em-breve) header,
+body:has(.pagina-em-breve) footer,
+body:has(.pagina-em-breve) .botao-whatsapp {
+  display: none;
+}
+
+body:has(.pagina-em-breve) {
+  overflow: hidden;
+}
+
+/* Trilho horizontal arrastável: a barra de rolagem nativa polui a composição,
+   mas a rolagem em si continua existindo (dedo, roda com shift, teclado). */
+.sem-barra {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sem-barra::-webkit-scrollbar {
+  display: none;
+}
+
+/* Linha que cresce da esquerda quando a seção entra em cena. */
+.regua {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    var(--color-salmon),
+    color-mix(in srgb, var(--color-salmon) 0%, transparent)
+  );
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Quem pediu menos movimento recebe menos movimento. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--color-salmon);
+  color: var(--color-preto);
+}
