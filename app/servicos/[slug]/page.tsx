@@ -178,8 +178,8 @@ export default async function ServicoPage({
           <SectionHeading
             eyebrow="Como funciona"
             titulo={[
-              { texto: "O processo," },
-              { texto: "etapa por etapa.", acento: true },
+              { texto: "Como o trabalho" },
+              { texto: "acontece.", acento: true },
             ]}
             lead="Um caminho estruturado, para que cada entrega chegue no padrão combinado."
           />

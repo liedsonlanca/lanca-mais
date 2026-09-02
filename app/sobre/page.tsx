@@ -108,8 +108,7 @@ export default function SobrePage() {
                 Atendemos clientes de todos os nichos: saúde, estética,
                 direito, imóveis, gastronomia, moda, educação, fitness, varejo
                 e muito mais. Cada um exige uma leitura própria de mercado, mas
-                o método é o mesmo: entender o público, estruturar a
-                estratégia, produzir com consistência e medir o que importa.
+                o rigor é o mesmo, e é ele que faz a marca sair do improviso.
               </p>
               <p className="mt-4 leading-relaxed text-preto/72">
                 Por trabalharmos com sete frentes complementares: gestão de

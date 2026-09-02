@@ -27,7 +27,7 @@ export const servicePages: Record<string, ServicePage> = {
     heroImage: "/images/team/LFF_0473_resized.jpg",
     deliverables: [
       "Posicionamento de marca",
-      "Linha editorial 60/30/10",
+      "Linha editorial definida",
       "Calendário mensal",
       "Produção de conteúdo",
       "Monitoramento de métricas",
@@ -45,12 +45,12 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Estratégia documentada",
         description:
-          "Perfil estratégico completo com persona, tom de voz e posicionamento. Estratégia não é achismo, é documento que guia cada decisão de conteúdo.",
+          "Sua marca passa a ter uma direção registrada, e não improvisada. É esse documento que guia cada decisão de conteúdo.",
       },
       {
-        title: "Linha editorial 60/30/10",
+        title: "Linha editorial definida",
         description:
-          "Conteúdo educativo, de autoridade e comercial na proporção certa. Cada post tem um objetivo claro dentro do funil da marca.",
+          "Educar, construir autoridade e vender entram na proporção certa. Cada post tem um objetivo claro dentro do funil da marca.",
       },
       {
         title: "Produção integrada",
@@ -67,32 +67,22 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Entrada e briefing",
         description:
-          "Entendemos o seu negócio, objetivos e o cenário atual da marca, o ponto de partida de tudo.",
+          "Entendemos o seu negócio, seus objetivos e onde a marca está hoje.",
       },
       {
-        title: "Pesquisa de mercado",
+        title: "Estratégia",
         description:
-          "Análise de público, concorrência e oportunidades reais de diferenciação no seu nicho.",
-      },
-      {
-        title: "Estruturação da estratégia",
-        description:
-          "Posicionamento, tom de voz, pilares de conteúdo e calendário editorial, validados com você.",
+          "Sua marca ganha uma direção definida e registrada, validada com você antes de qualquer publicação.",
       },
       {
         title: "Produção e publicação",
         description:
-          "Peças visuais, vídeos e legendas produzidos e publicados com consistência, semana após semana.",
+          "O conteúdo entra no ar com consistência, semana após semana.",
       },
       {
-        title: "Monitoramento",
+        title: "Leitura e ajuste",
         description:
-          "Acompanhamento contínuo de alcance, engajamento e conversão contra as metas definidas.",
-      },
-      {
-        title: "Reajuste mensal",
-        description:
-          "O que funciona é ampliado, o que não funciona é corrigido, ciclo a ciclo, com base em dados.",
+          "Acompanhamos o desempenho e corrigimos a rota ciclo a ciclo: o que funciona ganha espaço.",
       },
     ],
     results: [
@@ -146,34 +136,29 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Metodologia própria",
         description:
-          "A mesma metodologia que usamos na gestão dos nossos clientes: persona 3Ds, linha editorial 60/30/10, ciclo de reajuste.",
+          "A mesma metodologia que aplicamos na gestão dos nossos clientes, adaptada para o seu time executar.",
       },
     ],
     process: [
       {
         title: "Imersão no negócio",
         description:
-          "Entendemos o momento da empresa, os objetivos e a estrutura do time que executa hoje.",
+          "Entendemos o momento da empresa, os objetivos e como o time executa hoje.",
       },
       {
-        title: "Auditoria e diagnóstico",
+        title: "Diagnóstico",
         description:
-          "Análise profunda do perfil, do conteúdo e dos concorrentes, com leitura técnica de cada ponto.",
+          "Uma leitura técnica de onde a marca está e do que está travando o resultado.",
       },
       {
-        title: "Estratégia e plano de ação",
+        title: "Plano de ação",
         description:
-          "Documento com posicionamento, linha editorial e ações priorizadas por impacto e urgência.",
-      },
-      {
-        title: "Apresentação e alinhamento",
-        description:
-          "Validação conjunta da estratégia com você e com o time que vai executar.",
+          "Você recebe as ações priorizadas, na ordem que faz diferença primeiro.",
       },
       {
         title: "Acompanhamento",
         description:
-          "Mentorias periódicas para revisar a execução, medir resultados e ajustar a rota.",
+          "Encontros periódicos para revisar a execução e ajustar a rota.",
       },
     ],
     results: [
@@ -234,27 +219,22 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Pauta e roteiro",
         description:
-          "Definição do tema dentro da linha editorial e roteirização completa do vídeo.",
+          "Definimos o que o vídeo precisa comunicar antes de ligar a câmera.",
       },
       {
         title: "Pré-produção",
         description:
-          "Agendamento, locação, figurino e preparação de quem vai gravar, nada improvisado.",
+          "Agenda, locação e preparação de quem grava. Nada improvisado no dia.",
       },
       {
         title: "Captação",
         description:
-          "Gravação com direção de cena, em estúdio ou externa, otimizando o tempo do cliente.",
+          "Gravação com direção de cena, em estúdio ou externa, respeitando o seu tempo.",
       },
       {
-        title: "Edição e finalização",
+        title: "Edição e entrega",
         description:
-          "Montagem, legendas, trilha e ajustes finos, com rodada de revisão sua antes de publicar.",
-      },
-      {
-        title: "Publicação e leitura",
-        description:
-          "Publicação no formato certo de cada canal e análise de retenção para melhorar o próximo.",
+          "Finalização com uma rodada de revisão sua antes de publicar.",
       },
     ],
     results: [
@@ -315,27 +295,22 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Diagnóstico e metas",
         description:
-          "Definição de objetivo, verba, público e a métrica que define sucesso para o seu negócio.",
+          "Definimos o objetivo, a verba e a métrica que decide se deu certo.",
       },
       {
         title: "Estruturação",
         description:
-          "Configuração de contas, pixel, públicos e funil de campanhas nas plataformas certas.",
+          "As campanhas são montadas nas plataformas certas para esse objetivo.",
       },
       {
-        title: "Criativos e copy",
+        title: "Veiculação",
         description:
-          "Produção dos anúncios (visual e texto) pensados para o estágio de cada público.",
-      },
-      {
-        title: "Veiculação e testes",
-        description:
-          "Lançamento com testes A/B de criativos e públicos para encontrar as combinações vencedoras.",
+          "Os anúncios entram no ar e são testados até encontrarem o que responde melhor.",
       },
       {
         title: "Otimização e escala",
         description:
-          "Corte do que não performa, escala do que funciona e relatório claro a cada ciclo.",
+          "O que não performa sai, o que funciona ganha verba, com relatório claro a cada ciclo.",
       },
     ],
     results: [
@@ -396,26 +371,22 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Imersão e briefing",
         description:
-          "Entendemos o negócio, o público e o posicionamento desejado, a base do conceito.",
+          "Entendemos o negócio, o público e o posicionamento que a marca quer ocupar.",
       },
       {
-        title: "Pesquisa e conceito",
+        title: "Conceito",
         description:
-          "Análise de mercado e referências, e definição do território visual da marca.",
+          "Definimos o território visual da marca, com fundamentação, antes de desenhar.",
       },
       {
         title: "Criação",
         description:
-          "Desenvolvimento do logotipo e do sistema visual completo, com apresentação fundamentada.",
+          "O sistema visual completo é desenvolvido e apresentado para você.",
       },
       {
-        title: "Refinamento",
-        description: "Rodadas de ajuste com base no seu feedback até a aprovação final.",
-      },
-      {
-        title: "Entrega e manual",
+        title: "Refinamento e entrega",
         description:
-          "Arquivos em todos os formatos e manual de marca com as regras de aplicação.",
+          "Ajustes até a aprovação, e a entrega com as regras de aplicação da marca.",
       },
     ],
     results: [
@@ -476,27 +447,22 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Briefing e arquitetura",
         description:
-          "Definição de objetivos, páginas e a jornada que o visitante deve percorrer.",
+          "Definimos objetivos, páginas e o caminho que o visitante deve percorrer.",
       },
       {
         title: "Design",
         description:
-          "Layout de cada página alinhado à identidade da marca, aprovado antes do desenvolvimento.",
+          "O layout de cada página é aprovado por você antes de virar código.",
       },
       {
         title: "Desenvolvimento",
         description:
-          "Construção com tecnologia moderna, foco em velocidade e boas práticas de SEO.",
-      },
-      {
-        title: "Conteúdo e revisão",
-        description:
-          "Textos, imagens e ajustes finais, com sua validação em cada etapa.",
+          "Construção com foco em velocidade e em ser encontrado nas buscas.",
       },
       {
         title: "Lançamento e suporte",
         description:
-          "Publicação, monitoramento e evolução contínua do site no ar.",
+          "Publicação, acompanhamento e evolução contínua do site no ar.",
       },
     ],
     results: [
@@ -556,27 +522,22 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Briefing e medição",
         description:
-          "Levantamento do espaço, necessidades do negócio e identidade da marca.",
+          "Levantamento do espaço, das necessidades do negócio e da identidade da marca.",
       },
       {
         title: "Estudo preliminar",
         description:
-          "Primeiras propostas de layout e conceito para validação da direção.",
+          "Primeiras propostas de conceito para validar a direção com você.",
       },
       {
         title: "Projeto executivo",
         description:
-          "Detalhamento técnico completo: plantas, materiais, iluminação e mobiliário.",
-      },
-      {
-        title: "Orçamento e fornecedores",
-        description:
-          "Especificação e cotação com fornecedores para viabilizar a execução.",
+          "O detalhamento técnico que permite executar a obra sem improviso.",
       },
       {
         title: "Acompanhamento de obra",
         description:
-          "Visitas técnicas para garantir que a execução siga fielmente o projeto.",
+          "Visitas técnicas para garantir que a execução siga o projeto.",
       },
     ],
     results: [

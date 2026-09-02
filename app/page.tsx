@@ -53,30 +53,35 @@ const sintomas = [
   },
 ];
 
+// As quatro etapas dizem a forma do trabalho, não a receita dele.
+//
+// A versão anterior listava os artefatos internos de cada fase, o que
+// entregava o método pronto para quem quisesse copiar. O cliente precisa
+// saber que existe um caminho e que ele funciona; o passo a passo é da casa.
 const metodo = [
   {
     step: "01",
     title: "Estruturação",
     description:
-      "Pesquisa de mercado, persona, tom de voz e posicionamento. Antes de qualquer post, sua marca ganha uma estratégia documentada.",
+      "Antes de qualquer publicação, sua marca ganha uma direção definida e registrada. Nada sai no improviso.",
   },
   {
     step: "02",
     title: "Implementação",
     description:
-      "Calendário editorial, produção de conteúdo e publicação com consistência, cada peça com um objetivo claro dentro da estratégia.",
+      "O conteúdo entra no ar com consistência, e cada peça nasce com um objetivo dentro dessa direção.",
   },
   {
     step: "03",
     title: "Monitoramento",
     description:
-      "Acompanhamento contínuo das métricas que importam para o seu objetivo: alcance, engajamento, leads e conversão.",
+      "Acompanhamos de perto o que o desempenho mostra sobre o objetivo da sua marca.",
   },
   {
     step: "04",
     title: "Reajuste",
     description:
-      "Revisão mensal da estratégia com base nos dados. O que funciona é ampliado; o que não funciona é corrigido, sem achismo.",
+      "A rota é corrigida pelo que os números mostram. O que funciona ganha espaço, o que não funciona sai.",
   },
 ];
 
@@ -90,19 +95,21 @@ function formatarData(data: string) {
 
 // Ordem da home, e o porquê dela.
 //
-// O hero faz o gancho. Em seguida vem a parte comercial, na sequência que
-// alguém avaliando a agência pergunta de fato: quem são vocês (sobre), o que
-// vendem (serviços), como é o trabalho de vocês (vitrine), deu certo com quem
-// (cases) e quem confirma isso (depoimentos e logos).
+// O hero faz o gancho e a home vai direto ao comercial: o que vendemos
+// (serviços), como é o trabalho (vitrine), deu certo com quem (cases) e quem
+// confirma isso (depoimentos e logos).
 //
-// Só depois entram as seções de argumentação — diagnóstico do problema e
-// método. Elas convencem quem já se interessou; na frente, atrasavam a resposta
-// a "o que vocês vendem?".
+// Depois entram as seções de argumentação — diagnóstico do problema e método —,
+// que convencem quem já se interessou. A apresentação da agência fecha a
+// página, encostada no CTA: quem chegou até ali já quer saber com quem vai
+// falar.
 //
 // Atenção ao mexer nesta ordem: os fundos alternam papel/areia e duas seções
 // vizinhas nunca repetem. Inserir ou remover uma seção inverte a paridade de
 // tudo que vem abaixo, e o fundo dos cards precisa acompanhar — seção branca
-// pede card areia, seção areia pede card branco (ver README).
+// pede card areia, seção areia pede card branco (ver README). Quando der,
+// prefira ajustar as pontas (a faixa de nichos e o CTA, que não têm cards) a
+// virar as seções do meio.
 export default function Home() {
   return (
     <>
@@ -110,82 +117,6 @@ export default function Home() {
 
       <Hero />
       <NicheMarquee />
-
-      {/* ---------- Quem somos ---------- */}
-      <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            <div>
-              <SectionHeading
-                eyebrow="Sobre a LANÇA+"
-                alinhamento="esquerda"
-                titulo={[
-                  { texto: "Uma agência inteira" },
-                  { texto: "debaixo do mesmo teto.", acento: true },
-                ]}
-                lead="Estratégia, audiovisual, tráfego, identidade visual, web e arquitetura. Sem terceirização, sem ruído entre quem pensa e quem executa."
-              />
-
-              <Reveal delay={0.2}>
-                <div className="mt-10 grid grid-cols-2 gap-8 border-t border-preto/10 pt-10">
-                  {stats.map((stat) => (
-                    <div key={stat.label}>
-                      <span className="font-heading block text-4xl font-semibold text-preto">
-                        <Counter
-                          valor={stat.valor}
-                          prefixo={stat.prefixo}
-                          sufixo={stat.sufixo}
-                        />
-                      </span>
-                      <span className="mt-1 block text-sm text-preto/68">
-                        {stat.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.3}>
-                <Link
-                  href="/sobre"
-                  className="group mt-10 inline-flex items-center gap-2 rounded-full border border-preto/20 px-7 py-3.5 font-medium text-preto transition-colors duration-500 hover:border-preto"
-                >
-                  Conhecer a equipe
-                  <span
-                    aria-hidden
-                    className="transition-transform duration-500 group-hover:translate-x-1.5"
-                  >
-                    →
-                  </span>
-                </Link>
-              </Reveal>
-            </div>
-
-            <Reveal distance={40}>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-3xl">
-                  <Image
-                    src="/images/team/equipe-1.jpg"
-                    alt="Equipe da LANÇA+"
-                    fill
-                    sizes="(max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-[1.2s] hover:scale-105"
-                  />
-                </div>
-                <div className="relative mt-10 aspect-[3/4] overflow-hidden rounded-3xl">
-                  <Image
-                    src="/images/team/equipe-2.jpg"
-                    alt="Equipe da LANÇA+ nos bastidores"
-                    fill
-                    sizes="(max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-[1.2s] hover:scale-105"
-                  />
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
 
       {/* ---------- 1. Serviços ---------- */}
       <section className="relative overflow-hidden bg-areia">
@@ -435,7 +366,7 @@ export default function Home() {
               { texto: "Quatro etapas que tiram" },
               { texto: "a marca do improviso.", acento: true },
             ]}
-            lead="Um ciclo que não termina na publicação: ele recomeça a cada mês, com dado na mesa."
+            lead="Um ciclo que não termina na publicação: ele recomeça, com dado na mesa."
           />
 
           <MethodSteps etapas={metodo} />
@@ -530,8 +461,84 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- CTA final ---------- */}
+      {/* ---------- 9. Quem somos ---------- */}
       <section className="relative overflow-hidden bg-papel">
+        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <div>
+              <SectionHeading
+                eyebrow="Sobre a LANÇA+"
+                alinhamento="esquerda"
+                titulo={[
+                  { texto: "Uma agência inteira" },
+                  { texto: "debaixo do mesmo teto.", acento: true },
+                ]}
+                lead="Estratégia, audiovisual, tráfego, identidade visual, web e arquitetura. Sem terceirização, sem ruído entre quem pensa e quem executa."
+              />
+
+              <Reveal delay={0.2}>
+                <div className="mt-10 grid grid-cols-2 gap-8 border-t border-preto/10 pt-10">
+                  {stats.map((stat) => (
+                    <div key={stat.label}>
+                      <span className="font-heading block text-4xl font-semibold text-preto">
+                        <Counter
+                          valor={stat.valor}
+                          prefixo={stat.prefixo}
+                          sufixo={stat.sufixo}
+                        />
+                      </span>
+                      <span className="mt-1 block text-sm text-preto/68">
+                        {stat.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.3}>
+                <Link
+                  href="/sobre"
+                  className="group mt-10 inline-flex items-center gap-2 rounded-full border border-preto/20 px-7 py-3.5 font-medium text-preto transition-colors duration-500 hover:border-preto"
+                >
+                  Conhecer a equipe
+                  <span
+                    aria-hidden
+                    className="transition-transform duration-500 group-hover:translate-x-1.5"
+                  >
+                    →
+                  </span>
+                </Link>
+              </Reveal>
+            </div>
+
+            <Reveal distance={40}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-3xl">
+                  <Image
+                    src="/images/team/equipe-1.jpg"
+                    alt="Equipe da LANÇA+"
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-[1.2s] hover:scale-105"
+                  />
+                </div>
+                <div className="relative mt-10 aspect-[3/4] overflow-hidden rounded-3xl">
+                  <Image
+                    src="/images/team/equipe-2.jpg"
+                    alt="Equipe da LANÇA+ nos bastidores"
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-[1.2s] hover:scale-105"
+                  />
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- CTA final ---------- */}
+      <section className="relative overflow-hidden bg-areia">
         <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
         <div className="relative mx-auto max-w-4xl px-6 py-32 text-center lg:py-40">

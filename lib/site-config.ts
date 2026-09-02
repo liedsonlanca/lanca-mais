@@ -64,7 +64,7 @@ export const faq = [
   {
     question: "Em quanto tempo minha marca começa a publicar?",
     answer:
-      "Nosso onboarding leva cerca de 30 dias da assinatura à primeira publicação, tempo dedicado a pesquisa de mercado, estruturação da estratégia, validação com você e produção das primeiras peças. Presença digital sólida não nasce da pressa.",
+      "Cerca de 30 dias da assinatura à primeira publicação. Esse tempo é o que garante que a marca comece com direção definida e validada com você, em vez de sair no improviso. Presença digital sólida não nasce da pressa.",
   },
   {
     question: "Preciso contratar todos os serviços juntos?",
@@ -74,7 +74,7 @@ export const faq = [
   {
     question: "Como acompanho os resultados?",
     answer:
-      "Você recebe relatórios periódicos de performance com as métricas que importam para o seu objetivo, e a estratégia é reajustada mês a mês com base nesses dados, não em achismo.",
+      "Você recebe relatórios periódicos de performance com as métricas que importam para o seu objetivo, e a estratégia é reajustada com base nesses dados, não em achismo.",
   },
   {
     question: "Vocês atendem meu nicho?",
@@ -105,8 +105,8 @@ export const services: Service[] = [
     description:
       "Cuidamos do planejamento, produção e publicação do conteúdo da sua marca de ponta a ponta, com linha editorial definida, calendário mensal e acompanhamento constante de resultados. Sua marca não posta por postar: cada conteúdo tem um objetivo dentro de uma estratégia maior.",
     bullets: [
-      "Perfil estratégico completo (persona, tom de voz, posicionamento)",
-      "Calendário editorial mensal com linha 60/30/10",
+      "Perfil estratégico completo da marca",
+      "Calendário editorial mensal",
       "Produção de conteúdo para Instagram, TikTok e demais canais",
       "Monitoramento de métricas e reajuste contínuo de estratégia",
     ],
@@ -131,7 +131,7 @@ export const services: Service[] = [
     shortDescription:
       "Produção de vídeo de ponta a ponta, do roteiro à edição final.",
     description:
-      "Roteiro, captação e edição para Reels, vídeos institucionais, depoimentos e campanhas, sempre alinhados à linha editorial e ao tom de voz da marca.",
+      "Roteiro, captação e edição para Reels, vídeos institucionais, depoimentos e campanhas, sempre alinhados à linha editorial da marca.",
     bullets: [
       "Roteirização com e sem teleprompter",
       "Captação em estúdio ou externa",
