@@ -99,29 +99,29 @@ export const servicePages: Record<string, ServicePage> = {
     ],
     faq: [
       {
-        question: "Esse serviço serve para qualquer área de atuação?",
+        question: "Vocês atendem marcas de fora de Cajazeiras?",
         answer:
-          "Sim. Atendemos de saúde e direito a gastronomia e varejo. O que muda de um nicho para outro é a leitura de mercado e as regras que aquele segmento precisa respeitar. O rigor do trabalho é o mesmo.",
+          "Atendemos. A gestão acontece à distância sem perda nenhuma, e quando a marca precisa de produção presencial a equipe se desloca. Isso entra combinado na proposta, sem custo surpresa depois.",
       },
       {
-        question: "Em quanto tempo verei resultados?",
+        question: "Quem vai cuidar da minha marca no dia a dia?",
         answer:
-          "Os primeiros sinais de consistência aparecem nas primeiras semanas de publicação. Posicionamento, porém, é resultado acumulativo: ele se firma ao longo dos meses, e é por isso que trabalhamos em ciclo, e não em ações soltas.",
+          "Um time da casa, e não freelancers rotativos. Estratégia, design, audiovisual e texto ficam sob o mesmo teto, então a sua marca não muda de voz quando muda de formato.",
       },
       {
-        question: "Vocês respondem comentários e direct?",
+        question: "Quanto do meu tempo isso vai tomar?",
         answer:
-          "A gestão da comunidade pode entrar no escopo. Combinamos isso na proposta, junto com o tempo de resposta esperado e o tom que a marca vai usar nessas conversas.",
+          "Pouco, e de forma previsível. Você participa da definição da estratégia no começo e das aprovações depois. O resto do trabalho é nosso.",
       },
       {
-        question: "Precisamos aparecer em vídeos e stories?",
+        question: "E se eu já tiver alguém cuidando das redes?",
         answer:
-          "Ajuda bastante, mas não é obrigatório. Existem formatos que constroem autoridade sem ninguém na frente da câmera, e essa escolha é feita junto com você.",
+          "Funciona bem. Essa pessoa passa a executar com direção definida em vez de decidir sozinha o que postar. Se preferir manter a execução inteira internamente, o caminho é a consultoria.",
       },
       {
-        question: "O tráfego pago está incluído?",
+        question: "Preciso contratar tráfego pago junto?",
         answer:
-          "Não. Tráfego pago é uma frente própria e pode ser contratada junto. Quando as duas andam juntas, o conteúdo sustenta o anúncio e o custo por resultado tende a cair.",
+          "Não precisa, são frentes separadas. Mas vale saber: com conteúdo consistente sustentando o anúncio, o custo por resultado costuma cair, então a conta muda quando as duas andam juntas.",
       },
     ],
     ctaLabel: "Quero minha marca como referência",
@@ -417,7 +417,7 @@ export const servicePages: Record<string, ServicePage> = {
           "Não. O investimento é pago por você diretamente às plataformas, e o nosso valor é o da gestão. Assim você enxerga exatamente para onde vai cada real.",
       },
       {
-        question: "Em quanto tempo vejo retorno?",
+        question: "A partir de quando dá para saber se está funcionando?",
         answer:
           "As primeiras leituras aparecem nos primeiros dias. O ajuste fino leva algumas semanas, porque campanha boa se constrói com dado, e não com palpite.",
       },
@@ -427,7 +427,7 @@ export const servicePages: Record<string, ServicePage> = {
           "Criamos. Se você já tiver material produzido, avaliamos junto o que vale aproveitar.",
       },
       {
-        question: "Funciona para qualquer negócio?",
+        question: "Meu segmento pode anunciar?",
         answer:
           "Para a maioria, sim. Alguns segmentos têm restrição de anúncio nas plataformas, e nesses casos avisamos antes de você investir.",
       },

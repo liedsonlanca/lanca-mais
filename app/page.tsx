@@ -441,7 +441,12 @@ export default function Home() {
           <Stagger className="mt-14 space-y-3">
             {faq.map((item) => (
               <StaggerItem key={item.question}>
-                <details className="group rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40">
+                {/* Mesmo acordeão nativo do FAQ das páginas de serviço:
+                    abrir uma pergunta fecha a anterior. */}
+                <details
+                  name="faq-home"
+                  className="group rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
+                >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-preto [&::-webkit-details-marker]:hidden">
                     {item.question}
                     <span

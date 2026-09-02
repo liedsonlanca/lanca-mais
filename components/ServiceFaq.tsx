@@ -49,8 +49,16 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
             <StaggerItem key={item.question}>
               {/* Fio no topo de cada linha: vira salmão quando a pergunta
                   está aberta, a mesma régua de lançamento das outras seções,
-                  aqui deitada. */}
-              <details className="group border-t border-linha transition-colors duration-500 open:border-salmon">
+                  aqui deitada.
+
+                  O name compartilhado transforma a lista em acordeão: abrir
+                  uma pergunta fecha a anterior. É comportamento nativo do
+                  navegador, sem JavaScript. Em navegador antigo, que ignora o
+                  atributo, as perguntas apenas continuam abrindo juntas. */}
+              <details
+                name="faq-servico"
+                className="group border-t border-linha transition-colors duration-500 open:border-salmon"
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-medium text-preto transition-colors duration-500 hover:text-salmon-texto [&::-webkit-details-marker]:hidden">
                   {item.question}
                   <span
