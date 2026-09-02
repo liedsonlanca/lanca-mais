@@ -7,7 +7,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import JsonLd from "@/components/JsonLd";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import MotionProvider from "@/components/motion/MotionProvider";
-import SameRouteScrollTop from "@/components/motion/SameRouteScrollTop";
+import ScrollTopOnNavigate from "@/components/motion/ScrollTopOnNavigate";
 import { siteConfig, siteUrl } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col font-sans">
         <JsonLd />
         <SmoothScroll />
-        <SameRouteScrollTop />
+        <ScrollTopOnNavigate />
         <MotionProvider>
           <Header />
           <main className="flex-1">{children}</main>
