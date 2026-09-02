@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Originais entregues pelo cliente (28MB); as versões otimizadas vivem em public/images/team
 /IMAGENS
+
+# Configuração local do assistente, sem relação com o site
+/.claude
