@@ -211,7 +211,9 @@ export default async function ServicoPage({
 
       {/* ---------- O que você recebe ---------- */}
       <section className="relative overflow-hidden bg-bege text-preto">
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-32">
+        {/* items-center: as duas colunas têm alturas diferentes, e sem isso a
+            nuvem de entregáveis ficava colada no topo com um vazio embaixo. */}
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-32">
           <SectionHeading
             eyebrow="Entregáveis"
             alinhamento="esquerda"

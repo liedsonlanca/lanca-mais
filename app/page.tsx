@@ -445,7 +445,7 @@ export default function Home() {
                     abrir uma pergunta fecha a anterior. */}
                 <details
                   name="faq-home"
-                  className="group rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
+                  className="faq-suave group rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
                 >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-preto [&::-webkit-details-marker]:hidden">
                     {item.question}

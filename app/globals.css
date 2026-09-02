@@ -152,6 +152,39 @@ body:has(.pagina-em-breve) {
   overflow: hidden;
 }
 
+/* Abertura suave do FAQ.
+   O <details> nativo abre e fecha de um quadro para o outro, o que fica seco
+   numa lista de perguntas. ::details-content dá acesso ao bloco que o
+   navegador mostra e esconde, então a altura pode ser animada.
+
+   Dois detalhes fazem isso funcionar:
+   - interpolate-size: allow-keywords permite animar até `auto`, sem precisar
+     chutar uma altura máxima (que deixaria o tempo irregular entre respostas
+     curtas e longas);
+   - content-visibility precisa de allow-discrete, senão o conteúdo some no
+     primeiro quadro do fechamento e a saída não é vista.
+
+   Onde o navegador não suporta ::details-content, nada disso se aplica e a
+   abertura volta a ser instantânea, como era. */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.faq-suave::details-content {
+  block-size: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    block-size 460ms var(--ease-suave),
+    opacity 280ms var(--ease-suave),
+    content-visibility 460ms allow-discrete;
+}
+
+.faq-suave[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
 /* Trilho horizontal arrastável: a barra de rolagem nativa polui a composição,
    mas a rolagem em si continua existindo (dedo, roda com shift, teclado). */
 .sem-barra {
