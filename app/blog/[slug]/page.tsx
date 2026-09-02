@@ -104,6 +104,7 @@ export default async function BlogPostPage({
       <CtaFinal
         titulo="Quer aplicar isso"
         destaque="na sua marca?"
+        lead="A gente escreve sobre isso porque faz isso todo dia. Conte o momento da sua marca e a equipe responde com o melhor ponto de partida."
         rotulo="Falar com a LANÇA+"
       />
     </>

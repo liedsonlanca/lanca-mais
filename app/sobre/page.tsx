@@ -206,6 +206,7 @@ export default function SobrePage() {
       <CtaFinal
         titulo="Vamos construir o"
         destaque="posicionamento da sua marca?"
+        lead="Você acabou de conhecer quem vai cuidar dela. O próximo passo é uma conversa, sem compromisso."
         rotulo="Falar com a LANÇA+"
       />
     </>
