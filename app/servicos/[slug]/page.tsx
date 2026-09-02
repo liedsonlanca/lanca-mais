@@ -6,6 +6,8 @@ import { services } from "@/lib/site-config";
 import { servicePages } from "@/lib/service-pages";
 import SectionHeading from "@/components/SectionHeading";
 import CtaFinal from "@/components/CtaFinal";
+import ServiceFaq from "@/components/ServiceFaq";
+import FaqJsonLd from "@/components/FaqJsonLd";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 import WordReveal from "@/components/motion/WordReveal";
@@ -47,6 +49,9 @@ export default async function ServicoPage({
 
   return (
     <>
+      {/* Cada serviço concorre na busca com as suas próprias perguntas. */}
+      <FaqJsonLd itens={page.faq} />
+
       {/* ---------- Hero + painel de benefícios ---------- */}
       <section className="superficie-escura noise relative overflow-hidden bg-abismo">
         <div className="glow-salmon pointer-events-none absolute -left-40 top-1/4 h-[520px] w-[520px] opacity-30 blur-3xl" />
@@ -255,6 +260,15 @@ export default async function ServicoPage({
           </Stagger>
         </div>
       </section>
+
+      {/* ---------- Dúvidas deste serviço ----------
+          Entra depois dos diferenciais e antes dos serviços relacionados: as
+          objeções são respondidas enquanto a pessoa ainda pensa neste serviço,
+          e não depois de já ter sido convidada a olhar outros.
+
+          O fundo é areia, o terceiro tom da página. Papel colidiria com os
+          diferenciais logo acima e bege com os relacionados logo abaixo. */}
+      <ServiceFaq itens={page.faq} />
 
       {/* ---------- Serviços relacionados ---------- */}
       <section className="relative overflow-hidden bg-bege">

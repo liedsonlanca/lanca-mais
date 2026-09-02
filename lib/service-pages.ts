@@ -15,6 +15,10 @@ export type ServicePage = {
   features: { title: string; description: string }[];
   process: { title: string; description: string }[];
   results: string[];
+  // Dúvidas específicas deste serviço. São as objeções que aparecem antes de
+  // fechar, então respondem preço, prazo, escopo e limite — e nunca o passo a
+  // passo interno do trabalho.
+  faq: { question: string; answer: string }[];
   ctaLabel: string;
 };
 
@@ -93,6 +97,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Estratégia que evolui com dados, não com achismos",
       "Um time completo cuidando da sua marca de ponta a ponta",
     ],
+    faq: [
+      {
+        question: "Esse serviço serve para qualquer área de atuação?",
+        answer:
+          "Sim. Atendemos de saúde e direito a gastronomia e varejo. O que muda de um nicho para outro é a leitura de mercado e as regras que aquele segmento precisa respeitar. O rigor do trabalho é o mesmo.",
+      },
+      {
+        question: "Em quanto tempo verei resultados?",
+        answer:
+          "Os primeiros sinais de consistência aparecem nas primeiras semanas de publicação. Posicionamento, porém, é resultado acumulativo: ele se firma ao longo dos meses, e é por isso que trabalhamos em ciclo, e não em ações soltas.",
+      },
+      {
+        question: "Vocês respondem comentários e direct?",
+        answer:
+          "A gestão da comunidade pode entrar no escopo. Combinamos isso na proposta, junto com o tempo de resposta esperado e o tom que a marca vai usar nessas conversas.",
+      },
+      {
+        question: "Precisamos aparecer em vídeos e stories?",
+        answer:
+          "Ajuda bastante, mas não é obrigatório. Existem formatos que constroem autoridade sem ninguém na frente da câmera, e essa escolha é feita junto com você.",
+      },
+      {
+        question: "O tráfego pago está incluído?",
+        answer:
+          "Não. Tráfego pago é uma frente própria e pode ser contratada junto. Quando as duas andam juntas, o conteúdo sustenta o anúncio e o custo por resultado tende a cair.",
+      },
+    ],
     ctaLabel: "Quero minha marca como referência",
   },
 
@@ -167,6 +198,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Leitura precisa de onde a marca está e para onde vai",
       "Decisões de marketing baseadas em dados e método",
       "Retrabalho e desperdício de verba reduzidos",
+    ],
+    faq: [
+      {
+        question: "Qual a diferença entre consultoria e gestão?",
+        answer:
+          "Na gestão, a execução é nossa. Na consultoria, ela continua com o seu time e nós entramos com o diagnóstico, a direção e o acompanhamento para que esse time execute melhor.",
+      },
+      {
+        question: "Preciso ter uma equipe de marketing?",
+        answer:
+          "Ao menos alguém responsável por executar. Sem isso, a gestão costuma ser o caminho mais eficiente, e a gente diz isso na primeira conversa.",
+      },
+      {
+        question: "Serve para quem já tem agência?",
+        answer:
+          "Serve. Nesses casos a consultoria funciona como leitura externa: o que está funcionando, o que não está e onde a estratégia precisa mudar.",
+      },
+      {
+        question: "Quanto tempo dura o acompanhamento?",
+        answer:
+          "Depende do tamanho do desafio. A duração e a frequência dos encontros ficam definidas na proposta, antes de começar.",
+      },
+      {
+        question: "Recebo alguma coisa por escrito?",
+        answer:
+          "Sim. O diagnóstico e o plano de ação são registrados, com as prioridades na ordem que faz diferença primeiro.",
+      },
     ],
     ctaLabel: "Quero um diagnóstico da minha marca",
   },
@@ -244,6 +302,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Segurança na frente da câmera, mesmo para iniciantes",
       "Formatos otimizados para Instagram, TikTok e YouTube",
     ],
+    faq: [
+      {
+        question: "Preciso ter experiência na frente da câmera?",
+        answer:
+          "Não. A direção de cena existe justamente para isso, e boa parte dos nossos clientes grava pela primeira vez com a gente.",
+      },
+      {
+        question: "A gravação é no meu espaço ou em estúdio?",
+        answer:
+          "Os dois são possíveis. A escolha depende do que o vídeo precisa comunicar e do tempo que você tem disponível.",
+      },
+      {
+        question: "Quantos vídeos saem de uma diária?",
+        answer:
+          "Varia com o formato e com o roteiro. Essa quantidade é definida antes da gravação, para que o dia renda exatamente o combinado.",
+      },
+      {
+        question: "Posso pedir alterações na edição?",
+        answer:
+          "Pode. Cada entrega inclui uma rodada de revisão sua antes de a peça ir ao ar.",
+      },
+      {
+        question: "Vocês fazem só a edição?",
+        answer:
+          "Fazemos. Se você já tem o material captado, cuidamos da finalização e da adaptação para o formato de cada canal.",
+      },
+    ],
     ctaLabel: "Quero vídeos profissionais",
   },
 
@@ -319,6 +404,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Verba investida onde os dados mostram retorno",
       "Criativos renovados antes de saturar",
       "Clareza total sobre o retorno de cada real investido",
+    ],
+    faq: [
+      {
+        question: "Qual o investimento mínimo em anúncios?",
+        answer:
+          "Depende do objetivo e da disputa no seu mercado. Na primeira conversa dizemos qual verba faz sentido para a meta que você tem, sem inflar expectativa.",
+      },
+      {
+        question: "A verba de anúncio está incluída no valor?",
+        answer:
+          "Não. O investimento é pago por você diretamente às plataformas, e o nosso valor é o da gestão. Assim você enxerga exatamente para onde vai cada real.",
+      },
+      {
+        question: "Em quanto tempo vejo retorno?",
+        answer:
+          "As primeiras leituras aparecem nos primeiros dias. O ajuste fino leva algumas semanas, porque campanha boa se constrói com dado, e não com palpite.",
+      },
+      {
+        question: "Vocês criam os anúncios ou eu envio?",
+        answer:
+          "Criamos. Se você já tiver material produzido, avaliamos junto o que vale aproveitar.",
+      },
+      {
+        question: "Funciona para qualquer negócio?",
+        answer:
+          "Para a maioria, sim. Alguns segmentos têm restrição de anúncio nas plataformas, e nesses casos avisamos antes de você investir.",
+      },
     ],
     ctaLabel: "Quero anunciar com estratégia",
   },
@@ -396,6 +508,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Diferenciação clara em relação à concorrência",
       "Base visual pronta para redes, impressos e ambientes",
     ],
+    faq: [
+      {
+        question: "Já tenho logo. Preciso refazer tudo?",
+        answer:
+          "Nem sempre. Avaliamos se o caso pede um redesenho completo ou apenas a construção do sistema visual em volta do que já existe.",
+      },
+      {
+        question: "Quantas propostas de logo eu recebo?",
+        answer:
+          "Apresentamos um caminho, com a fundamentação da escolha. Marca não é gosto escolhido entre opções, é decisão de posicionamento.",
+      },
+      {
+        question: "Posso pedir ajustes?",
+        answer:
+          "Pode, com rodadas de refinamento até a aprovação. O número delas fica combinado na proposta.",
+      },
+      {
+        question: "O que recebo no fim?",
+        answer:
+          "Os arquivos em todos os formatos de uso e o manual com as regras de aplicação da marca.",
+      },
+      {
+        question: "Vocês registram a marca no INPI?",
+        answer:
+          "O registro é feito por um profissional de propriedade industrial. Entregamos o material pronto para esse processo e indicamos parceiros de confiança.",
+      },
+    ],
     ctaLabel: "Quero construir minha marca",
   },
 
@@ -472,6 +611,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Encontrado no Google pelas buscas certas",
       "Autonomia para crescer sem refazer tudo do zero",
     ],
+    faq: [
+      {
+        question: "Quanto tempo leva para o site ficar pronto?",
+        answer:
+          "Depende do tamanho. Uma landing page sai em poucas semanas; um site institucional completo leva mais. O prazo fica definido na proposta, antes de começar.",
+      },
+      {
+        question: "O site vai aparecer no Google?",
+        answer:
+          "Ele nasce com a estrutura técnica correta para isso. Chegar às primeiras posições, porém, também depende de conteúdo e de tempo, e esse trabalho a gente faz junto.",
+      },
+      {
+        question: "Consigo editar o site depois?",
+        answer:
+          "Sim, quando o projeto prevê isso. Combinamos na proposta o que fica editável por você e o que segue sob nossa manutenção.",
+      },
+      {
+        question: "Vocês cuidam do domínio e da hospedagem?",
+        answer:
+          "Cuidamos da configuração. O domínio e a hospedagem ficam em nome da sua empresa, então o site é seu de verdade.",
+      },
+      {
+        question: "E depois que o site entra no ar?",
+        answer:
+          "Continuamos disponíveis para manutenção e evolução. Site parado envelhece rápido, e isso aparece para quem visita.",
+      },
+    ],
     ctaLabel: "Quero um site que converte",
   },
 
@@ -546,6 +712,33 @@ export const servicePages: Record<string, ServicePage> = {
       "Ambiente funcional para a operação do dia a dia",
       "Cenários prontos para produção de conteúdo",
       "Projeto executado sem surpresas de obra",
+    ],
+    faq: [
+      {
+        question: "Vocês atendem obra nova e reforma?",
+        answer:
+          "Os dois. O que muda é o ponto de partida e o nível de intervenção que o espaço comporta.",
+      },
+      {
+        question: "O projeto inclui acompanhamento da obra?",
+        answer:
+          "Inclui, com visitas técnicas para garantir que a execução siga o projeto. A frequência fica combinada na proposta.",
+      },
+      {
+        question: "Vocês indicam fornecedores?",
+        answer:
+          "Indicamos e ajudamos na especificação. A contratação é sua, com liberdade total para comparar.",
+      },
+      {
+        question: "Consigo ver como vai ficar antes?",
+        answer:
+          "Sim. O estudo preliminar existe justamente para você validar a direção antes do detalhamento técnico.",
+      },
+      {
+        question: "Por que uma agência de marketing faz arquitetura?",
+        answer:
+          "Porque o ponto de venda é um canal da marca como qualquer outro. Quando o espaço fala a mesma língua do digital, a experiência do cliente não se quebra na porta.",
+      },
     ],
     ctaLabel: "Quero projetar meu espaço",
   },
