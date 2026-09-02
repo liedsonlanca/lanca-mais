@@ -39,17 +39,17 @@ const sintomas = [
   {
     titulo: "O feed não parece o preço",
     descricao:
-      "A entrega é excelente, mas a comunicação passa a impressão de um negócio menor do que ele é, e o público precifica pelo que vê.",
+      "A entrega é excelente, mas a comunicação mostra um negócio menor. E o público precifica pelo que vê.",
   },
   {
     titulo: "Publicar virou tarefa, não estratégia",
     descricao:
-      "Sem linha editorial, cada post nasce isolado e nenhum deles responde à pergunta básica: o que esse conteúdo deveria vender?",
+      "Sem linha editorial, cada post nasce solto e nenhum responde à pergunta básica: o que ele deveria vender?",
   },
   {
     titulo: "Ninguém sabe dizer o que funcionou",
     descricao:
-      "Sem métrica acompanhada, a decisão do mês seguinte vira achismo, e o investimento se repete sem aprendizado.",
+      "Sem métrica acompanhada, a decisão do mês seguinte vira achismo e o investimento se repete sem aprendizado.",
   },
 ];
 
@@ -88,6 +88,21 @@ function formatarData(data: string) {
   });
 }
 
+// Ordem da home, e o porquê dela.
+//
+// O hero faz o gancho. Em seguida vem a parte comercial, na sequência que
+// alguém avaliando a agência pergunta de fato: quem são vocês (sobre), o que
+// vendem (serviços), como é o trabalho de vocês (vitrine), deu certo com quem
+// (cases) e quem confirma isso (depoimentos e logos).
+//
+// Só depois entram as seções de argumentação — diagnóstico do problema e
+// método. Elas convencem quem já se interessou; na frente, atrasavam a resposta
+// a "o que vocês vendem?".
+//
+// Atenção ao mexer nesta ordem: os fundos alternam papel/areia e duas seções
+// vizinhas nunca repetem. Inserir ou remover uma seção inverte a paridade de
+// tudo que vem abaixo, e o fundo dos cards precisa acompanhar — seção branca
+// pede card areia, seção areia pede card branco (ver README).
 export default function Home() {
   return (
     <>
@@ -95,136 +110,8 @@ export default function Home() {
 
       <Hero />
       <NicheMarquee />
-      <ClientLogos />
 
-      {/* ---------- O problema ---------- */}
-      <section className="relative overflow-hidden bg-papel">
-        <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <SectionHeading
-            eyebrow="O problema que resolvemos"
-            titulo={[
-              { texto: "Negócios muito bons" },
-              { texto: "que parecem medianos no digital.", acento: true },
-            ]}
-            lead="Não é falta de qualidade. É falta de tradução: a marca entrega um nível que a comunicação ainda não mostra. É exatamente aí que a LANÇA+ entra."
-          />
-
-          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {sintomas.map((sintoma, i) => (
-              <StaggerItem
-                key={sintoma.titulo}
-                className="group relative h-full overflow-hidden rounded-3xl border border-linha bg-areia p-8 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
-              >
-                {/* Régua de lançamento, como nas abas de serviço e no método. */}
-                <span
-                  aria-hidden
-                  className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full"
-                />
-
-                <span
-                  aria-hidden
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-6 w-6"
-                  >
-                    {iconesSintoma[i]}
-                  </svg>
-                </span>
-
-                <h3 className="mt-6 text-xl font-semibold leading-snug text-preto">
-                  {sintoma.titulo}
-                </h3>
-                <p className="mt-3 leading-relaxed text-preto/70">
-                  {sintoma.descricao}
-                </p>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
-
-      {/* ---------- Método ---------- */}
-      <section className="relative overflow-hidden bg-areia">
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <SectionHeading
-            eyebrow="Nosso método"
-            alinhamento="esquerda"
-            titulo={[
-              { texto: "Quatro etapas que tiram" },
-              { texto: "a marca do improviso.", acento: true },
-            ]}
-            lead="Um ciclo que não termina na publicação: ele recomeça a cada mês, com dado na mesa."
-          />
-
-          <MethodSteps etapas={metodo} />
-        </div>
-      </section>
-
-      {/* ---------- Serviços ---------- */}
-      <section className="relative overflow-hidden bg-papel">
-        <div className="glow-salmon pointer-events-none absolute -left-32 bottom-0 h-[480px] w-[480px] opacity-25 blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <SectionHeading
-            eyebrow="O que fazemos"
-            alinhamento="esquerda"
-            titulo={[
-              { texto: "Sete frentes que" },
-              { texto: "conversam entre si.", acento: true },
-            ]}
-            lead="Cada uma pode ser contratada isoladamente. Juntas, garantem que estratégia, conteúdo, tráfego e identidade andem na mesma direção."
-          />
-
-          <ServiceRows />
-
-          <Reveal delay={0.2}>
-            <div className="mt-10 flex flex-col items-start gap-4 border-t border-linha pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-preto/62">Precisa de algo específico?</p>
-              <Link
-                href="/contato"
-                className="group inline-flex items-center gap-2 text-sm font-medium text-salmon-texto"
-              >
-                Solicitar orçamento
-                <span
-                  aria-hidden
-                  className="transition-transform duration-500 group-hover:translate-x-1.5"
-                >
-                  →
-                </span>
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------- Vitrine de trabalhos ---------- */}
-      <section className="relative overflow-hidden bg-areia">
-        <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-10 lg:pt-36">
-          <SectionHeading
-            eyebrow="Nosso trabalho"
-            titulo={[
-              { texto: "Cada peça que sai daqui" },
-              { texto: "tem um porquê.", acento: true },
-            ]}
-            lead="Nada sobe por subir: todo conteúdo responde a um objetivo dentro da estratégia da marca."
-          />
-        </div>
-
-        <div className="pb-28 pt-16 lg:pb-36">
-          <WorkShowcase />
-        </div>
-      </section>
-
-      {/* ---------- Sobre ---------- */}
+      {/* ---------- Quem somos ---------- */}
       <section className="relative overflow-hidden bg-papel">
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
@@ -300,10 +187,63 @@ export default function Home() {
         </div>
       </section>
 
-      <SloganBand />
+      {/* ---------- 1. Serviços ---------- */}
+      <section className="relative overflow-hidden bg-areia">
+        <div className="glow-salmon pointer-events-none absolute -left-32 bottom-0 h-[480px] w-[480px] opacity-25 blur-3xl" />
 
-      {/* ---------- Cases ---------- */}
+        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <SectionHeading
+            eyebrow="O que fazemos"
+            alinhamento="esquerda"
+            titulo={[
+              { texto: "Sete frentes que" },
+              { texto: "conversam entre si.", acento: true },
+            ]}
+            lead="Contrate uma frente ou todas. Juntas, mantêm estratégia, conteúdo, tráfego e identidade na mesma direção."
+          />
+
+          <ServiceRows />
+
+          <Reveal delay={0.2}>
+            <div className="mt-10 flex flex-col items-start gap-4 border-t border-linha pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-preto/62">Precisa de algo específico?</p>
+              <Link
+                href="/contato"
+                className="group inline-flex items-center gap-2 text-sm font-medium text-salmon-texto"
+              >
+                Solicitar orçamento
+                <span
+                  aria-hidden
+                  className="transition-transform duration-500 group-hover:translate-x-1.5"
+                >
+                  →
+                </span>
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ---------- 2. Vitrine de trabalhos ---------- */}
       <section className="relative overflow-hidden bg-papel">
+        <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-10 lg:pt-36">
+          <SectionHeading
+            eyebrow="Nosso trabalho"
+            titulo={[
+              { texto: "Cada peça que sai daqui" },
+              { texto: "tem um porquê.", acento: true },
+            ]}
+            lead="Nada sobe por subir. Todo conteúdo responde a um objetivo da estratégia."
+          />
+        </div>
+
+        <div className="pb-28 pt-16 lg:pb-36">
+          <WorkShowcase />
+        </div>
+      </section>
+
+      {/* ---------- 3. Cases ---------- */}
+      <section className="relative overflow-hidden bg-areia">
         <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <SectionHeading
             eyebrow="Cases"
@@ -319,7 +259,7 @@ export default function Home() {
               <StaggerItem key={caso.slug}>
                 {/* No claro o texto sai de cima da foto e vai para o card:
                     sobre a imagem ele exigiria um véu escuro em toda peça. */}
-                <article className="group h-full overflow-hidden rounded-3xl border border-linha bg-areia transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
+                <article className="group h-full overflow-hidden rounded-3xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
                   <div className="relative aspect-[16/11] overflow-hidden">
                     <Image
                       src={caso.image}
@@ -366,8 +306,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- Depoimentos ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      {/* ---------- 4. Depoimentos ---------- */}
+      <section className="relative overflow-hidden bg-papel">
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <SectionHeading
             eyebrow="Depoimentos"
@@ -383,7 +323,7 @@ export default function Home() {
                 // Os depoimentos ainda são placeholders com o mesmo nome; o índice
                 // garante chave única até entrarem os depoimentos reais.
                 key={i}
-                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-linha bg-branco p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50"
+                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco"
               >
                 {/* Faixa de acento no topo do card: cresce ao passar o mouse. */}
                 <span
@@ -424,7 +364,87 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- Blog ---------- */}
+      {/* Prova social visual, logo depois de quem fala por escrito. Divide o
+          fundo com os depoimentos de propósito: a borda superior da faixa já
+          separa os dois, e assim a paridade papel/areia continua valendo mesmo
+          quando não há logos cadastrados e a faixa não renderiza nada. */}
+      <ClientLogos />
+
+      {/* ---------- 5. O problema ---------- */}
+      <section className="relative overflow-hidden bg-areia">
+        <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <SectionHeading
+            eyebrow="O problema que resolvemos"
+            titulo={[
+              { texto: "Negócios muito bons" },
+              { texto: "que parecem medianos no digital.", acento: true },
+            ]}
+            lead="Não é falta de qualidade. É falta de tradução: a marca entrega um nível que a comunicação ainda não mostra."
+          />
+
+          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
+            {sintomas.map((sintoma, i) => (
+              <StaggerItem
+                key={sintoma.titulo}
+                className="group relative h-full overflow-hidden rounded-3xl border border-linha bg-branco p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
+              >
+                {/* Régua de lançamento, como nas abas de serviço e no método. */}
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full"
+                />
+
+                <span
+                  aria-hidden
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6"
+                  >
+                    {iconesSintoma[i]}
+                  </svg>
+                </span>
+
+                <h3 className="mt-6 text-xl font-semibold leading-snug text-preto">
+                  {sintoma.titulo}
+                </h3>
+                <p className="mt-3 leading-relaxed text-preto/70">
+                  {sintoma.descricao}
+                </p>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
+
+      {/* ---------- 6. Método ---------- */}
+      <section className="relative overflow-hidden bg-papel">
+        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <SectionHeading
+            eyebrow="Nosso método"
+            alinhamento="esquerda"
+            titulo={[
+              { texto: "Quatro etapas que tiram" },
+              { texto: "a marca do improviso.", acento: true },
+            ]}
+            lead="Um ciclo que não termina na publicação: ele recomeça a cada mês, com dado na mesa."
+          />
+
+          <MethodSteps etapas={metodo} />
+        </div>
+      </section>
+
+      <SloganBand />
+
+      {/* ---------- 7. Blog ---------- */}
       <section className="relative overflow-hidden bg-papel">
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <SectionHeading
@@ -441,7 +461,7 @@ export default function Home() {
               <StaggerItem key={post.slug} className="h-full">
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="group flex h-full flex-col rounded-3xl border border-linha bg-areia p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
+                  className="group flex h-full flex-col rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
                 >
                   {/* Categoria vira etiqueta: dá um ponto de cor ao card e
                       separa a leitura do tempo estimado. */}
@@ -476,7 +496,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- FAQ ---------- */}
+      {/* ---------- 8. FAQ ---------- */}
       <section className="relative overflow-hidden bg-areia">
         <div className="mx-auto max-w-3xl px-6 py-28 lg:py-36">
           <SectionHeading

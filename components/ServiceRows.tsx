@@ -18,7 +18,7 @@ export default function ServiceRows() {
         <StaggerItem key={service.slug}>
           <Link
             href={`/servicos/${service.slug}`}
-            className="group relative flex items-center gap-6 overflow-hidden rounded-3xl border border-linha bg-areia p-6 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1 focus-visible:border-salmon focus-visible:outline-none sm:gap-8 sm:p-8 lg:gap-10 lg:p-10"
+            className="group relative flex items-center gap-6 overflow-hidden rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1 focus-visible:border-salmon focus-visible:outline-none sm:gap-8 sm:p-8 lg:gap-10 lg:p-10"
           >
             {/* Régua de lançamento */}
             <span

@@ -81,13 +81,13 @@ export default function MethodSteps({ etapas }: { etapas: Etapa[] }) {
             className="group relative flex gap-6 lg:block"
           >
             {/* Marcador que cruza o trilho */}
-            <span className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
+            <span className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-linha bg-areia shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
               <span className="numeral-fantasma text-xl text-salmon-texto transition-colors duration-500 group-hover:text-preto">
                 {etapa.step}
               </span>
             </span>
 
-            <div className="relative flex-1 overflow-hidden rounded-3xl border border-linha bg-branco p-7 shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:-translate-y-1 group-hover:border-salmon/45 group-hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:mt-8 lg:p-8">
+            <div className="relative flex-1 overflow-hidden rounded-3xl border border-linha bg-areia p-7 shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:-translate-y-1 group-hover:border-salmon/45 group-hover:bg-branco group-hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:mt-8 lg:p-8">
               {/* A mesma régua de lançamento das abas de serviço. */}
               <span
                 aria-hidden
