@@ -148,6 +148,13 @@ body:has(.pagina-em-breve) .botao-whatsapp {
   display: none;
 }
 
+/* O botão do WhatsApp é z-50 para flutuar sobre o conteúdo, e o menu em tela
+   cheia é z-40 (abaixo do header, que precisa manter o botão de fechar
+   acessível). Sem isto o botão fica boiando sobre o menu aberto. */
+body:has(.menu-aberto) .botao-whatsapp {
+  display: none;
+}
+
 body:has(.pagina-em-breve) {
   overflow: hidden;
 }
