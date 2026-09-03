@@ -82,6 +82,10 @@ export const config = {
     // Tudo, menos a própria página Em breve, a rota que valida a senha,
     // os assets e o robots.txt (que precisa continuar respondendo para os
     // buscadores enquanto o site está fechado).
-    "/((?!em-breve|api/acesso|robots.txt|_next/static|_next/image|images|fonts|favicon.ico).*)",
+    //
+    // O painel também fica de fora: ele tem senha própria (ADMIN_SENHA) e não
+    // deve exigir as duas. Ficar fora daqui não o expõe — sem a senha do
+    // painel ele não abre, e essa continua sendo a única porta.
+    "/((?!em-breve|admin|api/acesso|api/admin|robots.txt|_next/static|_next/image|images|fonts|favicon.ico).*)",
   ],
 };
