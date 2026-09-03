@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { vitrine } from "@/lib/showcase";
+import { type PecaVitrine } from "@/lib/showcase";
 import Lightbox from "@/components/Lightbox";
 
 // Vitrine de trabalhos.
@@ -21,7 +21,7 @@ import Lightbox from "@/components/Lightbox";
 const VELOCIDADE = 26; // pixels por segundo
 const LIMIAR_ARRASTO = 6;
 
-export default function WorkShowcase() {
+export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
   const area = useRef<HTMLDivElement>(null);
   const trilho = useRef<HTMLDivElement>(null);
   const [aberta, setAberta] = useState<number | null>(null);

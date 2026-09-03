@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { blogPosts } from "@/lib/blog-posts";
+import { lerPosts } from "@/lib/conteudo";
 import PageHero from "@/components/PageHero";
 import CtaFinal from "@/components/CtaFinal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -19,7 +19,9 @@ function formatarData(data: string) {
   });
 }
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const blogPosts = await lerPosts();
+
   return (
     <>
       <PageHero

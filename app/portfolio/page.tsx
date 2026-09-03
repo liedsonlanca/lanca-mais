@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
-import { caseStudies } from "@/lib/portfolio";
+import { lerCases } from "@/lib/conteudo";
 import PageHero from "@/components/PageHero";
 import CtaFinal from "@/components/CtaFinal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -11,7 +11,9 @@ export const metadata: Metadata = {
     "Cases de marcas que trabalharam com a LANÇA+ em estratégia, conteúdo, tráfego pago e identidade visual.",
 };
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const caseStudies = await lerCases();
+
   return (
     <>
       <PageHero

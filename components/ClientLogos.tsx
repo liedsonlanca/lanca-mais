@@ -1,11 +1,13 @@
 import Image from "next/image";
-import { clientes } from "@/lib/clients";
+import { lerLogos } from "@/lib/conteudo";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 
 // Faixa de marcas atendidas. Sem logos cadastrados, não renderiza nada —
 // melhor a seção não existir do que existir vazia.
-export default function ClientLogos() {
+export default async function ClientLogos() {
+  const clientes = await lerLogos();
+
   if (clientes.length === 0) return null;
 
   return (

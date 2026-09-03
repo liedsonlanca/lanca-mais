@@ -6,9 +6,9 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import WordReveal from "@/components/motion/WordReveal";
 import Counter from "@/components/motion/Counter";
-import { stats } from "@/lib/site-config";
+import { type Numero } from "@/lib/conteudo";
 
-export default function Hero() {
+export default function Hero({ numeros }: { numeros: Numero[] }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -121,8 +121,8 @@ export default function Hero() {
           className="mt-16 hidden flex-col gap-8 border-t border-borda/70 pt-8 lg:flex lg:flex-row lg:items-center lg:justify-between"
         >
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:gap-12">
-            {stats.map((stat) => (
-              <div key={stat.label}>
+            {numeros.map((stat) => (
+              <div key={stat.rotulo}>
                 <span className="font-heading block text-3xl font-semibold text-salmon lg:text-4xl">
                   <Counter
                     valor={stat.valor}
@@ -131,7 +131,7 @@ export default function Hero() {
                   />
                 </span>
                 <span className="mt-1 block text-xs uppercase tracking-widest text-bege/68">
-                  {stat.label}
+                  {stat.rotulo}
                 </span>
               </div>
             ))}

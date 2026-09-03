@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { navLinks, services, siteConfig } from "@/lib/site-config";
 import FooterMap from "@/components/FooterMap";
-import { blogPosts } from "@/lib/blog-posts";
+import { lerPosts } from "@/lib/conteudo";
 
 const socials = [
   {
@@ -27,7 +27,9 @@ function formatDate(date: string) {
   });
 }
 
-export default function Footer() {
+export default async function Footer() {
+  const blogPosts = await lerPosts();
+
   return (
     <footer className="border-t border-borda bg-abismo text-bege">
       <div className="mx-auto max-w-6xl px-6 py-14">

@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { blogPosts, getPostBySlug } from "@/lib/blog-posts";
+import { lerPosts } from "@/lib/conteudo";
 import CtaFinal from "@/components/CtaFinal";
 import Reveal from "@/components/motion/Reveal";
 import WordReveal from "@/components/motion/WordReveal";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const blogPosts = await lerPosts();
   return blogPosts.map((post) => ({ slug: post.slug }));
 }
 
@@ -16,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = (await lerPosts()).find((p) => p.slug === slug);
   if (!post) return {};
   return {
     title: post.title,
@@ -46,7 +47,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = (await lerPosts()).find((p) => p.slug === slug);
   if (!post) notFound();
 
   return (

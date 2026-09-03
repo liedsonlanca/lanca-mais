@@ -1,8 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { siteConfig, stats, testimonials, faq } from "@/lib/site-config";
-import { blogPosts } from "@/lib/blog-posts";
-import { caseStudies } from "@/lib/portfolio";
+import { siteConfig, faq } from "@/lib/site-config";
+import {
+  lerVitrine,
+  lerDepoimentos,
+  lerCases,
+  lerNumeros,
+  lerPosts,
+} from "@/lib/conteudo";
 import Hero from "@/components/Hero";
 import NicheMarquee from "@/components/NicheMarquee";
 import ServiceRows from "@/components/ServiceRows";
@@ -109,12 +114,22 @@ function formatarData(data: string) {
 // pede card areia, seção areia pede card branco (ver README). Quando der,
 // prefira ajustar as pontas (a faixa de nichos e o CTA, que não têm cards) a
 // virar as seções do meio.
-export default function Home() {
+export default async function Home() {
+  // Conteúdo editável pelo painel. Sem banco configurado cada leitura devolve
+  // o conteúdo estático de lib/, então a home nunca fica vazia.
+  const [vitrine, depoimentos, cases, numeros, posts] = await Promise.all([
+    lerVitrine(),
+    lerDepoimentos(),
+    lerCases(),
+    lerNumeros(),
+    lerPosts(),
+  ]);
+
   return (
     <>
       <FaqJsonLd />
 
-      <Hero />
+      <Hero numeros={numeros} />
       <NicheMarquee />
 
       {/* ---------- 1. Serviços ---------- */}
@@ -223,7 +238,7 @@ export default function Home() {
         </div>
 
         <div className="pb-28 pt-16 lg:pb-36">
-          <WorkShowcase />
+          <WorkShowcase vitrine={vitrine} />
         </div>
       </section>
 
@@ -257,7 +272,7 @@ export default function Home() {
           />
 
           <Stagger className="mt-16 grid gap-5 md:grid-cols-2">
-            {caseStudies.map((caso) => (
+            {cases.map((caso) => (
               <StaggerItem key={caso.slug}>
                 {/* No claro o texto sai de cima da foto e vai para o card:
                     sobre a imagem ele exigiria um véu escuro em toda peça. */}
@@ -320,7 +335,7 @@ export default function Home() {
           />
 
           <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {testimonials.map((depoimento, i) => (
+            {depoimentos.map((depoimento, i) => (
               <StaggerItem
                 // Os depoimentos ainda são placeholders com o mesmo nome; o índice
                 // garante chave única até entrarem os depoimentos reais.
@@ -341,7 +356,7 @@ export default function Home() {
                 </span>
 
                 <p className="mt-7 flex-1 text-[17px] leading-relaxed text-preto/85">
-                  {depoimento.quote}
+                  {depoimento.citacao}
                 </p>
 
                 <div className="mt-8 flex items-center gap-4 border-t border-linha pt-6">
@@ -349,14 +364,14 @@ export default function Home() {
                     aria-hidden
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-salmon-texto"
                   >
-                    {depoimento.name.replace(/[^A-Za-zÀ-ÿ ]/g, '').trim().charAt(0).toUpperCase() || '•'}
+                    {depoimento.nome.replace(/[^A-Za-zÀ-ÿ ]/g, '').trim().charAt(0).toUpperCase() || '•'}
                   </span>
                   <span>
                     <span className="block font-semibold text-preto">
-                      {depoimento.name}
+                      {depoimento.nome}
                     </span>
                     <span className="block text-sm text-preto/60">
-                      {depoimento.role}
+                      {depoimento.cargo}
                     </span>
                   </span>
                 </div>
@@ -387,7 +402,7 @@ export default function Home() {
           />
 
           <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {blogPosts.slice(0, 3).map((post) => (
+            {posts.slice(0, 3).map((post) => (
               <StaggerItem key={post.slug} className="h-full">
                 <Link
                   href={`/blog/${post.slug}`}
@@ -482,8 +497,8 @@ export default function Home() {
 
               <Reveal delay={0.2}>
                 <div className="mt-10 grid grid-cols-2 gap-8 border-t border-preto/10 pt-10">
-                  {stats.map((stat) => (
-                    <div key={stat.label}>
+                  {numeros.map((stat) => (
+                    <div key={stat.rotulo}>
                       <span className="font-heading block text-4xl font-semibold text-preto">
                         <Counter
                           valor={stat.valor}
@@ -492,7 +507,7 @@ export default function Home() {
                         />
                       </span>
                       <span className="mt-1 block text-sm text-preto/68">
-                        {stat.label}
+                        {stat.rotulo}
                       </span>
                     </div>
                   ))}
