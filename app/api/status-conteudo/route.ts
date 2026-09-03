@@ -42,11 +42,41 @@ export async function GET() {
       contagem[tabela] = linhas[0]?.total ?? 0;
     }
 
+    // Colunas de cada tabela. Uma coluna que não chegou (ALTER que não rodou)
+    // faz a leitura falhar e o site cair para o conteúdo estático, sem erro
+    // visível — foi o que sumiu com a faixa de logos.
+    const colunas = (await sql.query(
+      `SELECT table_name, string_agg(column_name, ', ' ORDER BY ordinal_position) AS campos
+         FROM information_schema.columns
+        WHERE table_schema = 'public'
+        GROUP BY table_name`
+    )) as Array<{ table_name: string; campos: string }>;
+
+    // Roda as mesmas consultas que as páginas rodam, e guarda o erro de cada
+    // uma. É a diferença entre "a tabela tem linhas" e "a página consegue ler".
+    const leituras: Record<string, string> = {};
+    const consultas: Array<[string, string]> = [
+      ["logos", "SELECT nome, logo, escala FROM logos ORDER BY ordem, id"],
+      ["depoimentos", "SELECT citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"],
+      ["vitrine", "SELECT src, alt, tipo, video, legenda FROM vitrine ORDER BY ordem, id"],
+    ];
+
+    for (const [nome, consulta] of consultas) {
+      try {
+        const linhas = (await sql.query(consulta)) as unknown[];
+        leituras[nome] = `ok, ${linhas.length} linhas`;
+      } catch (erro) {
+        leituras[nome] = `FALHOU: ${erro instanceof Error ? erro.message : String(erro)}`;
+      }
+    }
+
     return NextResponse.json({
       banco: true,
       tabelas: contagem,
+      leituras,
+      colunas: Object.fromEntries(colunas.map((c) => [c.table_name, c.campos])),
       diagnostico:
-        "Banco conectado e tabelas criadas. Os números acima são as linhas de cada bloco editável.",
+        "Banco conectado. 'tabelas' conta as linhas; 'leituras' roda as consultas que as páginas usam e mostra qual falha.",
     });
   } catch (erro) {
     return NextResponse.json(

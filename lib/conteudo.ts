@@ -146,9 +146,21 @@ export async function lerLogos(): Promise<Cliente[]> {
       }
     });
 
-    return (await sql!.query(
-      "SELECT nome, logo, escala FROM logos ORDER BY ordem, id"
-    )) as Cliente[];
+    // A coluna `escala` é recente. Se por algum motivo o ALTER não tiver
+    // rodado neste banco, a consulta falharia e a faixa cairia para a lista
+    // estática — que é vazia, então ela sumiria do site inteiro, sem erro
+    // visível. Aqui a segunda tentativa devolve os logos sem o ajuste de
+    // tamanho: melhor a faixa aparecer com tamanhos desiguais do que não
+    // aparecer.
+    try {
+      return (await sql!.query(
+        "SELECT nome, logo, escala FROM logos ORDER BY ordem, id"
+      )) as Cliente[];
+    } catch {
+      return (await sql!.query(
+        "SELECT nome, logo FROM logos ORDER BY ordem, id"
+      )) as Cliente[];
+    }
   }, clientes);
 }
 
