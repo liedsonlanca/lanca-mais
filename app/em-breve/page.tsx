@@ -2,15 +2,17 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
+import { lerConfigSite } from "@/lib/modo-site";
 import FormularioAcesso from "@/components/FormularioAcesso";
+import ContagemRegressiva from "@/components/ContagemRegressiva";
 
-// A página Em breve mantém a tipografia e as cores da versão que já está no ar:
-// ela é a face pública da marca hoje e não deve mudar de cara na migração.
-// Por isso usa Cormorant Garamond e Plus Jakarta Sans, e não as fontes do site
-// novo (Palmore e Google Sans).
+// A página Em breve mantém a tipografia da versão que já esteve no ar: ela é a
+// face pública da marca hoje, e trocar a fonte seria trocar a marca no meio do
+// pré-lançamento. Por isso Cormorant Garamond e Plus Jakarta Sans, e não as
+// fontes do site novo.
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["300", "600", "700"],
   style: ["normal", "italic"],
   variable: "--fonte-em-breve-display",
   display: "swap",
@@ -26,9 +28,11 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Em breve",
   description: `${siteConfig.name}. ${siteConfig.tagline}`,
-  // O site ainda não está pronto: nada aqui deve ser indexado.
   robots: { index: false, follow: false },
 };
+
+// A data vem do banco e muda pelo painel: nada de cache.
+export const dynamic = "force-dynamic";
 
 const canais = [
   {
@@ -67,84 +71,111 @@ const canais = [
   },
 ];
 
-export default function EmBrevePage() {
+export default async function EmBrevePage() {
+  const { lancamento } = await lerConfigSite();
+
   return (
     // A classe pagina-em-breve é o gancho que esconde header, rodapé e o botão
     // flutuante do WhatsApp: esta página é uma tela inteira, não uma seção.
     //
     // data-lenis-prevent devolve a rolagem nativa a este contêiner. Sem ele o
     // Lenis, que é global, captura a roda e o toque para rolar a janela — que
-    // aqui está travada (body overflow hidden), então nada se movia: numa tela
-    // baixa o conteúdo passa de 900px e ninguém alcançava os contatos nem o
-    // botão de acesso.
+    // aqui está travada, então nada se moveria em tela baixa.
     <section
       data-lenis-prevent
-      className={`${cormorant.variable} ${jakarta.variable} pagina-em-breve fixed inset-0 z-[100] overflow-y-auto bg-[#0D0D0B] text-[#E8E4D9]`}
+      className={`${cormorant.variable} ${jakarta.variable} pagina-em-breve noise fixed inset-0 z-[100] overflow-y-auto bg-[#0D0D0B] text-[#E8E4D9]`}
       style={{ fontFamily: "var(--fonte-em-breve-texto), system-ui, sans-serif" }}
     >
-      {/* Padrão da marca ao fundo, discreto como na versão atual. */}
+      {/* Padrão da marca ao fundo, agora só como textura: bem mais apagado que
+          antes, para não competir com a contagem. */}
       <Image
         src="/images/fundo-inicio.jpg"
         alt=""
         fill
         priority
         sizes="100vw"
-        className="object-cover object-top opacity-[0.35]"
+        className="object-cover object-top opacity-[0.18]"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0D0D0B]/80 via-[#0D0D0B]/90 to-[#0D0D0B]" />
 
-      <div className="relative mx-auto flex min-h-full max-w-3xl flex-col items-center px-6 py-16 text-center sm:py-20">
+      {/* Dois véus: um vertical, que assenta o topo e o rodapé, e um brilho
+          salmão atrás do centro, o mesmo gesto das seções claras do site. */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0D0D0B] via-[#0D0D0B]/85 to-[#0D0D0B]" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[620px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.14] blur-3xl"
+        style={{ background: "radial-gradient(closest-side, #D97B45, transparent)" }}
+      />
+
+      <div className="relative mx-auto flex min-h-full max-w-4xl flex-col items-center px-6 py-14 text-center sm:py-20">
         <Image
           src="/images/logo-1.png"
           alt={siteConfig.name}
           width={220}
           height={62}
           priority
-          className="h-10 w-auto sm:h-12"
+          className="h-9 w-auto sm:h-11"
         />
 
-        {/* Fio vertical separando a marca do anúncio. */}
-        <span aria-hidden className="mt-10 block h-16 w-px bg-[#E8E4D9]/25" />
+        {/* Fio vertical: o mesmo respiro que separa marca e anúncio. */}
+        <span aria-hidden className="mt-8 block h-12 w-px bg-[#E8E4D9]/20 sm:mt-10 sm:h-16" />
+
+        <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.32em] text-[#D97B45] sm:mt-10 sm:text-xs">
+          Agência de marketing completa
+        </p>
 
         <h1
-          className="mt-10 text-[clamp(3.25rem,13vw,6rem)] font-semibold leading-[1.02]"
+          className="mt-5 text-[clamp(2.75rem,11vw,5.5rem)] font-semibold leading-[1.02]"
           style={{ fontFamily: "var(--fonte-em-breve-display), Georgia, serif" }}
         >
-          em <em className="text-[#D97B45]">breve.</em>
+          Estamos <em className="text-[#D97B45]">lançando</em>
+          <span className="mt-1 block font-light text-[#E8E4D9]/70">
+            algo à altura da sua marca.
+          </span>
         </h1>
 
-        <p
-          className="mt-6 text-xl italic text-[#E8E4D9]/60 sm:text-2xl"
-          style={{ fontFamily: "var(--fonte-em-breve-display), Georgia, serif" }}
-        >
-          Nosso site oficial está a caminho.
-        </p>
+        {/* Régua de lançamento: o gesto da marca, aqui como assinatura. */}
+        <span
+          aria-hidden
+          className="mt-8 block h-px w-24 bg-gradient-to-r from-transparent via-[#D97B45] to-transparent"
+        />
 
-        <p className="mt-10 max-w-xl leading-relaxed text-[#E8E4D9]/72">
-          Enquanto finalizamos nosso novo site, entre em contato com a nossa
-          equipe pelos canais abaixo e{" "}
+        {lancamento && (
+          <div className="mt-10 w-full sm:mt-12">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-[#E8E4D9]/40 sm:text-xs">
+              O novo site entra no ar em
+            </p>
+            <div className="mt-6">
+              <ContagemRegressiva lancamento={lancamento} />
+            </div>
+          </div>
+        )}
+
+        <p className="mt-10 max-w-xl leading-relaxed text-[#E8E4D9]/70 sm:mt-12">
+          Enquanto finalizamos, a equipe continua atendendo normalmente.{" "}
           <strong className="font-semibold text-[#E8E4D9]">
-            solicite um orçamento para o seu negócio.
-          </strong>
+            Fale com a gente e peça um orçamento
+          </strong>{" "}
+          — a primeira conversa é sem compromisso.
         </p>
 
-        <p className="mt-5 max-w-xl leading-relaxed text-[#E8E4D9]/72">
-          Será um prazer atender você e desenvolver uma solução estratégica para
-          a sua marca.
-        </p>
-
-        <div className="mt-12 grid w-full gap-4 sm:grid-cols-3">
+        <div className="mt-10 grid w-full gap-3 sm:mt-12 sm:grid-cols-3 sm:gap-4">
           {canais.map((canal) => (
             <a
               key={canal.rotulo}
               href={canal.href}
               target={canal.externo ? "_blank" : undefined}
               rel={canal.externo ? "noopener noreferrer" : undefined}
-              className="group flex flex-col items-center gap-3 rounded-2xl border border-[#E8E4D9]/12 bg-[#E8E4D9]/[0.04] px-5 py-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#D97B45]/50 hover:bg-[#E8E4D9]/[0.07]"
+              className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-[#E8E4D9]/10 bg-[#E8E4D9]/[0.03] px-5 py-4 text-left transition-all duration-500 hover:border-[#D97B45]/50 hover:bg-[#E8E4D9]/[0.07] sm:flex-col sm:items-center sm:px-5 sm:py-7 sm:text-center"
             >
+              {/* A régua cresce na borda esquerda, como nas abas de serviço. */}
               <span
                 aria-hidden
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#D97B45]/15 text-[#D97B45] transition-colors duration-300 group-hover:bg-[#D97B45] group-hover:text-[#0D0D0B]"
+                className="absolute left-0 top-0 h-0 w-[2px] bg-[#D97B45] transition-all duration-700 ease-out group-hover:h-full"
+              />
+
+              <span
+                aria-hidden
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D97B45]/12 text-[#D97B45] transition-colors duration-500 group-hover:bg-[#D97B45] group-hover:text-[#0D0D0B]"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -153,21 +184,39 @@ export default function EmBrevePage() {
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="h-5 w-5"
+                  className="h-[18px] w-[18px]"
                 >
                   {canal.icone}
                 </svg>
               </span>
 
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E8E4D9]/50">
-                {canal.rotulo}
+              <span className="min-w-0">
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#E8E4D9]/45">
+                  {canal.rotulo}
+                </span>
+                <span className="mt-0.5 block truncate text-sm font-medium text-[#E8E4D9]">
+                  {canal.valor}
+                </span>
               </span>
-              <span className="font-medium text-[#E8E4D9]">{canal.valor}</span>
             </a>
           ))}
         </div>
 
-        <FormularioAcesso />
+        {/* mt-auto empurra a assinatura e o acesso para o fim em tela alta,
+            sem sobrepor nada em tela baixa. */}
+        <div className="mt-auto w-full pt-12">
+          <p
+            className="text-lg italic text-[#E8E4D9]/45"
+            style={{ fontFamily: "var(--fonte-em-breve-display), Georgia, serif" }}
+          >
+            Somos movimento. Somos ideia em ação.{" "}
+            <span className="text-[#D97B45]/80">Somos LANÇA+</span>
+          </p>
+
+          <div className="mt-8 flex justify-center">
+            <FormularioAcesso />
+          </div>
+        </div>
       </div>
     </section>
   );

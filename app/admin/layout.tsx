@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 // Server Actions conferem de novo por conta própria, porque são alcançáveis
 // por POST direto, sem passar por esta árvore.
 const SECOES = [
+  { href: "/admin/site", rotulo: "Estado do site" },
   { href: "/admin/vitrine", rotulo: "Nosso trabalho" },
   { href: "/admin/depoimentos", rotulo: "Depoimentos" },
   { href: "/admin/cases", rotulo: "Cases" },
