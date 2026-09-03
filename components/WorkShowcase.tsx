@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { type PecaVitrine } from "@/lib/showcase";
 import Lightbox from "@/components/Lightbox";
+import VitrineVideo from "@/components/VitrineVideo";
 
 // Vitrine de trabalhos.
 //
@@ -178,16 +179,27 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                 aria-label={`Ampliar: ${peca.legenda ?? peca.alt}`}
                 className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 hover:border-salmon/60 hover:shadow-[0_28px_60px_-30px_rgba(10,10,8,0.6)] focus-visible:border-salmon focus-visible:outline-none sm:w-[240px] lg:w-[280px]"
               >
-                <Image
-                  src={peca.src}
-                  alt={copia ? "" : peca.alt}
-                  fill
-                  // Sem isto o navegador inicia o arrasto nativo da imagem e o
-                  // gesto do trilho morre no meio.
-                  draggable={false}
-                  sizes="(max-width: 640px) 200px, (max-width: 1024px) 240px, 280px"
-                  className="object-cover transition-transform duration-[1.2s] group-hover:scale-[1.05]"
-                />
+                {peca.tipo === "video" && peca.video ? (
+                  // O vídeo toca no próprio trilho, sem esperar clique. Clicar
+                  // continua abrindo a versão ampliada, agora com som.
+                  <VitrineVideo
+                    src={peca.video}
+                    poster={peca.src || undefined}
+                    alt={copia ? "" : peca.alt}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] group-hover:scale-[1.05]"
+                  />
+                ) : (
+                  <Image
+                    src={peca.src}
+                    alt={copia ? "" : peca.alt}
+                    fill
+                    // Sem isto o navegador inicia o arrasto nativo da imagem e o
+                    // gesto do trilho morre no meio.
+                    draggable={false}
+                    sizes="(max-width: 640px) 200px, (max-width: 1024px) 240px, 280px"
+                    className="object-cover transition-transform duration-[1.2s] group-hover:scale-[1.05]"
+                  />
+                )}
 
                 <span
                   aria-hidden

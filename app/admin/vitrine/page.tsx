@@ -1,4 +1,5 @@
 import CampoArquivo from "@/components/admin/CampoArquivo";
+import SeletorTipoPeca from "@/components/admin/SeletorTipoPeca";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import { blobConfigurado } from "@/lib/upload";
@@ -18,7 +19,6 @@ import {
   apagarPeca,
   moverPeca,
   posicionarPeca,
-  removerVideo,
 } from "./acoes";
 
 export const dynamic = "force-dynamic";
@@ -56,9 +56,9 @@ export default async function AdminVitrine() {
       <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-preto/70`}>
         <strong className="font-medium text-preto">Formato:</strong> as peças
         aparecem em pé, na proporção 4:5 do feed. Uma imagem quadrada ou
-        deitada vai ser cortada em cima e embaixo. Para vídeo, envie também uma
-        imagem de capa: é ela que aparece no trilho, e o vídeo só toca quando
-        alguém clica.
+        deitada vai ser cortada em cima e embaixo. O vídeo toca sozinho e sem
+        som no trilho, e ganha o som ao ser aberto — por isso vale começar por
+        uma imagem forte no primeiro segundo.
       </div>
 
       {!sql && (
@@ -80,21 +80,7 @@ export default async function AdminVitrine() {
         <h2 className="font-medium text-preto">Adicionar peça</h2>
 
         <div className="mt-5 grid gap-4">
-          <CampoArquivo
-            name="capa"
-            pasta="vitrine"
-            label="Imagem (obrigatória)"
-            obrigatorio
-            ajuda="JPG, PNG ou WEBP, até 8 MB, em pé (4:5)."
-          />
-
-          <CampoArquivo
-            name="video"
-            pasta="vitrine"
-            aceita="video"
-            label="Vídeo (opcional)"
-            ajuda="MP4, WEBM ou MOV, até 60 MB. Vídeo consome banda a cada visita, então prefira o arquivo mais leve que mantenha a qualidade."
-          />
+          <SeletorTipoPeca />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -142,18 +128,25 @@ export default async function AdminVitrine() {
         {pecas.map((p, i) => (
           <div key={p.id} className={cartao}>
             <div className="flex items-start gap-4">
-              <div className="relative h-28 w-[90px] shrink-0 overflow-hidden rounded-xl border border-linha">
-                <Image
-                  src={p.src}
-                  alt={p.alt}
-                  fill
-                  sizes="90px"
-                  className="object-cover"
-                />
-                {p.video && (
-                  <span className="absolute bottom-1 left-1 rounded-full bg-preto/70 px-2 py-0.5 text-[10px] font-medium text-branco">
-                    vídeo
-                  </span>
+              {/* Peça de vídeo não tem imagem: a prévia é o próprio vídeo,
+                  parado no primeiro quadro. */}
+              <div className="relative h-28 w-[90px] shrink-0 overflow-hidden rounded-xl border border-linha bg-areia">
+                {p.video ? (
+                  <video
+                    src={p.video}
+                    muted
+                    playsInline
+                    preload="metadata"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={p.src}
+                    alt={p.alt}
+                    fill
+                    sizes="90px"
+                    className="object-cover"
+                  />
                 )}
               </div>
 
@@ -259,32 +252,27 @@ export default async function AdminVitrine() {
                 />
               </div>
 
-              <CampoArquivo
-                name="capa"
-                pasta="vitrine"
-                label="Trocar a imagem"
-              />
-
-              <CampoArquivo
-                name="video"
-                pasta="vitrine"
-                aceita="video"
-                label={p.video ? "Trocar o vídeo" : "Adicionar vídeo"}
-              />
+              {/* Só o campo do tipo que a peça já é: trocar imagem por vídeo
+                  seria outra peça, e é mais claro apagar e criar de novo. */}
+              {p.video ? (
+                <CampoArquivo
+                  name="video"
+                  pasta="vitrine"
+                  aceita="video"
+                  label="Trocar o vídeo"
+                />
+              ) : (
+                <CampoArquivo
+                  name="capa"
+                  pasta="vitrine"
+                  label="Trocar a imagem"
+                />
+              )}
 
               <button type="submit" className={`${botaoSecundario} justify-self-start`}>
                 Salvar
               </button>
             </form>
-
-            {p.video && (
-              <form action={removerVideo} className="mt-3">
-                <input type="hidden" name="id" value={p.id} />
-                <button type="submit" className={botaoDiscreto}>
-                  Remover o vídeo e deixar só a imagem
-                </button>
-              </form>
-            )}
 
             <form action={apagarPeca} className="mt-4 border-t border-linha pt-4">
               <input type="hidden" name="id" value={p.id} />

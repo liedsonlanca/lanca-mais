@@ -20,20 +20,22 @@ function atualizarSite() {
 export async function criarPeca(dados: FormData) {
   const banco = await preparar();
 
-  // A capa é obrigatória mesmo em vídeo: é ela que aparece no trilho, e sem
-  // ela o ladrilho ficaria vazio até o vídeo carregar.
+  // Uma coisa ou outra: o vídeo toca sozinho no trilho e mostra o próprio
+  // primeiro quadro, então não precisa de capa.
+  const ehVideo = texto(dados, "tipo") === "video";
   const capa = urlEnviada(dados, "capa");
-  if (!capa) throw new Error("Escolha a imagem de capa.");
-
   const video = urlEnviada(dados, "video");
+
+  if (ehVideo && !video) throw new Error("Escolha o arquivo de vídeo.");
+  if (!ehVideo && !capa) throw new Error("Escolha a imagem.");
 
   await banco.query(
     "INSERT INTO vitrine (src, alt, tipo, video, legenda, ordem) VALUES ($1,$2,$3,$4,$5,$6)",
     [
-      capa,
+      ehVideo ? "" : capa,
       texto(dados, "alt") || "Trabalho da LANÇA+",
-      video ? "video" : "imagem",
-      video,
+      ehVideo ? "video" : "imagem",
+      ehVideo ? video : null,
       texto(dados, "legenda") || null,
       await proximaOrdem("vitrine"),
     ]
@@ -56,13 +58,14 @@ export async function salvarPeca(dados: FormData) {
     [id]
   )) as Array<{ src: string; video: string | null }>;
 
+  // Trocar o arquivo não muda o tipo da peça: quem é vídeo continua vídeo, e
+  // o formulário só oferece o campo do tipo que ela já tem.
   await banco.query(
     `UPDATE vitrine
         SET src = COALESCE($1, src),
             video = COALESCE($2, video),
             alt = $3,
-            legenda = $4,
-            tipo = CASE WHEN COALESCE($2, video) IS NULL THEN 'imagem' ELSE 'video' END
+            legenda = $4
       WHERE id = $5`,
     [capa, video, texto(dados, "alt"), texto(dados, "legenda") || null, id]
   );
@@ -71,26 +74,6 @@ export async function salvarPeca(dados: FormData) {
   // ninguém e vira peso morto na cota.
   if (capa) await apagarArquivo(antes[0]?.src);
   if (video) await apagarArquivo(antes[0]?.video);
-
-  atualizarSite();
-}
-
-/** Tira o vídeo e devolve a peça à condição de imagem. */
-export async function removerVideo(dados: FormData) {
-  const banco = await preparar();
-
-  const id = Number(dados.get("id"));
-  if (!Number.isFinite(id)) return;
-
-  const antes = (await banco.query("SELECT video FROM vitrine WHERE id = $1", [
-    id,
-  ])) as Array<{ video: string | null }>;
-
-  await banco.query(
-    "UPDATE vitrine SET video = NULL, tipo = 'imagem' WHERE id = $1",
-    [id]
-  );
-  await apagarArquivo(antes[0]?.video);
 
   atualizarSite();
 }
