@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -96,7 +95,7 @@ export default async function ServicoPage({
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <Link
                     href="/contato"
-                    className="rounded-full bg-salmon px-7 py-3.5 text-center font-medium text-preto shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
+                    className="rounded-full bg-salmon-texto px-7 py-3.5 text-center font-medium text-branco shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
                   >
                     {page.ctaLabel}
                   </Link>
@@ -155,24 +154,12 @@ export default async function ServicoPage({
         </div>
       </section>
 
-      {/* ---------- Faixa de imagem ---------- */}
-      <section className="relative overflow-hidden bg-bege">
-        <div className="mx-auto max-w-7xl px-6 pb-24 lg:px-10 lg:pb-32">
-          <Reveal distance={40}>
-            <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-linha sm:aspect-[21/9]">
-              <Image
-                src={page.heroImage}
-                alt={service.name}
-                fill
-                priority
-                sizes="(max-width: 1280px) 100vw, 1280px"
-                className="object-cover object-top grayscale"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-abismo/70 via-transparent to-transparent" />
-            </div>
-          </Reveal>
-        </div>
-      </section>
+      {/* A faixa de imagem que ficava aqui foi retirada: a foto era recortada
+          numa proporção muito deitada e sobrava a parte errada do
+          enquadramento, sem acrescentar nada ao argumento da página.
+
+          O manifesto acima é bege e "Como funciona" abaixo é papel, então a
+          alternância de fundos segue correta sem ela. */}
 
       {/* ---------- Como funciona ---------- */}
       <section

@@ -16,7 +16,7 @@ export const ajuda = "mt-2 text-xs leading-relaxed text-preto/50";
 export const botao =
   "inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-medium transition-colors duration-300";
 
-export const botaoPrimario = `${botao} bg-salmon text-preto hover:bg-salmon-escuro`;
+export const botaoPrimario = `${botao} bg-salmon-texto text-branco hover:bg-salmon-escuro`;
 
 export const botaoSecundario = `${botao} border border-preto/20 text-preto hover:border-preto`;
 

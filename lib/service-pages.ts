@@ -6,7 +6,6 @@ export type ServicePage = {
   slug: string;
   heroKicker: string;
   heroSubtitle: string;
-  heroImage: string;
   deliverables: string[];
   manifesto: {
     statement: string;
@@ -28,7 +27,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "O carro-chefe da agência",
     heroSubtitle:
       "Onde a marca deixa de postar por postar e passa a se posicionar. No digital, ninguém escolhe o mais barato, escolhe-se quem parece mais preparado.",
-    heroImage: "/images/team/LFF_0473_resized.jpg",
     deliverables: [
       "Posicionamento de marca",
       "Linha editorial definida",
@@ -132,7 +130,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "Direção estratégica para o seu time",
     heroSubtitle:
       "Sua equipe executa, a LANÇA+ direciona. Diagnóstico honesto, estratégia clara e um olhar externo especializado para destravar o crescimento da marca.",
-    heroImage: "/images/team/LFF_0519_resized.jpg",
     deliverables: [
       "Auditoria de perfil",
       "Análise de concorrência",
@@ -234,7 +231,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "Produção que para o scroll",
     heroSubtitle:
       "Do roteiro à edição final. Vídeos pensados para reter atenção nos primeiros segundos e comunicar o valor da marca até o último.",
-    heroImage: "/images/team/LFF_0602_resized.jpg",
     deliverables: [
       "Roteirização",
       "Captação em estúdio e externa",
@@ -337,7 +333,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "Performance com método",
     heroSubtitle:
       "Anúncio não é sorte nem mágica: é público certo, criativo certo e otimização constante. Campanhas que trazem oportunidades reais, não só cliques.",
-    heroImage: "/images/team/LFF_0551_resized.jpg",
     deliverables: [
       "Meta Ads",
       "Google Ads",
@@ -440,7 +435,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "Marca que se reconhece de longe",
     heroSubtitle:
       "Logotipo, paleta, tipografia e aplicações que traduzem a essência do negócio, para a marca ser lembrada, não confundida.",
-    heroImage: "/images/team/LFF_0691_resized.jpg",
     deliverables: [
       "Naming e conceito",
       "Logotipo",
@@ -543,7 +537,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "Seu melhor vendedor, 24 horas no ar",
     heroSubtitle:
       "Sites e landing pages rápidos, bonitos e feitos para converter, a experiência digital no mesmo nível da marca.",
-    heroImage: "/images/team/LFF_0655_resized.jpg",
     deliverables: [
       "Sites institucionais",
       "Landing pages",
@@ -646,7 +639,6 @@ export const servicePages: Record<string, ServicePage> = {
     heroKicker: "A marca também se constrói no espaço",
     heroSubtitle:
       "Projetos arquitetônicos e de interiores que fazem o cliente sentir, ao entrar, a mesma marca que ele viu nas redes.",
-    heroImage: "/images/team/LFF_0726_resized.jpg",
     deliverables: [
       "Projeto arquitetônico",
       "Design de interiores",

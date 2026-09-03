@@ -81,7 +81,7 @@ export default function LoginAdmin() {
       <button
         type="submit"
         disabled={enviando || senha.length === 0}
-        className="mt-6 w-full rounded-full bg-salmon px-7 py-3.5 font-medium text-preto transition-opacity duration-300 disabled:opacity-50"
+        className="mt-6 w-full rounded-full bg-salmon-texto px-7 py-3.5 font-medium text-branco transition-opacity duration-300 disabled:opacity-50"
       >
         {enviando ? "Entrando" : "Entrar"}
       </button>

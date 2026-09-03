@@ -128,7 +128,7 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <Link
               href="/contato"
-              className="hidden rounded-full bg-salmon px-5 py-2.5 text-sm font-medium text-preto shadow-[0_0_24px_-8px_var(--color-salmon)] transition-all duration-300 hover:shadow-[0_0_36px_-6px_var(--color-salmon)] sm:inline-block"
+              className="hidden rounded-full bg-salmon-texto px-5 py-2.5 text-sm font-medium text-branco shadow-[0_0_24px_-8px_var(--color-salmon)] transition-all duration-300 hover:shadow-[0_0_36px_-6px_var(--color-salmon)] sm:inline-block"
             >
               Pedir orçamento
             </Link>
@@ -274,7 +274,7 @@ export default function Header() {
                 <Link
                   href="/contato"
                   onClick={() => setAberto(false)}
-                  className="block rounded-full bg-salmon px-7 py-4 text-center font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)]"
+                  className="block rounded-full bg-salmon-texto px-7 py-4 text-center font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)]"
                 >
                   Pedir orçamento
                 </Link>

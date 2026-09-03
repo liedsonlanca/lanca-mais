@@ -101,7 +101,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-full bg-salmon px-7 py-4 font-medium text-preto shadow-[0_0_32px_-10px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)] disabled:opacity-60"
+        className="w-full rounded-full bg-salmon-texto px-7 py-4 font-medium text-branco shadow-[0_0_32px_-10px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)] disabled:opacity-60"
       >
         Enviar pelo WhatsApp
       </button>

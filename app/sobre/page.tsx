@@ -160,7 +160,10 @@ export default function SobrePage() {
             lead="Estratégia, social media, design, arquitetura, vídeo e fotografia debaixo do mesmo teto."
           />
 
-          <Stagger className="mt-14 grid gap-6 grid-cols-2 lg:grid-cols-5">
+          {/* Uma coluna por pessoa: com quatro na equipe, a grade de cinco
+              deixava um vão no fim da fileira e espremia todos os cards para
+              caber a coluna vazia. A largura por card sobe cerca de um terço. */}
+          <Stagger className="mt-14 grid grid-cols-2 gap-6 lg:grid-cols-4">
             {team.map((member) => (
               <StaggerItem key={member.name}>
                 {/* A foto ocupa o card inteiro e o nome vem sobre ela, num véu
