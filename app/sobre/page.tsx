@@ -71,7 +71,7 @@ export default function SobrePage() {
         titulo={[
           { texto: "Uma agência completa" },
           { texto: "para marcas que querem" },
-          { texto: "ser levadas a sério.", acento: true },
+          { texto: "ser levadas a sério.", acento: "sério." },
         ]}
         lead="Nascemos para resolver um problema comum: marcas com bons produtos e serviços, mas com uma presença digital que não comunica o valor real do que entregam. A LANÇA+ existe para fechar essa distância."
       />
@@ -99,7 +99,7 @@ export default function SobrePage() {
               alinhamento="esquerda"
               titulo={[
                 { texto: "Transformar marca em" },
-                { texto: "posicionamento, não em ruído.", acento: true },
+                { texto: "posicionamento, não em ruído.", acento: "posicionamento," },
               ]}
             />
 
@@ -130,7 +130,7 @@ export default function SobrePage() {
             alinhamento="esquerda"
             titulo={[
               { texto: "Princípios que guiam" },
-              { texto: "cada entrega.", acento: true },
+              { texto: "cada entrega.", acento: "entrega." },
             ]}
           />
 
@@ -160,7 +160,7 @@ export default function SobrePage() {
             alinhamento="esquerda"
             titulo={[
               { texto: "Quem constrói" },
-              { texto: "a sua marca.", acento: true },
+              { texto: "a sua marca.", acento: "marca." },
             ]}
             lead="Estratégia, social media, design, arquitetura, vídeo e fotografia debaixo do mesmo teto."
           />
@@ -206,6 +206,7 @@ export default function SobrePage() {
       <CtaFinal
         titulo="Vamos construir o"
         destaque="posicionamento da sua marca?"
+        realce="posicionamento"
         lead="Você acabou de conhecer quem vai cuidar dela. O próximo passo é uma conversa, sem compromisso."
         rotulo="Falar com a LANÇA+"
       />

@@ -2,7 +2,32 @@
 
 import { motion, type Variants } from "motion/react";
 
-export type Linha = { texto: string; acento?: boolean };
+// acento: `true` pinta a linha inteira, uma string pinta só aquele trecho.
+// O destaque de uma palavra-chave é o padrão dos títulos de seção; a linha
+// inteira ficou reservada ao hero, onde a frase toda é o gesto.
+export type Linha = { texto: string; acento?: boolean | string };
+
+// Índices das palavras que recebem a cor da marca.
+//
+// Compara palavra a palavra, e não por substring, para não pintar pedaço de
+// palavra: procurar "arca" em "Marcas que" não deve casar.
+function indicesAcentuados(texto: string, acento: Linha["acento"]) {
+  const palavras = texto.split(" ");
+
+  if (acento === true) return new Set(palavras.map((_, i) => i));
+  if (typeof acento !== "string" || acento.trim() === "") return new Set<number>();
+
+  const alvo = acento.trim().split(" ");
+
+  for (let i = 0; i + alvo.length <= palavras.length; i += 1) {
+    if (alvo.every((palavra, j) => palavras[i + j] === palavra)) {
+      return new Set(alvo.map((_, j) => i + j));
+    }
+  }
+
+  // Nada casou: melhor um título sem destaque do que a palavra errada pintada.
+  return new Set<number>();
+}
 
 type Props = {
   linhas: Linha[];
@@ -53,9 +78,13 @@ export default function WordReveal({
       initial="oculto"
       {...animacao}
     >
-      {linhas.map((linha, indiceLinha) => (
-        <span key={indiceLinha} className="block">
-          {linha.texto.split(" ").map((texto, indicePalavra) => (
+      {linhas.map((linha, indiceLinha) => {
+        const palavras = linha.texto.split(" ");
+        const acentuadas = indicesAcentuados(linha.texto, linha.acento);
+
+        return (
+          <span key={indiceLinha} className="block">
+          {palavras.map((texto, indicePalavra) => (
             <span
               key={`${indiceLinha}-${indicePalavra}`}
               // A máscara precisa de overflow oculto e um respiro vertical para
@@ -64,15 +93,16 @@ export default function WordReveal({
             >
               <motion.span
                 variants={palavra}
-                className={linha.acento ? "acento" : undefined}
+                className={acentuadas.has(indicePalavra) ? "acento" : undefined}
               >
                 {texto}
-                {indicePalavra < linha.texto.split(" ").length - 1 ? "\u00A0" : ""}
+                {indicePalavra < palavras.length - 1 ? "\u00A0" : ""}
               </motion.span>
             </span>
           ))}
-        </span>
-      ))}
+          </span>
+        );
+      })}
     </motion.span>
   );
 }

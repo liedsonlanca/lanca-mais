@@ -26,7 +26,7 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
             alinhamento="esquerda"
             titulo={[
               { texto: "Perguntas que" },
-              { texto: "todo mundo faz.", acento: true },
+              { texto: "todo mundo faz.", acento: "faz." },
             ]}
           />
 

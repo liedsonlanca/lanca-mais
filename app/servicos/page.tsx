@@ -19,7 +19,7 @@ export default function ServicosPage() {
         eyebrow="Serviços"
         titulo={[
           { texto: "Sete frentes que constroem" },
-          { texto: "uma marca por inteiro.", acento: true },
+          { texto: "uma marca por inteiro.", acento: "inteiro." },
         ]}
         lead="Cada serviço pode ser contratado isoladamente ou combinado, o que não muda é o padrão de qualidade e o alinhamento estratégico entre eles."
       />

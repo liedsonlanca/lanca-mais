@@ -26,7 +26,7 @@ export default function BlogPage() {
         eyebrow="Blog"
         titulo={[
           { texto: "Estratégia de marca," },
-          { texto: "sem enrolação.", acento: true },
+          { texto: "sem enrolação.", acento: "enrolação." },
         ]}
         lead="Reflexões e processos reais da LANÇA+ sobre marketing de conteúdo, posicionamento e crescimento digital."
       />
@@ -74,6 +74,7 @@ export default function BlogPage() {
       <CtaFinal
         titulo="Quer esse tipo de estratégia"
         destaque="aplicada à sua marca?"
+        realce="marca?"
         lead="Fale com a equipe da LANÇA+ e receba um diagnóstico inicial, sem compromisso."
       />
     </>

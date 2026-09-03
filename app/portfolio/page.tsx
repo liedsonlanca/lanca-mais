@@ -18,7 +18,7 @@ export default function PortfolioPage() {
         eyebrow="Portfólio"
         titulo={[
           { texto: "Marcas que já lançamos" },
-          { texto: "para o próximo nível.", acento: true },
+          { texto: "para o próximo nível.", acento: "nível." },
         ]}
         lead="Uma amostra de como a estratégia da LANÇA+ se adapta a nichos diferentes sem perder consistência de método."
       />
@@ -79,6 +79,7 @@ export default function PortfolioPage() {
       <CtaFinal
         titulo="Quer ser o próximo"
         destaque="case de sucesso?"
+        realce="sucesso?"
         lead="Fale com a equipe e receba um diagnóstico inicial da presença digital da sua marca."
       />
     </>

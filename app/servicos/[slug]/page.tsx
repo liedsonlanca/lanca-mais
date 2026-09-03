@@ -241,7 +241,7 @@ export default async function ServicoPage({
             alinhamento="esquerda"
             titulo={[
               { texto: "O que torna esse" },
-              { texto: "trabalho diferente.", acento: true },
+              { texto: "trabalho diferente.", acento: "diferente." },
             ]}
           />
 

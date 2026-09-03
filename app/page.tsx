@@ -95,14 +95,13 @@ function formatarData(data: string) {
 
 // Ordem da home, e o porquê dela.
 //
-// O hero faz o gancho e a home vai direto ao comercial: o que vendemos
-// (serviços), como é o trabalho (vitrine), deu certo com quem (cases) e quem
-// confirma isso (depoimentos e logos).
+// O hero faz o gancho e a home alterna oferta e argumento, aos pares: o que
+// vendemos (serviços) e por que isso importa (o problema); como é o trabalho
+// (vitrine) e como ele acontece (método). Só então vem a prova — deu certo com
+// quem (cases) e quem confirma (depoimentos e logos).
 //
-// Depois entram as seções de argumentação — diagnóstico do problema e método —,
-// que convencem quem já se interessou. A apresentação da agência fecha a
-// página, encostada no CTA: quem chegou até ali já quer saber com quem vai
-// falar.
+// A apresentação da agência fecha a página, encostada no CTA: quem chegou até
+// ali já quer saber com quem vai falar.
 //
 // Atenção ao mexer nesta ordem: os fundos alternam papel/areia e duas seções
 // vizinhas nunca repetem. Inserir ou remover uma seção inverte a paridade de
@@ -128,7 +127,7 @@ export default function Home() {
             alinhamento="esquerda"
             titulo={[
               { texto: "Sete frentes que" },
-              { texto: "conversam entre si.", acento: true },
+              { texto: "conversam entre si.", acento: "conversam" },
             ]}
             lead="Contrate uma frente ou todas. Juntas, mantêm estratégia, conteúdo, tráfego e identidade na mesma direção."
           />
@@ -155,14 +154,69 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- 2. Vitrine de trabalhos ---------- */}
+      {/* ---------- 2. O problema ---------- */}
       <section className="relative overflow-hidden bg-papel">
+        <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <SectionHeading
+            eyebrow="O problema que resolvemos"
+            titulo={[
+              { texto: "Negócios muito bons" },
+              { texto: "que parecem medianos no digital.", acento: "medianos" },
+            ]}
+            lead="Não é falta de qualidade. É falta de tradução: a marca entrega um nível que a comunicação ainda não mostra."
+          />
+
+          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
+            {sintomas.map((sintoma, i) => (
+              <StaggerItem
+                key={sintoma.titulo}
+                className="group relative h-full overflow-hidden rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
+              >
+                {/* Régua de lançamento, como nas abas de serviço e no método. */}
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full"
+                />
+
+                <span
+                  aria-hidden
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6"
+                  >
+                    {iconesSintoma[i]}
+                  </svg>
+                </span>
+
+                <h3 className="mt-6 text-xl font-semibold leading-snug text-preto">
+                  {sintoma.titulo}
+                </h3>
+                <p className="mt-3 leading-relaxed text-preto/70">
+                  {sintoma.descricao}
+                </p>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
+
+      {/* ---------- 3. Vitrine de trabalhos ---------- */}
+      <section className="relative overflow-hidden bg-areia">
         <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-10 lg:pt-36">
           <SectionHeading
             eyebrow="Nosso trabalho"
             titulo={[
               { texto: "Cada peça que sai daqui" },
-              { texto: "tem um porquê.", acento: true },
+              { texto: "tem um porquê.", acento: "porquê." },
             ]}
             lead="Nada sobe por subir. Todo conteúdo responde a um objetivo da estratégia."
           />
@@ -173,7 +227,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- 3. Cases ---------- */}
+      {/* ---------- 4. Método ---------- */}
+      <section className="relative overflow-hidden bg-papel">
+        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <SectionHeading
+            eyebrow="Nosso método"
+            alinhamento="esquerda"
+            titulo={[
+              { texto: "Quatro etapas que tiram" },
+              { texto: "a marca do improviso.", acento: "improviso." },
+            ]}
+            lead="Um ciclo que não termina na publicação: ele recomeça, com dado na mesa."
+          />
+
+          <MethodSteps etapas={metodo} />
+        </div>
+      </section>
+
+      {/* ---------- 5. Cases ---------- */}
       <section className="relative overflow-hidden bg-areia">
         <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <SectionHeading
@@ -181,7 +252,7 @@ export default function Home() {
             alinhamento="esquerda"
             titulo={[
               { texto: "Marcas que" },
-              { texto: "mudaram de patamar.", acento: true },
+              { texto: "mudaram de patamar.", acento: "patamar." },
             ]}
           />
 
@@ -237,14 +308,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ---------- 4. Depoimentos ---------- */}
+      {/* ---------- 6. Depoimentos ---------- */}
       <section className="relative overflow-hidden bg-papel">
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <SectionHeading
             eyebrow="Depoimentos"
             titulo={[
               { texto: "Quem já" },
-              { texto: "trabalha com a gente.", acento: true },
+              { texto: "trabalha com a gente.", acento: "gente." },
             ]}
           />
 
@@ -301,78 +372,6 @@ export default function Home() {
           quando não há logos cadastrados e a faixa não renderiza nada. */}
       <ClientLogos />
 
-      {/* ---------- 5. O problema ---------- */}
-      <section className="relative overflow-hidden bg-areia">
-        <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <SectionHeading
-            eyebrow="O problema que resolvemos"
-            titulo={[
-              { texto: "Negócios muito bons" },
-              { texto: "que parecem medianos no digital.", acento: true },
-            ]}
-            lead="Não é falta de qualidade. É falta de tradução: a marca entrega um nível que a comunicação ainda não mostra."
-          />
-
-          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {sintomas.map((sintoma, i) => (
-              <StaggerItem
-                key={sintoma.titulo}
-                className="group relative h-full overflow-hidden rounded-3xl border border-linha bg-branco p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
-              >
-                {/* Régua de lançamento, como nas abas de serviço e no método. */}
-                <span
-                  aria-hidden
-                  className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full"
-                />
-
-                <span
-                  aria-hidden
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-6 w-6"
-                  >
-                    {iconesSintoma[i]}
-                  </svg>
-                </span>
-
-                <h3 className="mt-6 text-xl font-semibold leading-snug text-preto">
-                  {sintoma.titulo}
-                </h3>
-                <p className="mt-3 leading-relaxed text-preto/70">
-                  {sintoma.descricao}
-                </p>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
-
-      {/* ---------- 6. Método ---------- */}
-      <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <SectionHeading
-            eyebrow="Nosso método"
-            alinhamento="esquerda"
-            titulo={[
-              { texto: "Quatro etapas que tiram" },
-              { texto: "a marca do improviso.", acento: true },
-            ]}
-            lead="Um ciclo que não termina na publicação: ele recomeça, com dado na mesa."
-          />
-
-          <MethodSteps etapas={metodo} />
-        </div>
-      </section>
-
       <SloganBand />
 
       {/* ---------- 7. Blog ---------- */}
@@ -383,7 +382,7 @@ export default function Home() {
             alinhamento="esquerda"
             titulo={[
               { texto: "O que a gente" },
-              { texto: "pensa sobre marca.", acento: true },
+              { texto: "pensa sobre marca.", acento: "marca." },
             ]}
           />
 
@@ -434,7 +433,7 @@ export default function Home() {
             eyebrow="Dúvidas frequentes"
             titulo={[
               { texto: "O que você precisa saber" },
-              { texto: "antes de começar.", acento: true },
+              { texto: "antes de começar.", acento: "começar." },
             ]}
           />
 
@@ -476,7 +475,7 @@ export default function Home() {
                 alinhamento="esquerda"
                 titulo={[
                   { texto: "Uma agência inteira" },
-                  { texto: "debaixo do mesmo teto.", acento: true },
+                  { texto: "debaixo do mesmo teto.", acento: "teto." },
                 ]}
                 lead="Estratégia, audiovisual, tráfego, identidade visual, web e arquitetura. Sem terceirização, sem ruído entre quem pensa e quem executa."
               />
@@ -549,7 +548,9 @@ export default function Home() {
         <div className="relative mx-auto max-w-4xl px-6 py-32 text-center lg:py-40">
           <h2 className="font-heading text-4xl font-semibold leading-[1.06] text-preto md:text-6xl">
             Pronto para lançar sua marca
-            <span className="block text-salmon-texto">para o próximo nível?</span>
+            <span className="block">
+              para o próximo <span className="text-salmon-texto">nível?</span>
+            </span>
           </h2>
           <Reveal delay={0.15}>
             <p className="mx-auto mt-6 max-w-xl text-lg text-preto/72">

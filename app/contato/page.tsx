@@ -24,7 +24,7 @@ export default function ContatoPage() {
         eyebrow="Contato"
         titulo={[
           { texto: "Vamos falar" },
-          { texto: "sobre a sua marca.", acento: true },
+          { texto: "sobre a sua marca.", acento: "marca." },
         ]}
         lead="Preencha o formulário com um pouco do seu momento atual. A equipe da LANÇA+ responde com os próximos passos e, se fizer sentido, agenda uma conversa."
       />
