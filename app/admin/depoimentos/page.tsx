@@ -1,3 +1,4 @@
+import CampoArquivo from "@/components/admin/CampoArquivo";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
@@ -104,23 +105,12 @@ export default async function AdminDepoimentos() {
             </div>
           </div>
 
-          <div>
-            <label htmlFor="novo-foto" className={rotulo}>
-              Foto do cliente (opcional)
-            </label>
-            <input
-              id="novo-foto"
-              name="foto"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto"
-            />
-            <p className="mt-2 text-xs text-preto/50">
-              JPG, PNG ou WEBP, até 8 MB. Aparece redonda, então prefira uma
-              foto com o rosto centralizado. Sem foto, o card mostra a inicial
-              do nome.
-            </p>
-          </div>
+          <CampoArquivo
+            name="foto"
+            pasta="depoimentos"
+            label="Foto do cliente (opcional)"
+            ajuda="JPG, PNG ou WEBP, até 8 MB. Aparece redonda, então prefira uma foto com o rosto centralizado. Sem foto, o card mostra a inicial do nome."
+          />
         </div>
 
         <button
@@ -248,15 +238,10 @@ export default async function AdminDepoimentos() {
                 )}
 
                 <div className="min-w-[220px] flex-1">
-                  <label htmlFor={`foto-${d.id}`} className={rotulo}>
-                    {d.foto ? "Trocar a foto" : "Adicionar foto"}
-                  </label>
-                  <input
-                    id={`foto-${d.id}`}
+                  <CampoArquivo
                     name="foto"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto"
+                    pasta="depoimentos"
+                    label={d.foto ? "Trocar a foto" : "Adicionar foto"}
                   />
                 </div>
               </div>

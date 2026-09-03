@@ -1,3 +1,4 @@
+import CampoArquivo from "@/components/admin/CampoArquivo";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
@@ -8,7 +9,6 @@ import {
   botaoSecundario,
   botaoDiscreto,
   cartao,
-  arquivo,
   setaOrdem,
 } from "@/components/admin/estilos";
 import { criarLogo, salvarLogo, apagarLogo, moverLogo } from "./acoes";
@@ -62,19 +62,12 @@ export default async function AdminLogos() {
             <input id="novo-nome" name="nome" required className={`${campo} mt-2`} />
             <p className={ajuda}>Usado na descrição da imagem.</p>
           </div>
-          <div>
-            <label htmlFor="novo-logo" className={rotulo}>
-              Arquivo do logo
-            </label>
-            <input
-              id="novo-logo"
-              name="logo"
-              type="file"
-              required
-              accept="image/png,image/webp"
-              className={arquivo}
-            />
-          </div>
+          <CampoArquivo
+            name="logo"
+            pasta="logos"
+            label="Arquivo do logo"
+            obrigatorio
+          />
         </div>
 
         <button type="submit" className={`${botaoPrimario} mt-5`}>
@@ -149,18 +142,11 @@ export default async function AdminLogos() {
                 />
               </div>
 
-              <div>
-                <label htmlFor={`logo-${l.id}`} className={rotulo}>
-                  Trocar o arquivo
-                </label>
-                <input
-                  id={`logo-${l.id}`}
-                  name="logo"
-                  type="file"
-                  accept="image/png,image/webp"
-                  className={arquivo}
-                />
-              </div>
+              <CampoArquivo
+                name="logo"
+                pasta="logos"
+                label="Trocar o arquivo"
+              />
 
               <button type="submit" className={`${botaoSecundario} justify-self-start`}>
                 Salvar

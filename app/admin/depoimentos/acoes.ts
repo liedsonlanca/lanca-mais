@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
-import { enviarArquivo, apagarArquivo } from "@/lib/upload";
+import { apagarArquivo } from "@/lib/upload";
+import { urlEnviada } from "@/lib/painel";
 
 // Server Actions do bloco de depoimentos.
 //
@@ -29,15 +30,9 @@ function texto(dados: FormData, campo: string) {
   return typeof valor === "string" ? valor.trim() : "";
 }
 
-// O <input type="file"> vazio ainda chega como File, de tamanho zero: sem esta
-// checagem, salvar um depoimento sem trocar a foto tentaria enviar nada.
-async function fotoEnviada(dados: FormData) {
-  const arquivo = dados.get("foto");
-  if (!(arquivo instanceof File) || arquivo.size === 0) return null;
-
-  const resultado = await enviarArquivo(arquivo, "depoimentos", "imagem");
-  if ("erro" in resultado) throw new Error(resultado.erro);
-  return resultado.url;
+// A foto já foi enviada ao Blob pelo navegador; aqui chega só a URL.
+function fotoEnviada(dados: FormData) {
+  return urlEnviada(dados, "foto");
 }
 
 export async function criarDepoimento(dados: FormData) {
@@ -58,7 +53,7 @@ export async function criarDepoimento(dados: FormData) {
       citacao,
       nome,
       texto(dados, "cargo"),
-      await fotoEnviada(dados),
+      fotoEnviada(dados),
       ultimo[0]?.proxima ?? 0,
     ]
   );
@@ -72,7 +67,7 @@ export async function salvarDepoimento(dados: FormData) {
   const id = Number(dados.get("id"));
   if (!Number.isFinite(id)) return;
 
-  const nova = await fotoEnviada(dados);
+  const nova = fotoEnviada(dados);
 
   if (nova) {
     // Foto trocada: a antiga sai do Blob, senão ela fica ocupando espaço para

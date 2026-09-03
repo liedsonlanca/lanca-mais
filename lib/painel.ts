@@ -1,6 +1,6 @@
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
-import { enviarArquivo } from "@/lib/upload";
+
 
 // Peças comuns às Server Actions do painel.
 //
@@ -40,20 +40,28 @@ export function marcado(dados: FormData, campo: string) {
   return dados.get(campo) !== null;
 }
 
-// Um campo de arquivo vazio ainda chega como File de tamanho zero: sem esta
-// checagem, salvar sem trocar o arquivo tentaria enviar nada.
-export async function arquivoEnviado(
-  dados: FormData,
-  campo: string,
-  pasta: string,
-  aceita: "imagem" | "video" = "imagem"
-) {
-  const arquivo = dados.get(campo);
-  if (!(arquivo instanceof File) || arquivo.size === 0) return null;
+/**
+ * Endereço do arquivo que o navegador já enviou ao Blob.
+ *
+ * O envio acontece antes, em CampoArquivo: aqui chega só a URL. Devolve null
+ * quando nada foi escolhido, que é o caso de salvar sem trocar o arquivo.
+ *
+ * A URL é conferida porque o campo vem do navegador como qualquer outro: sem
+ * isto, alguém poderia gravar o endereço de uma imagem de fora e fazer o site
+ * servir conteúdo de terceiro.
+ */
+export function urlEnviada(dados: FormData, campo: string) {
+  const valor = texto(dados, campo);
+  if (!valor) return null;
 
-  const resultado = await enviarArquivo(arquivo, pasta, aceita);
-  if ("erro" in resultado) throw new Error(resultado.erro);
-  return resultado.url;
+  if (
+    !valor.startsWith("https://") ||
+    !valor.includes(".blob.vercel-storage.com/")
+  ) {
+    throw new Error("Endereço de arquivo inválido.");
+  }
+
+  return valor;
 }
 
 /** Próxima posição no fim da lista. */

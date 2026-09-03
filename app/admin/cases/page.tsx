@@ -1,3 +1,4 @@
+import CampoArquivo from "@/components/admin/CampoArquivo";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
@@ -8,7 +9,6 @@ import {
   botaoSecundario,
   botaoDiscreto,
   cartao,
-  arquivo,
   setaOrdem,
 } from "@/components/admin/estilos";
 import { criarCase, salvarCase, apagarCase, moverCase } from "./acoes";
@@ -126,19 +126,13 @@ export default async function AdminCases() {
             </div>
           </div>
 
-          <div>
-            <label htmlFor="nova-imagem" className={rotulo}>
-              Imagem
-            </label>
-            <input
-              id="nova-imagem"
-              name="imagem"
-              type="file"
-              required
-              accept="image/jpeg,image/png,image/webp"
-              className={arquivo}
-            />
-          </div>
+          <CampoArquivo
+            name="imagem"
+            pasta="cases"
+            label="Imagem"
+            obrigatorio
+            ajuda="Deitada, 16:11. JPG, PNG ou WEBP, até 8 MB."
+          />
         </div>
 
         <button type="submit" className={`${botaoPrimario} mt-5`}>
@@ -267,18 +261,11 @@ export default async function AdminCases() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor={`imagem-${c.id}`} className={rotulo}>
-                  Trocar a imagem
-                </label>
-                <input
-                  id={`imagem-${c.id}`}
-                  name="imagem"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className={arquivo}
-                />
-              </div>
+              <CampoArquivo
+                name="imagem"
+                pasta="cases"
+                label="Trocar a imagem"
+              />
 
               <button type="submit" className={`${botaoSecundario} justify-self-start`}>
                 Salvar

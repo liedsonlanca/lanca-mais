@@ -5,7 +5,7 @@ import { apagarArquivo } from "@/lib/upload";
 import {
   preparar,
   texto,
-  arquivoEnviado,
+  urlEnviada,
   proximaOrdem,
   moverItem,
   paraSlug,
@@ -33,7 +33,7 @@ export async function criarCase(dados: FormData) {
   const cliente = texto(dados, "cliente");
   if (!cliente) throw new Error("Escreva o nome do cliente.");
 
-  const imagem = await arquivoEnviado(dados, "imagem", "cases", "imagem");
+  const imagem = urlEnviada(dados, "imagem");
   if (!imagem) throw new Error("Escolha a imagem do case.");
 
   // O slug é o endereço do case. Nasce do nome do cliente e ganha um número
@@ -71,7 +71,7 @@ export async function salvarCase(dados: FormData) {
   const id = Number(dados.get("id"));
   if (!Number.isFinite(id)) return;
 
-  const nova = await arquivoEnviado(dados, "imagem", "cases", "imagem");
+  const nova = urlEnviada(dados, "imagem");
 
   const antes = (await banco.query("SELECT imagem FROM cases WHERE id = $1", [
     id,

@@ -5,7 +5,7 @@ import { apagarArquivo } from "@/lib/upload";
 import {
   preparar,
   texto,
-  arquivoEnviado,
+  urlEnviada,
   proximaOrdem,
   moverItem,
   reposicionarItem,
@@ -22,10 +22,10 @@ export async function criarPeca(dados: FormData) {
 
   // A capa é obrigatória mesmo em vídeo: é ela que aparece no trilho, e sem
   // ela o ladrilho ficaria vazio até o vídeo carregar.
-  const capa = await arquivoEnviado(dados, "capa", "vitrine", "imagem");
+  const capa = urlEnviada(dados, "capa");
   if (!capa) throw new Error("Escolha a imagem de capa.");
 
-  const video = await arquivoEnviado(dados, "video", "vitrine", "video");
+  const video = urlEnviada(dados, "video");
 
   await banco.query(
     "INSERT INTO vitrine (src, alt, tipo, video, legenda, ordem) VALUES ($1,$2,$3,$4,$5,$6)",
@@ -48,8 +48,8 @@ export async function salvarPeca(dados: FormData) {
   const id = Number(dados.get("id"));
   if (!Number.isFinite(id)) return;
 
-  const capa = await arquivoEnviado(dados, "capa", "vitrine", "imagem");
-  const video = await arquivoEnviado(dados, "video", "vitrine", "video");
+  const capa = urlEnviada(dados, "capa");
+  const video = urlEnviada(dados, "video");
 
   const antes = (await banco.query(
     "SELECT src, video FROM vitrine WHERE id = $1",

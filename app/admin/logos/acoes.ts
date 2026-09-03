@@ -5,7 +5,7 @@ import { apagarArquivo } from "@/lib/upload";
 import {
   preparar,
   texto,
-  arquivoEnviado,
+  urlEnviada,
   proximaOrdem,
   moverItem,
 } from "@/lib/painel";
@@ -23,7 +23,7 @@ export async function criarLogo(dados: FormData) {
   const nome = texto(dados, "nome");
   if (!nome) throw new Error("Escreva o nome da marca.");
 
-  const logo = await arquivoEnviado(dados, "logo", "logos", "imagem");
+  const logo = urlEnviada(dados, "logo");
   if (!logo) throw new Error("Escolha o arquivo do logo.");
 
   await banco.query("INSERT INTO logos (nome, logo, ordem) VALUES ($1,$2,$3)", [
@@ -41,7 +41,7 @@ export async function salvarLogo(dados: FormData) {
   const id = Number(dados.get("id"));
   if (!Number.isFinite(id)) return;
 
-  const novo = await arquivoEnviado(dados, "logo", "logos", "imagem");
+  const novo = urlEnviada(dados, "logo");
 
   const antes = (await banco.query("SELECT logo FROM logos WHERE id = $1", [
     id,

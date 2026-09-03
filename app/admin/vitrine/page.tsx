@@ -1,3 +1,4 @@
+import CampoArquivo from "@/components/admin/CampoArquivo";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import { blobConfigurado } from "@/lib/upload";
@@ -9,7 +10,6 @@ import {
   botaoSecundario,
   botaoDiscreto,
   cartao,
-  arquivo,
   setaOrdem,
 } from "@/components/admin/estilos";
 import {
@@ -80,37 +80,21 @@ export default async function AdminVitrine() {
         <h2 className="font-medium text-preto">Adicionar peça</h2>
 
         <div className="mt-5 grid gap-4">
-          <div>
-            <label htmlFor="nova-capa" className={rotulo}>
-              Imagem (obrigatória)
-            </label>
-            <input
-              id="nova-capa"
-              name="capa"
-              type="file"
-              required
-              accept="image/jpeg,image/png,image/webp"
-              className={arquivo}
-            />
-            <p className={ajuda}>JPG, PNG ou WEBP, até 8 MB, em pé (4:5).</p>
-          </div>
+          <CampoArquivo
+            name="capa"
+            pasta="vitrine"
+            label="Imagem (obrigatória)"
+            obrigatorio
+            ajuda="JPG, PNG ou WEBP, até 8 MB, em pé (4:5)."
+          />
 
-          <div>
-            <label htmlFor="novo-video" className={rotulo}>
-              Vídeo (opcional)
-            </label>
-            <input
-              id="novo-video"
-              name="video"
-              type="file"
-              accept="video/mp4,video/webm,video/quicktime"
-              className={arquivo}
-            />
-            <p className={ajuda}>
-              MP4, WEBM ou MOV, até 60 MB. Vídeo consome banda a cada visita,
-              então prefira o arquivo mais leve que mantenha a qualidade.
-            </p>
-          </div>
+          <CampoArquivo
+            name="video"
+            pasta="vitrine"
+            aceita="video"
+            label="Vídeo (opcional)"
+            ajuda="MP4, WEBM ou MOV, até 60 MB. Vídeo consome banda a cada visita, então prefira o arquivo mais leve que mantenha a qualidade."
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -275,31 +259,18 @@ export default async function AdminVitrine() {
                 />
               </div>
 
-              <div>
-                <label htmlFor={`capa-${p.id}`} className={rotulo}>
-                  Trocar a imagem
-                </label>
-                <input
-                  id={`capa-${p.id}`}
-                  name="capa"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className={arquivo}
-                />
-              </div>
+              <CampoArquivo
+                name="capa"
+                pasta="vitrine"
+                label="Trocar a imagem"
+              />
 
-              <div>
-                <label htmlFor={`video-${p.id}`} className={rotulo}>
-                  {p.video ? "Trocar o vídeo" : "Adicionar vídeo"}
-                </label>
-                <input
-                  id={`video-${p.id}`}
-                  name="video"
-                  type="file"
-                  accept="video/mp4,video/webm,video/quicktime"
-                  className={arquivo}
-                />
-              </div>
+              <CampoArquivo
+                name="video"
+                pasta="vitrine"
+                aceita="video"
+                label={p.video ? "Trocar o vídeo" : "Adicionar vídeo"}
+              />
 
               <button type="submit" className={`${botaoSecundario} justify-self-start`}>
                 Salvar
