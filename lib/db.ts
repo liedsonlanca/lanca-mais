@@ -2,10 +2,35 @@ import { neon } from "@neondatabase/serverless";
 
 // Conexão com o Neon.
 //
-// O Neon contratado pelo Marketplace da Vercel injeta a string de conexão em
-// DATABASE_URL; integrações mais antigas usam POSTGRES_URL. Aceitamos as duas
-// para não depender de qual delas a Vercel escreveu.
-const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? "";
+// O nome da variável depende do prefixo escolhido ao conectar a integração no
+// painel da Vercel: DATABASE_URL com o prefixo "DATABASE", STORAGE_URL com o
+// padrão, POSTGRES_URL nas integrações antigas. Errar o nome faria o site
+// seguir servindo o conteúdo estático em silêncio, parecendo que o painel não
+// grava nada — então procuramos por todos, na ordem de preferência.
+function acharUrl() {
+  const nomes = [
+    "DATABASE_URL",
+    "POSTGRES_URL",
+    "STORAGE_URL",
+    "DATABASE_URL_UNPOOLED",
+    "POSTGRES_PRISMA_URL",
+  ];
+
+  for (const nome of nomes) {
+    const valor = process.env[nome];
+    if (valor && valor.startsWith("post")) return valor;
+  }
+
+  // Última tentativa: qualquer variável que seja claramente uma string de
+  // conexão Postgres. Cobre um prefixo personalizado que não previmos.
+  for (const [nome, valor] of Object.entries(process.env)) {
+    if (nome.endsWith("_URL") && valor?.startsWith("postgres")) return valor;
+  }
+
+  return "";
+}
+
+const url = acharUrl();
 
 /** Falso enquanto o banco não foi criado. O site inteiro sabe lidar com isso. */
 export const bancoConfigurado = url !== "";
