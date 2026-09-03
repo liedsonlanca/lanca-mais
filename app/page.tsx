@@ -104,10 +104,11 @@ function formatarData(data: string) {
 // O hero faz o gancho e a home alterna oferta e argumento, aos pares: o que
 // vendemos (serviços) e por que isso importa (o problema); como é o trabalho
 // (vitrine) e como ele acontece (método). Só então vem a prova — deu certo com
-// quem (cases) e quem confirma (depoimentos e logos).
+// quem (cases) e quem confirma (depoimentos).
 //
-// A apresentação da agência fecha a página, encostada no CTA: quem chegou até
-// ali já quer saber com quem vai falar.
+// A apresentação da agência e a faixa de logos fecham a página, encostadas no
+// CTA: quem chegou até ali já quer saber com quem vai falar, e a última coisa
+// antes do convite é quem já confiou.
 //
 // Atenção ao mexer nesta ordem: os fundos alternam papel/areia e duas seções
 // vizinhas nunca repetem. Inserir ou remover uma seção inverte a paridade de
@@ -343,12 +344,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Prova social visual, logo depois de quem fala por escrito. Divide o
-          fundo com os depoimentos de propósito: a borda superior da faixa já
-          separa os dois, e assim a paridade papel/areia continua valendo mesmo
-          quando não há logos cadastrados e a faixa não renderiza nada. */}
-      <ClientLogos />
-
       <SloganBand />
 
       {/* ---------- 7. Blog ---------- */}
@@ -517,6 +512,15 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Prova social visual, encostada no convite final: a última coisa antes
+          de pedir o contato é quem já confiou.
+
+          Divide o fundo branco com a apresentação da agência logo acima, de
+          propósito: o fio no topo da faixa já separa os dois, e assim a
+          alternância papel/areia continua valendo mesmo quando não há logos
+          cadastrados e a faixa não renderiza nada. */}
+      <ClientLogos />
 
       {/* ---------- CTA final ---------- */}
       <section className="relative overflow-hidden bg-areia">
