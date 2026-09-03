@@ -9,8 +9,35 @@ import {
   origemDaRequisicao,
 } from "@/lib/tentativas";
 
-// Abre a sessão do painel: senha e, se estiver ativada, o código de seis
-// dígitos do aplicativo autenticador.
+// Abre a sessão do painel, em duas etapas quando o segundo fator está ativo:
+// primeiro a senha, depois o código de seis dígitos do aplicativo.
+//
+// Antes as duas viajavam juntas e a recusa não dizia qual das duas errou, para
+// não confirmar uma senha a quem estivesse adivinhando. O preço disso apareceu
+// na prática: quem esquece a senha fica sem saber se o problema é ela ou o
+// código, e gasta o freio inteiro tentando descobrir.
+//
+// Agora a senha é conferida sozinha. Isso de fato confirma a senha a quem
+// acertar, mas o custo de tentar continua o mesmo de antes: oito erros por
+// endereço a cada quinze minutos, e o código de seis dígitos ainda barra a
+// entrada. O que muda é só quem já sabe a senha saber que sabe.
+
+/** Aviso de tentativas restantes, só quando começa a ficar perto do limite. */
+function comSaldo(base: string, restantes: number) {
+  return restantes <= 3
+    ? `${base} ${
+        restantes === 1 ? "Resta 1 tentativa." : `Restam ${restantes} tentativas.`
+      }`
+    : base;
+}
+
+/** Quanto falta para a janela do freio vencer, em texto. */
+function esperaEmTexto(ate: number) {
+  const minutos = Math.ceil((ate - Date.now()) / 60_000);
+  if (!Number.isFinite(minutos) || minutos <= 1) return "1 minuto";
+  return `${minutos} minutos`;
+}
+
 export async function POST(request: Request) {
   const senhaCorreta = process.env.ADMIN_SENHA;
 
@@ -27,7 +54,7 @@ export async function POST(request: Request) {
   if (!freio.permitido) {
     return NextResponse.json(
       {
-        erro: "Muitas tentativas. Espere 15 minutos antes de tentar de novo.",
+        erro: `Muitas tentativas. Tente de novo em ${esperaEmTexto(freio.ate)}.`,
       },
       { status: 429 }
     );
@@ -44,31 +71,46 @@ export async function POST(request: Request) {
   }
 
   const segredo = await segredoTotp();
+  const restantes = Math.max(0, freio.restantes - 1);
 
-  // A senha é conferida em tempo constante, e a resposta não diz qual dos dois
-  // errou: dizer "senha certa, código errado" confirmaria a senha a quem está
-  // tentando adivinhar.
-  const senhaBate = comparaSegura(senha, senhaCorreta);
-  const codigoBate = segredo ? await codigoValido(segredo, codigo) : true;
-
-  if (!senhaBate || !codigoBate) {
+  // ---------- Etapa 1: a senha ----------
+  //
+  // Conferida em tempo constante. Comparar com !== para na primeira letra
+  // diferente, e o tempo revela quantos caracteres estavam certos.
+  if (!comparaSegura(senha, senhaCorreta)) {
     await registrarFalha("admin", origem);
     // Atraso curto, que atrapalha a tentativa manual sem travar o servidor.
     await new Promise((r) => setTimeout(r, 600));
 
-    const restantes = Math.max(0, freio.restantes - 1);
+    return NextResponse.json(
+      { erro: comSaldo("Senha incorreta.", restantes), campo: "senha" },
+      { status: 401 }
+    );
+  }
+
+  // Senha certa e existe segundo fator: para aqui e pede o código. Nada de
+  // cookie ainda, e nenhuma falha registrada — acertar não gasta tentativa.
+  //
+  // A senha volta no próximo envio e é conferida de novo, em vez de o servidor
+  // guardar um passe de "já conferi". Sem passe não há passe para roubar, e a
+  // etapa dois nunca vale sem a senha na mão.
+  if (segredo && !codigo) {
+    return NextResponse.json({ etapa: "codigo" });
+  }
+
+  // ---------- Etapa 2: o código ----------
+  if (segredo && !(await codigoValido(segredo, codigo))) {
+    await registrarFalha("admin", origem);
+    await new Promise((r) => setTimeout(r, 600));
 
     return NextResponse.json(
       {
-        // O aviso só aparece quando começa a ficar perto do limite, para não
-        // ensinar o contador a quem está sondando.
-        erro:
-          restantes <= 3
-            ? `Dados incorretos. Restam ${restantes} tentativas.`
-            : "Dados incorretos.",
-        // Diz à tela que existe segunda etapa, para ela mostrar o campo. Isso
-        // não vaza nada: quem tem a senha descobriria no primeiro acerto.
-        exigeCodigo: Boolean(segredo),
+        erro: comSaldo(
+          "Código incorreto. Ele muda a cada 30 segundos.",
+          restantes
+        ),
+        campo: "codigo",
+        etapa: "codigo",
       },
       { status: 401 }
     );

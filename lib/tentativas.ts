@@ -44,22 +44,25 @@ async function ler(k: string): Promise<Registro | null> {
  * única — a senha continua sendo a barreira.
  */
 export async function podeTentar(escopo: string, origem: string) {
-  if (!sql) return { permitido: true, restantes: LIMITE };
+  if (!sql) return { permitido: true, restantes: LIMITE, ate: 0 };
 
   try {
     await garantirEsquema();
     const registro = await ler(chave(escopo, origem));
 
     if (!registro || Date.now() > registro.ate) {
-      return { permitido: true, restantes: LIMITE };
+      return { permitido: true, restantes: LIMITE, ate: 0 };
     }
 
     return {
       permitido: registro.n < LIMITE,
       restantes: Math.max(0, LIMITE - registro.n),
+      // Quando a janela vence. Vai junto para a tela dizer quanto falta, em
+      // vez de repetir "quinze minutos" quando faltam dois.
+      ate: registro.ate,
     };
   } catch {
-    return { permitido: true, restantes: LIMITE };
+    return { permitido: true, restantes: LIMITE, ate: 0 };
   }
 }
 
