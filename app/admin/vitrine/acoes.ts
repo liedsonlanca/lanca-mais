@@ -8,6 +8,7 @@ import {
   arquivoEnviado,
   proximaOrdem,
   moverItem,
+  reposicionarItem,
 } from "@/lib/painel";
 
 // O trilho "Nosso trabalho" fica na home.
@@ -115,5 +116,16 @@ export async function apagarPeca(dados: FormData) {
 export async function moverPeca(dados: FormData) {
   await preparar();
   await moverItem("vitrine", Number(dados.get("id")), Number(dados.get("direcao")));
+  atualizarSite();
+}
+
+/** Leva a peça para a posição digitada, empurrando as outras. */
+export async function posicionarPeca(dados: FormData) {
+  await preparar();
+  await reposicionarItem(
+    "vitrine",
+    Number(dados.get("id")),
+    Number(dados.get("posicao"))
+  );
   atualizarSite();
 }

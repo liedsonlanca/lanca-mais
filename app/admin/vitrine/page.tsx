@@ -17,6 +17,7 @@ import {
   salvarPeca,
   apagarPeca,
   moverPeca,
+  posicionarPeca,
   removerVideo,
 } from "./acoes";
 
@@ -173,21 +174,35 @@ export default async function AdminVitrine() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <span className="numeral-fantasma text-sm text-preto/35">
-                  {String(i + 1).padStart(2, "0")}
+                <span className="flex items-center gap-2">
+                  <span className="numeral-fantasma text-sm text-preto/35">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {/* O tipo aparece aqui para a alternação vídeo/imagem ser
+                      visível de relance enquanto se monta a sequência. */}
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      p.video
+                        ? "bg-salmon/15 text-salmon-texto"
+                        : "border border-linha text-preto/45"
+                    }`}
+                  >
+                    {p.video ? "vídeo" : "imagem"}
+                  </span>
                 </span>
+
                 <p className="mt-1 truncate text-sm text-preto/70">
                   {p.legenda || p.alt}
                 </p>
 
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
                   <form action={moverPeca}>
                     <input type="hidden" name="id" value={p.id} />
                     <input type="hidden" name="direcao" value={-1} />
                     <button
                       type="submit"
                       disabled={i === 0}
-                      aria-label="Mover para trás"
+                      aria-label="Mover uma posição para trás"
                       className={setaOrdem}
                     >
                       ←
@@ -199,10 +214,34 @@ export default async function AdminVitrine() {
                     <button
                       type="submit"
                       disabled={i === pecas.length - 1}
-                      aria-label="Mover para frente"
+                      aria-label="Mover uma posição para frente"
                       className={setaOrdem}
                     >
                       →
+                    </button>
+                  </form>
+
+                  {/* Ir direto para uma posição: com muitas peças, montar a
+                      sequência só com as setas seria um clique por casa. */}
+                  <form action={posicionarPeca} className="flex items-center gap-2">
+                    <input type="hidden" name="id" value={p.id} />
+                    <label htmlFor={`posicao-${p.id}`} className="sr-only">
+                      Nova posição desta peça
+                    </label>
+                    <input
+                      id={`posicao-${p.id}`}
+                      name="posicao"
+                      type="number"
+                      min={1}
+                      max={pecas.length}
+                      defaultValue={i + 1}
+                      className="w-16 rounded-full border border-linha bg-branco px-3 py-1 text-center text-sm text-preto outline-none focus:border-salmon"
+                    />
+                    <button
+                      type="submit"
+                      className="rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon hover:text-salmon-texto"
+                    >
+                      Ir
                     </button>
                   </form>
                 </div>

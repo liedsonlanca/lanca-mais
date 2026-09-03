@@ -94,6 +94,45 @@ export async function moverItem(tabela: Tabela, id: number, direcao: number) {
   }
 }
 
+/**
+ * Leva um item para uma posição qualquer da lista.
+ *
+ * As setas movem uma casa por clique, o que é lento para montar uma sequência
+ * pensada (vídeo, imagem, vídeo…) numa lista longa. Aqui a pessoa diz o número
+ * e o item vai direto, empurrando os outros.
+ */
+export async function reposicionarItem(
+  tabela: Tabela,
+  id: number,
+  posicaoHumana: number
+) {
+  if (!Number.isFinite(id) || !Number.isFinite(posicaoHumana)) return;
+
+  const banco = sql!;
+  const lista = (await banco.query(
+    `SELECT id FROM ${tabela} ORDER BY ordem, id`
+  )) as Array<{ id: number }>;
+
+  const atual = lista.findIndex((l) => l.id === id);
+  if (atual === -1) return;
+
+  // A pessoa conta a partir de 1; a lista, de 0. E um número fora da faixa
+  // vira a ponta mais próxima, em vez de não fazer nada.
+  const destino = Math.min(Math.max(Math.trunc(posicaoHumana) - 1, 0), lista.length - 1);
+  if (destino === atual) return;
+
+  const nova = [...lista];
+  const [movido] = nova.splice(atual, 1);
+  nova.splice(destino, 0, movido);
+
+  for (const [posicao, item] of nova.entries()) {
+    await banco.query(`UPDATE ${tabela} SET ordem = $1 WHERE id = $2`, [
+      posicao,
+      item.id,
+    ]);
+  }
+}
+
 /** Texto vira "slug-assim", usado como endereço de case e de post. */
 export function paraSlug(valor: string) {
   return valor

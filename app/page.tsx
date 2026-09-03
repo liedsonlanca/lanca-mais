@@ -20,6 +20,7 @@ import FaqJsonLd from "@/components/FaqJsonLd";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 import Counter from "@/components/motion/Counter";
+import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
 
 // Um ícone por sintoma: preço que não bate com a percepção, publicação em
 // piloto automático e ausência de medição.
@@ -334,67 +335,11 @@ export default async function Home() {
             ]}
           />
 
-          {/* Só os três primeiros.
-              A grade tem três colunas, então qualquer quantidade que não seja
-              múltiplo de três deixa card sozinho na última fila. E prova
-              social satura: sete depoimentos não convencem mais que três, só
-              cansam. Quais três aparecem é decidido pela ordem no painel. */}
-          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {depoimentos.slice(0, 3).map((depoimento, i) => (
-              <StaggerItem
-                // Os depoimentos ainda são placeholders com o mesmo nome; o índice
-                // garante chave única até entrarem os depoimentos reais.
-                key={i}
-                className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco"
-              >
-                {/* Faixa de acento no topo do card: cresce ao passar o mouse. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-1 w-0 bg-salmon transition-all duration-700 group-hover:w-full"
-                />
-
-                <span
-                  aria-hidden
-                  className="font-heading block text-7xl leading-[0.6] text-salmon"
-                >
-                  &ldquo;
-                </span>
-
-                <p className="mt-7 flex-1 text-[17px] leading-relaxed text-preto/85">
-                  {depoimento.citacao}
-                </p>
-
-                <div className="mt-8 flex items-center gap-4 border-t border-linha pt-6">
-                  {/* Foto do cliente quando houver; a inicial do nome é a
-                      reserva, para o card nunca ficar com um buraco. */}
-                  {depoimento.foto ? (
-                    <Image
-                      src={depoimento.foto}
-                      alt={`Foto de ${depoimento.nome}`}
-                      width={44}
-                      height={44}
-                      className="h-11 w-11 shrink-0 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span
-                      aria-hidden
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-salmon-texto"
-                    >
-                      {depoimento.nome.replace(/[^A-Za-zÀ-ÿ ]/g, '').trim().charAt(0).toUpperCase() || '•'}
-                    </span>
-                  )}
-                  <span>
-                    <span className="block font-semibold text-preto">
-                      {depoimento.nome}
-                    </span>
-                    <span className="block text-sm text-preto/60">
-                      {depoimento.cargo}
-                    </span>
-                  </span>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
+          {/* Todos os depoimentos, navegáveis por página.
+              A grade fixa de três deixava card sozinho na última fila e
+              obrigava a esconder o resto; aqui cabem quantos existirem, e
+              quem quiser ver mais avança pelas setas. */}
+          <DepoimentosCarrossel itens={depoimentos} />
         </div>
       </section>
 

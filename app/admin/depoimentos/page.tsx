@@ -49,11 +49,12 @@ export default async function AdminDepoimentos() {
 
       <div className="mt-4 rounded-2xl border border-linha bg-branco p-5 text-sm leading-relaxed text-preto/70">
         <strong className="font-medium text-preto">
-          Só os três primeiros aparecem no site.
+          Todos aparecem no site.
         </strong>{" "}
-        A seção tem três colunas, e qualquer outra quantidade deixa card
-        sozinho na última fila. Os demais ficam guardados aqui: use as setas
-        para promover o que quiser mostrar.
+        A seção mostra três por vez e o visitante avança pelas setas, então
+        pode cadastrar quantos quiser. A ordem aqui decide quais são vistos
+        primeiro, que é o que mais importa: muita gente não passa da primeira
+        tela.
       </div>
 
       {!sql && (
@@ -149,13 +150,9 @@ export default async function AdminDepoimentos() {
                 <span className="numeral-fantasma text-sm text-preto/35">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                {i < 3 ? (
+                {i < 3 && (
                   <span className="rounded-full bg-salmon/15 px-3 py-0.5 text-xs font-medium text-salmon-texto">
-                    aparece no site
-                  </span>
-                ) : (
-                  <span className="rounded-full border border-linha px-3 py-0.5 text-xs text-preto/45">
-                    guardado
+                    primeira tela
                   </span>
                 )}
               </span>
