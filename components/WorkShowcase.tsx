@@ -33,16 +33,47 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
   const inicio = useRef({ x: 0, scroll: 0 });
   const houveArrasto = useRef(false);
 
-  const pecas = [...vitrine, ...vitrine];
+  // O laço só existe quando as peças não cabem na tela.
+  //
+  // A lista é renderizada duas vezes para o movimento não ter emenda. Com
+  // muitas peças ninguém vê as duas cópias ao mesmo tempo; com duas ou três,
+  // elas cabem juntas na tela e a repetição fica escancarada — parece defeito.
+  //
+  // Então começamos com uma cópia só e medimos: se ela transbordar, aí sim
+  // duplicamos e o trilho passa a deslizar. Enquanto não transbordar, as peças
+  // ficam paradas e centralizadas.
+  const [duplicar, setDuplicar] = useState(false);
+  const pecas = duplicar ? [...vitrine, ...vitrine] : vitrine;
 
   // Enquanto o lightbox está aberto o trilho não deve andar por baixo dele.
   useEffect(() => {
     pausado.current = aberta !== null;
   }, [aberta]);
 
+  // Mede se uma cópia da lista transborda. Refaz no redimensionamento porque
+  // o que cabe muda com a largura da janela.
   useEffect(() => {
     const el = trilho.current;
     if (!el) return;
+
+    function medir() {
+      if (!el) return;
+      // Com a lista duplicada, uma cópia ocupa metade do conteúdo.
+      const umaCopia = duplicar ? el.scrollWidth / 2 : el.scrollWidth;
+      setDuplicar(umaCopia > el.clientWidth + 1);
+    }
+
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(el);
+    return () => observador.disconnect();
+  }, [duplicar, vitrine.length]);
+
+  useEffect(() => {
+    const el = trilho.current;
+    if (!el) return;
+    // Sem laço não há o que animar: as peças ficam paradas.
+    if (!duplicar) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let visivel = true;
@@ -113,7 +144,7 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
       alvo?.removeEventListener("focusin", pausar);
       alvo?.removeEventListener("focusout", retomar);
     };
-  }, []);
+  }, [duplicar]);
 
   function aoPressionar(e: React.PointerEvent) {
     // Arrasto manual só com mouse: no toque a rolagem nativa já resolve, com a
@@ -156,6 +187,8 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
           onPointerMove={aoMover}
           onPointerUp={() => setArrastando(false)}
           className={`sem-barra flex gap-5 overflow-x-auto px-6 py-4 lg:gap-6 lg:px-10 ${
+            duplicar ? "" : "justify-center"
+          } ${
             arrastando ? "cursor-grabbing" : "cursor-grab"
           }`}
         >
@@ -230,11 +263,15 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
           })}
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-3 px-6 lg:px-10">
-          <BotaoTrilho direcao="anterior" aoClicar={() => deslocar(-1)} />
-          <span className="eyebrow text-preto/45">Arraste para ver mais</span>
-          <BotaoTrilho direcao="proxima" aoClicar={() => deslocar(1)} />
-        </div>
+        {/* Nada a arrastar quando tudo já está na tela: seta que não leva a
+            lugar nenhum e um "arraste para ver mais" sem mais nada confundem. */}
+        {duplicar && (
+          <div className="mt-6 flex items-center justify-center gap-3 px-6 lg:px-10">
+            <BotaoTrilho direcao="anterior" aoClicar={() => deslocar(-1)} />
+            <span className="eyebrow text-preto/45">Arraste para ver mais</span>
+            <BotaoTrilho direcao="proxima" aoClicar={() => deslocar(1)} />
+          </div>
+        )}
       </div>
 
       <Lightbox
