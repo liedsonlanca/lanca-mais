@@ -1,22 +1,30 @@
+import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
   criarDepoimento,
   salvarDepoimento,
   apagarDepoimento,
   moverDepoimento,
+  removerFoto,
 } from "./acoes";
 
 // Sempre fresco: o painel precisa mostrar o que está no banco agora, não uma
 // versão em cache de minutos atrás.
 export const dynamic = "force-dynamic";
 
-type Linha = { id: number; citacao: string; nome: string; cargo: string };
+type Linha = {
+  id: number;
+  citacao: string;
+  nome: string;
+  cargo: string;
+  foto: string | null;
+};
 
 async function carregar(): Promise<Linha[]> {
   if (!sql) return [];
   await garantirEsquema();
   return (await sql.query(
-    "SELECT id, citacao, nome, cargo FROM depoimentos ORDER BY ordem, id"
+    "SELECT id, citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"
   )) as Linha[];
 }
 
@@ -84,6 +92,24 @@ export default async function AdminDepoimentos() {
                 className={`${campo} mt-2`}
               />
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="novo-foto" className={rotulo}>
+              Foto do cliente (opcional)
+            </label>
+            <input
+              id="novo-foto"
+              name="foto"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto"
+            />
+            <p className="mt-2 text-xs text-preto/50">
+              JPG, PNG ou WEBP, até 8 MB. Aparece redonda, então prefira uma
+              foto com o rosto centralizado. Sem foto, o card mostra a inicial
+              do nome.
+            </p>
           </div>
         </div>
 
@@ -186,6 +212,38 @@ export default async function AdminDepoimentos() {
                 </div>
               </div>
 
+              <div className="flex flex-wrap items-center gap-4">
+                {d.foto ? (
+                  <Image
+                    src={d.foto}
+                    alt={`Foto de ${d.nome}`}
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 shrink-0 rounded-full border border-linha object-cover"
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-lg font-semibold text-salmon-texto"
+                  >
+                    {d.nome.trim().charAt(0).toUpperCase() || "•"}
+                  </span>
+                )}
+
+                <div className="min-w-[220px] flex-1">
+                  <label htmlFor={`foto-${d.id}`} className={rotulo}>
+                    {d.foto ? "Trocar a foto" : "Adicionar foto"}
+                  </label>
+                  <input
+                    id={`foto-${d.id}`}
+                    name="foto"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto"
+                  />
+                </div>
+              </div>
+
               <button
                 type="submit"
                 className={`${botao} justify-self-start border border-preto/20 text-preto hover:border-preto`}
@@ -193,6 +251,20 @@ export default async function AdminDepoimentos() {
                 Salvar
               </button>
             </form>
+
+            {/* Fora do formulário acima: um formulário não pode conter outro,
+                e tirar a foto é uma ação própria, não um "salvar" sem arquivo. */}
+            {d.foto && (
+              <form action={removerFoto} className="mt-3">
+                <input type="hidden" name="id" value={d.id} />
+                <button
+                  type="submit"
+                  className="text-sm text-preto/45 transition-colors duration-300 hover:text-salmon-texto"
+                >
+                  Remover a foto e voltar para a inicial
+                </button>
+              </form>
+            )}
 
             <form action={apagarDepoimento} className="mt-4 border-t border-linha pt-4">
               <input type="hidden" name="id" value={d.id} />

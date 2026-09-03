@@ -16,7 +16,13 @@ import { blogPosts, type BlogPost } from "@/lib/blog-posts";
 // banco. Assim o painel nasce com o que já está no ar, pronto para editar, em
 // vez de uma tela vazia. A cópia acontece uma vez só (ver tabela `meta`).
 
-export type Depoimento = { citacao: string; nome: string; cargo: string };
+export type Depoimento = {
+  citacao: string;
+  nome: string;
+  cargo: string;
+  /** Foto do cliente, no Blob. Sem ela, o card mostra a inicial do nome. */
+  foto?: string | null;
+};
 export type Numero = {
   prefixo: string;
   valor: number;
@@ -84,7 +90,7 @@ export async function lerDepoimentos(): Promise<Depoimento[]> {
     });
 
     return (await sql!.query(
-      "SELECT citacao, nome, cargo FROM depoimentos ORDER BY ordem, id"
+      "SELECT citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"
     )) as Depoimento[];
   }, reserva);
 }

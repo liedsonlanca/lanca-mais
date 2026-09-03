@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
+import { enviarArquivo, apagarArquivo } from "@/lib/upload";
 
 // Server Actions do bloco de depoimentos.
 //
@@ -28,6 +29,17 @@ function texto(dados: FormData, campo: string) {
   return typeof valor === "string" ? valor.trim() : "";
 }
 
+// O <input type="file"> vazio ainda chega como File, de tamanho zero: sem esta
+// checagem, salvar um depoimento sem trocar a foto tentaria enviar nada.
+async function fotoEnviada(dados: FormData) {
+  const arquivo = dados.get("foto");
+  if (!(arquivo instanceof File) || arquivo.size === 0) return null;
+
+  const resultado = await enviarArquivo(arquivo, "depoimentos", "imagem");
+  if ("erro" in resultado) throw new Error(resultado.erro);
+  return resultado.url;
+}
+
 export async function criarDepoimento(dados: FormData) {
   const banco = await preparar();
 
@@ -41,8 +53,14 @@ export async function criarDepoimento(dados: FormData) {
   )) as Array<{ proxima: number }>;
 
   await banco.query(
-    "INSERT INTO depoimentos (citacao, nome, cargo, ordem) VALUES ($1,$2,$3,$4)",
-    [citacao, nome, texto(dados, "cargo"), ultimo[0]?.proxima ?? 0]
+    "INSERT INTO depoimentos (citacao, nome, cargo, foto, ordem) VALUES ($1,$2,$3,$4,$5)",
+    [
+      citacao,
+      nome,
+      texto(dados, "cargo"),
+      await fotoEnviada(dados),
+      ultimo[0]?.proxima ?? 0,
+    ]
   );
 
   atualizarSite();
@@ -54,10 +72,42 @@ export async function salvarDepoimento(dados: FormData) {
   const id = Number(dados.get("id"));
   if (!Number.isFinite(id)) return;
 
+  const nova = await fotoEnviada(dados);
+
+  if (nova) {
+    // Foto trocada: a antiga sai do Blob, senão ela fica ocupando espaço para
+    // sempre, sem estar em lugar nenhum do site.
+    const antes = (await banco.query(
+      "SELECT foto FROM depoimentos WHERE id = $1",
+      [id]
+    )) as Array<{ foto: string | null }>;
+    await apagarArquivo(antes[0]?.foto);
+  }
+
   await banco.query(
-    "UPDATE depoimentos SET citacao = $1, nome = $2, cargo = $3 WHERE id = $4",
-    [texto(dados, "citacao"), texto(dados, "nome"), texto(dados, "cargo"), id]
+    `UPDATE depoimentos
+        SET citacao = $1, nome = $2, cargo = $3,
+            foto = COALESCE($4, foto)
+      WHERE id = $5`,
+    [texto(dados, "citacao"), texto(dados, "nome"), texto(dados, "cargo"), nova, id]
   );
+
+  atualizarSite();
+}
+
+/** Tira a foto do depoimento, voltando para a inicial do nome. */
+export async function removerFoto(dados: FormData) {
+  const banco = await preparar();
+
+  const id = Number(dados.get("id"));
+  if (!Number.isFinite(id)) return;
+
+  const antes = (await banco.query("SELECT foto FROM depoimentos WHERE id = $1", [
+    id,
+  ])) as Array<{ foto: string | null }>;
+
+  await banco.query("UPDATE depoimentos SET foto = NULL WHERE id = $1", [id]);
+  await apagarArquivo(antes[0]?.foto);
 
   atualizarSite();
 }
@@ -68,7 +118,12 @@ export async function apagarDepoimento(dados: FormData) {
   const id = Number(dados.get("id"));
   if (!Number.isFinite(id)) return;
 
+  const antes = (await banco.query("SELECT foto FROM depoimentos WHERE id = $1", [
+    id,
+  ])) as Array<{ foto: string | null }>;
+
   await banco.query("DELETE FROM depoimentos WHERE id = $1", [id]);
+  await apagarArquivo(antes[0]?.foto);
 
   atualizarSite();
 }

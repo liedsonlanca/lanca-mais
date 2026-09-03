@@ -360,12 +360,24 @@ export default async function Home() {
                 </p>
 
                 <div className="mt-8 flex items-center gap-4 border-t border-linha pt-6">
-                  <span
-                    aria-hidden
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-salmon-texto"
-                  >
-                    {depoimento.nome.replace(/[^A-Za-zÀ-ÿ ]/g, '').trim().charAt(0).toUpperCase() || '•'}
-                  </span>
+                  {/* Foto do cliente quando houver; a inicial do nome é a
+                      reserva, para o card nunca ficar com um buraco. */}
+                  {depoimento.foto ? (
+                    <Image
+                      src={depoimento.foto}
+                      alt={`Foto de ${depoimento.nome}`}
+                      width={44}
+                      height={44}
+                      className="h-11 w-11 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-salmon-texto"
+                    >
+                      {depoimento.nome.replace(/[^A-Za-zÀ-ÿ ]/g, '').trim().charAt(0).toUpperCase() || '•'}
+                    </span>
+                  )}
                   <span>
                     <span className="block font-semibold text-preto">
                       {depoimento.nome}

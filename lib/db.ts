@@ -121,12 +121,24 @@ const TABELAS = [
    )`,
 ];
 
+// Colunas acrescentadas depois que as tabelas já existiam em produção.
+//
+// CREATE TABLE IF NOT EXISTS não altera tabela existente, então campos novos
+// precisam entrar por aqui. ADD COLUMN IF NOT EXISTS é idempotente: roda a
+// cada partida sem custo e sem tocar no dado que já está gravado.
+const EVOLUCOES = [
+  `ALTER TABLE depoimentos ADD COLUMN IF NOT EXISTS foto TEXT`,
+];
+
 export async function garantirEsquema() {
   if (!sql) return;
 
   if (!criacao) {
     criacao = (async () => {
       for (const comando of TABELAS) {
+        await sql.query(comando);
+      }
+      for (const comando of EVOLUCOES) {
         await sql.query(comando);
       }
     })();
