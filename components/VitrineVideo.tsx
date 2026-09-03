@@ -49,10 +49,21 @@ export default function VitrineVideo({
     return () => observador.disconnect();
   }, []);
 
+  // "#t=0.1" pede ao navegador que posicione o vídeo em 0,1 segundo.
+  //
+  // Sem isso o ladrilho ficava branco até o vídeo começar: com preload
+  // "metadata" o navegador baixa a ficha do arquivo mas não desenha quadro
+  // nenhum, e um vídeo que ainda não entrou na tela nunca tinha o que mostrar.
+  // Com o marcador de tempo, ele busca aquele instante e pinta esse quadro.
+  //
+  // 0,1s e não 0: muitos vídeos abrem com um quadro preto ou desbotado, e o
+  // primeiro décimo já costuma trazer a imagem de verdade.
+  const comQuadro = src.includes("#") ? src : `${src}#t=0.1`;
+
   return (
     <video
       ref={ref}
-      src={src}
+      src={comQuadro}
       poster={poster}
       muted
       loop
@@ -62,7 +73,10 @@ export default function VitrineVideo({
       preload="metadata"
       aria-label={alt}
       draggable={false}
-      className={className}
+      // Fundo neutro por baixo: se o quadro demorar a chegar numa conexão
+      // ruim, o ladrilho aparece como um espaço reservado, e não como um
+      // buraco branco dentro do card branco.
+      className={`bg-linha ${className ?? ""}`}
     />
   );
 }
