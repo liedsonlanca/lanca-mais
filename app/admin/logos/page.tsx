@@ -51,6 +51,38 @@ export default async function AdminLogos() {
         </p>
       )}
 
+      {/* Prévia da faixa inteira, do jeito que sai no site.
+          Equilibrar tamanhos olhando um logo por vez não funciona: o que
+          importa é o peso de cada um ao lado dos outros. Aqui dá para ver
+          quem está grande demais e quem sumiu, tudo de uma vez. */}
+      {logos.length > 0 && (
+        <div className="mt-8">
+          <p className={rotulo}>Como está no site</p>
+          <div className="sem-barra mt-3 flex items-center gap-10 overflow-x-auto rounded-3xl border border-linha bg-branco px-8 py-7">
+            {logos.map((l) => (
+              <div
+                key={`previa-${l.id}`}
+                className="relative h-12 w-40 shrink-0 lg:h-14 lg:w-44"
+              >
+                <Image
+                  src={l.logo}
+                  alt={l.nome}
+                  fill
+                  sizes="176px"
+                  style={{ transform: `scale(${(l.escala ?? 100) / 100})` }}
+                  className="object-contain opacity-80 grayscale brightness-[0.55]"
+                />
+              </div>
+            ))}
+          </div>
+          <p className={ajuda}>
+            Ajuste o campo &ldquo;Tamanho na faixa&rdquo; de cada marca abaixo
+            até os pesos ficarem parecidos, e recarregue esta página para
+            conferir aqui.
+          </p>
+        </div>
+      )}
+
       <form action={criarLogo} className={`${cartao} mt-8`}>
         <h2 className="font-medium text-preto">Adicionar logo</h2>
 

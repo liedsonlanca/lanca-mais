@@ -57,12 +57,17 @@ export default async function ClientLogos() {
                   fill
                   sizes="176px"
                   style={{ transform: `scale(${(cliente.escala ?? 100) / 100})` }}
-                  // Cinza sobre o fundo claro, colorido ao passar o mouse.
+                  // Cinza escurecido sobre o fundo claro, colorido no hover.
                   //
-                  // A versão anterior usava brightness-0 invert, que pinta o
-                  // logo de branco. Funcionava quando a faixa era escura; com
-                  // o fundo branco de hoje, os logos ficavam invisíveis.
-                  className="object-contain opacity-55 grayscale transition-[opacity,filter] duration-500 hover:opacity-100 hover:grayscale-0"
+                  // brightness abaixo de 1 escurece proporcionalmente: um logo
+                  // de traço fino e claro ganha peso e passa a ser legível,
+                  // enquanto um logo preto não muda (zero vezes qualquer coisa
+                  // continua zero). É o que aproxima marcas de pesos muito
+                  // diferentes sem mexer em arquivo nenhum.
+                  //
+                  // A versão anterior usava opacidade 55% sobre cinza, e os
+                  // logos claros praticamente sumiam.
+                  className="object-contain opacity-80 grayscale brightness-[0.55] transition-[opacity,filter] duration-500 hover:opacity-100 hover:grayscale-0 hover:brightness-100"
                 />
               </div>
             ))}

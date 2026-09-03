@@ -29,11 +29,6 @@ const team = [
     image: "/images/team/diogenes-mesquita.jpg",
   },
   {
-    name: "Renato Lima",
-    role: "Videomaker",
-    image: "/images/team/renato-lima.jpg",
-  },
-  {
     name: "Silas Oliveira",
     role: "Filmmaker e Fotógrafo",
     image: "/images/team/silas-oliveira.jpg",
