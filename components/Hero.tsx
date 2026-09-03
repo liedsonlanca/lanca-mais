@@ -91,10 +91,10 @@ export default function Hero({ numeros }: { numeros: Numero[] }) {
             <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href="/contato"
-                className="group relative overflow-hidden rounded-full bg-salmon px-7 py-3.5 text-center font-medium text-preto shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
+                className="group relative overflow-hidden rounded-full bg-salmon-texto px-7 py-3.5 text-center font-medium text-branco shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
               >
                 <span className="relative z-10">Receber diagnóstico inicial</span>
-                <span className="absolute inset-0 -translate-x-full bg-salmon-claro transition-transform duration-500 group-hover:translate-x-0" />
+                <span className="absolute inset-0 -translate-x-full bg-[#8f4d24] transition-transform duration-500 group-hover:translate-x-0" />
               </Link>
               <Link
                 href="/servicos"
