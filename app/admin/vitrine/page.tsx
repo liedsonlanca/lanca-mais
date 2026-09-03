@@ -1,0 +1,290 @@
+import Image from "next/image";
+import { sql, garantirEsquema } from "@/lib/db";
+import { blobConfigurado } from "@/lib/upload";
+import {
+  campo,
+  rotulo,
+  ajuda,
+  botaoPrimario,
+  botaoSecundario,
+  botaoDiscreto,
+  cartao,
+  arquivo,
+  setaOrdem,
+} from "@/components/admin/estilos";
+import {
+  criarPeca,
+  salvarPeca,
+  apagarPeca,
+  moverPeca,
+  removerVideo,
+} from "./acoes";
+
+export const dynamic = "force-dynamic";
+
+type Linha = {
+  id: number;
+  src: string;
+  alt: string;
+  tipo: string;
+  video: string | null;
+  legenda: string | null;
+};
+
+async function carregar(): Promise<Linha[]> {
+  if (!sql) return [];
+  await garantirEsquema();
+  return (await sql.query(
+    "SELECT id, src, alt, tipo, video, legenda FROM vitrine ORDER BY ordem, id"
+  )) as Linha[];
+}
+
+export default async function AdminVitrine() {
+  const pecas = await carregar();
+
+  return (
+    <div>
+      <h1 className="font-heading text-3xl font-semibold text-preto">
+        Nosso trabalho
+      </h1>
+      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+        O trilho que desliza sozinho na home. A ordem aqui é a ordem lá, e
+        clicar numa peça no site abre a versão ampliada.
+      </p>
+
+      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-preto/70`}>
+        <strong className="font-medium text-preto">Formato:</strong> as peças
+        aparecem em pé, na proporção 4:5 do feed. Uma imagem quadrada ou
+        deitada vai ser cortada em cima e embaixo. Para vídeo, envie também uma
+        imagem de capa: é ela que aparece no trilho, e o vídeo só toca quando
+        alguém clica.
+      </div>
+
+      {!sql && (
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+          Banco de dados não configurado. Nada aqui será salvo.
+        </p>
+      )}
+
+      {!blobConfigurado && (
+        <p className="mt-4 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm leading-relaxed text-preto/75">
+          Armazenamento de arquivos não configurado. Falta o
+          <span className="text-salmon-texto"> BLOB_READ_WRITE_TOKEN</span> no
+          projeto da Vercel, então o envio de imagem e vídeo vai falhar.
+        </p>
+      )}
+
+      {/* ---------- Nova peça ---------- */}
+      <form action={criarPeca} className={`${cartao} mt-8`}>
+        <h2 className="font-medium text-preto">Adicionar peça</h2>
+
+        <div className="mt-5 grid gap-4">
+          <div>
+            <label htmlFor="nova-capa" className={rotulo}>
+              Imagem (obrigatória)
+            </label>
+            <input
+              id="nova-capa"
+              name="capa"
+              type="file"
+              required
+              accept="image/jpeg,image/png,image/webp"
+              className={arquivo}
+            />
+            <p className={ajuda}>JPG, PNG ou WEBP, até 8 MB, em pé (4:5).</p>
+          </div>
+
+          <div>
+            <label htmlFor="novo-video" className={rotulo}>
+              Vídeo (opcional)
+            </label>
+            <input
+              id="novo-video"
+              name="video"
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              className={arquivo}
+            />
+            <p className={ajuda}>
+              MP4, WEBM ou MOV, até 60 MB. Vídeo consome banda a cada visita,
+              então prefira o arquivo mais leve que mantenha a qualidade.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="nova-legenda" className={rotulo}>
+                Legenda
+              </label>
+              <input
+                id="nova-legenda"
+                name="legenda"
+                placeholder="Ex: Campanha de verão, Clínica X"
+                className={`${campo} mt-2`}
+              />
+              <p className={ajuda}>Aparece ao abrir a peça ampliada.</p>
+            </div>
+            <div>
+              <label htmlFor="novo-alt" className={rotulo}>
+                Descrição da imagem
+              </label>
+              <input
+                id="novo-alt"
+                name="alt"
+                placeholder="O que aparece na imagem"
+                className={`${campo} mt-2`}
+              />
+              <p className={ajuda}>
+                Para quem usa leitor de tela e para o Google.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" className={`${botaoPrimario} mt-5`}>
+          Adicionar
+        </button>
+      </form>
+
+      {/* ---------- Lista ---------- */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {pecas.length === 0 && (
+          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60 sm:col-span-2">
+            Nenhuma peça cadastrada.
+          </p>
+        )}
+
+        {pecas.map((p, i) => (
+          <div key={p.id} className={cartao}>
+            <div className="flex items-start gap-4">
+              <div className="relative h-28 w-[90px] shrink-0 overflow-hidden rounded-xl border border-linha">
+                <Image
+                  src={p.src}
+                  alt={p.alt}
+                  fill
+                  sizes="90px"
+                  className="object-cover"
+                />
+                {p.video && (
+                  <span className="absolute bottom-1 left-1 rounded-full bg-preto/70 px-2 py-0.5 text-[10px] font-medium text-branco">
+                    vídeo
+                  </span>
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <span className="numeral-fantasma text-sm text-preto/35">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p className="mt-1 truncate text-sm text-preto/70">
+                  {p.legenda || p.alt}
+                </p>
+
+                <div className="mt-3 flex items-center gap-2">
+                  <form action={moverPeca}>
+                    <input type="hidden" name="id" value={p.id} />
+                    <input type="hidden" name="direcao" value={-1} />
+                    <button
+                      type="submit"
+                      disabled={i === 0}
+                      aria-label="Mover para trás"
+                      className={setaOrdem}
+                    >
+                      ←
+                    </button>
+                  </form>
+                  <form action={moverPeca}>
+                    <input type="hidden" name="id" value={p.id} />
+                    <input type="hidden" name="direcao" value={1} />
+                    <button
+                      type="submit"
+                      disabled={i === pecas.length - 1}
+                      aria-label="Mover para frente"
+                      className={setaOrdem}
+                    >
+                      →
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <form action={salvarPeca} className="mt-5 grid gap-4">
+              <input type="hidden" name="id" value={p.id} />
+
+              <div>
+                <label htmlFor={`legenda-${p.id}`} className={rotulo}>
+                  Legenda
+                </label>
+                <input
+                  id={`legenda-${p.id}`}
+                  name="legenda"
+                  defaultValue={p.legenda ?? ""}
+                  className={`${campo} mt-2`}
+                />
+              </div>
+
+              <div>
+                <label htmlFor={`alt-${p.id}`} className={rotulo}>
+                  Descrição da imagem
+                </label>
+                <input
+                  id={`alt-${p.id}`}
+                  name="alt"
+                  defaultValue={p.alt}
+                  className={`${campo} mt-2`}
+                />
+              </div>
+
+              <div>
+                <label htmlFor={`capa-${p.id}`} className={rotulo}>
+                  Trocar a imagem
+                </label>
+                <input
+                  id={`capa-${p.id}`}
+                  name="capa"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className={arquivo}
+                />
+              </div>
+
+              <div>
+                <label htmlFor={`video-${p.id}`} className={rotulo}>
+                  {p.video ? "Trocar o vídeo" : "Adicionar vídeo"}
+                </label>
+                <input
+                  id={`video-${p.id}`}
+                  name="video"
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  className={arquivo}
+                />
+              </div>
+
+              <button type="submit" className={`${botaoSecundario} justify-self-start`}>
+                Salvar
+              </button>
+            </form>
+
+            {p.video && (
+              <form action={removerVideo} className="mt-3">
+                <input type="hidden" name="id" value={p.id} />
+                <button type="submit" className={botaoDiscreto}>
+                  Remover o vídeo e deixar só a imagem
+                </button>
+              </form>
+            )}
+
+            <form action={apagarPeca} className="mt-4 border-t border-linha pt-4">
+              <input type="hidden" name="id" value={p.id} />
+              <button type="submit" className={botaoDiscreto}>
+                Apagar esta peça
+              </button>
+            </form>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

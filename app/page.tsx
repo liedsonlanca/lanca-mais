@@ -334,8 +334,13 @@ export default async function Home() {
             ]}
           />
 
+          {/* Só os três primeiros.
+              A grade tem três colunas, então qualquer quantidade que não seja
+              múltiplo de três deixa card sozinho na última fila. E prova
+              social satura: sete depoimentos não convencem mais que três, só
+              cansam. Quais três aparecem é decidido pela ordem no painel. */}
           <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {depoimentos.map((depoimento, i) => (
+            {depoimentos.slice(0, 3).map((depoimento, i) => (
               <StaggerItem
                 // Os depoimentos ainda são placeholders com o mesmo nome; o índice
                 // garante chave única até entrarem os depoimentos reais.

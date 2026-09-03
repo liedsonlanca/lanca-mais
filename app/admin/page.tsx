@@ -9,7 +9,7 @@ const SECOES = [
     tabela: "vitrine",
     rotulo: "Nosso trabalho",
     descricao: "As fotos e vídeos do trilho que roda na home.",
-    pronto: false,
+    pronto: true,
   },
   {
     href: "/admin/depoimentos",
@@ -23,14 +23,14 @@ const SECOES = [
     tabela: "cases",
     rotulo: "Cases",
     descricao: "Os trabalhos com foto, resumo e resultado.",
-    pronto: false,
+    pronto: true,
   },
   {
     href: "/admin/logos",
     tabela: "logos",
     rotulo: "Logos de clientes",
     descricao: "A faixa de marcas atendidas.",
-    pronto: false,
+    pronto: true,
   },
   {
     href: "/admin/numeros",
@@ -44,7 +44,7 @@ const SECOES = [
     tabela: "posts",
     rotulo: "Blog",
     descricao: "Os textos publicados.",
-    pronto: false,
+    pronto: true,
   },
 ];
 

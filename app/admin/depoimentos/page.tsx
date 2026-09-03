@@ -44,8 +44,17 @@ export default async function AdminDepoimentos() {
       </h1>
       <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
         Aparecem na home, na seção &ldquo;Quem já trabalha com a gente&rdquo;.
-        A ordem aqui é a ordem lá. Toda alteração vale no site em segundos.
+        Toda alteração vale no site em segundos.
       </p>
+
+      <div className="mt-4 rounded-2xl border border-linha bg-branco p-5 text-sm leading-relaxed text-preto/70">
+        <strong className="font-medium text-preto">
+          Só os três primeiros aparecem no site.
+        </strong>{" "}
+        A seção tem três colunas, e qualquer outra quantidade deixa card
+        sozinho na última fila. Os demais ficam guardados aqui: use as setas
+        para promover o que quiser mostrar.
+      </div>
 
       {!sql && (
         <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
@@ -136,8 +145,19 @@ export default async function AdminDepoimentos() {
             className="rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)]"
           >
             <div className="flex items-center justify-between gap-4">
-              <span className="numeral-fantasma text-sm text-preto/35">
-                {String(i + 1).padStart(2, "0")}
+              <span className="flex items-center gap-3">
+                <span className="numeral-fantasma text-sm text-preto/35">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {i < 3 ? (
+                  <span className="rounded-full bg-salmon/15 px-3 py-0.5 text-xs font-medium text-salmon-texto">
+                    aparece no site
+                  </span>
+                ) : (
+                  <span className="rounded-full border border-linha px-3 py-0.5 text-xs text-preto/45">
+                    guardado
+                  </span>
+                )}
               </span>
 
               <div className="flex items-center gap-2">
