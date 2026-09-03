@@ -37,7 +37,7 @@ const SECOES = [
     tabela: "numeros",
     rotulo: "Números",
     descricao: "Os contadores de prova social.",
-    pronto: false,
+    pronto: true,
   },
   {
     href: "/admin/blog",
