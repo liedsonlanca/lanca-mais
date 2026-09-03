@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { montarSessao, sessaoValida } from "@/lib/seguranca";
 
 export const COOKIE_ACESSO = "lanca_acesso";
 
@@ -15,24 +16,9 @@ export const COOKIE_ACESSO = "lanca_acesso";
 // é pedida de novo.
 export const JANELA_ACESSO_MS = 30 * 60 * 1000;
 
-// O valor do cookie é "<senha>.<emitidoEm>". Não é assinado de propósito:
-// forjar exigiria conhecer a senha, que já é o segredo do portão, então uma
-// assinatura não acrescentaria nada.
-export function montarValorAcesso(senha: string) {
-  return `${senha}.${Date.now()}`;
-}
-
-export function lerValorAcesso(valor: string | undefined) {
-  if (!valor) return null;
-
-  // Último ponto, e não o primeiro: a senha pode conter pontos.
-  const corte = valor.lastIndexOf(".");
-  if (corte === -1) return null;
-
-  const emitidoEm = Number(valor.slice(corte + 1));
-  if (!Number.isFinite(emitidoEm)) return null;
-
-  return { senha: valor.slice(0, corte), emitidoEm };
+// O cookie leva "carimbo.assinatura", nunca a senha (ver lib/seguranca.ts).
+export async function montarValorAcesso(senha: string) {
+  return montarSessao(senha);
 }
 
 // Porteiro do site em pré-lançamento.
@@ -42,20 +28,21 @@ export function lerValorAcesso(valor: string | undefined) {
 // defina SITE_PUBLICO=1.
 //
 // No Next 16 o arquivo `middleware` foi renomeado para `proxy`.
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Falha fechado de propósito: o site só abre ao público quando alguém liga
   // SITE_PUBLICO explicitamente. Assim um deploy novo, sem variáveis, nasce em
   // pré-lançamento, e não expondo por acidente o conteúdo ainda de exemplo.
   if (process.env.SITE_PUBLICO === "1") return NextResponse.next();
 
   const senha = process.env.SENHA_PREVIA;
-  const guardado = lerValorAcesso(request.cookies.get(COOKIE_ACESSO)?.value);
 
   const liberado =
     Boolean(senha) &&
-    guardado !== null &&
-    guardado.senha === senha &&
-    Date.now() - guardado.emitidoEm < JANELA_ACESSO_MS;
+    (await sessaoValida(
+      request.cookies.get(COOKIE_ACESSO)?.value,
+      senha as string,
+      JANELA_ACESSO_MS
+    ));
 
   if (liberado) {
     // Renova a janela a cada página vista, para não expulsar quem está
@@ -63,7 +50,7 @@ export function proxy(request: NextRequest) {
     const resposta = NextResponse.next();
     resposta.cookies.set({
       name: COOKIE_ACESSO,
-      value: montarValorAcesso(senha as string),
+      value: await montarValorAcesso(senha as string),
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",

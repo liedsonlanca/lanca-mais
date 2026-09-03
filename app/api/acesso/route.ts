@@ -1,5 +1,12 @@
 import { NextResponse } from "next/server";
 import { COOKIE_ACESSO, montarValorAcesso } from "@/proxy";
+import { comparaSegura } from "@/lib/seguranca";
+import {
+  podeTentar,
+  registrarFalha,
+  limparTentativas,
+  origemDaRequisicao,
+} from "@/lib/tentativas";
 
 // Valida a senha de pré-lançamento e libera o site neste navegador.
 export async function POST(request: Request) {
@@ -12,6 +19,14 @@ export async function POST(request: Request) {
     );
   }
 
+  const origem = origemDaRequisicao(request);
+  if (!(await podeTentar("site", origem)).permitido) {
+    return NextResponse.json(
+      { erro: "Muitas tentativas. Espere 15 minutos antes de tentar de novo." },
+      { status: 429 }
+    );
+  }
+
   let enviada = "";
   try {
     const corpo = await request.json();
@@ -20,17 +35,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "Requisição inválida." }, { status: 400 });
   }
 
-  if (enviada !== senhaCorreta) {
+  if (!comparaSegura(enviada, senhaCorreta)) {
+    await registrarFalha("site", origem);
     // Atraso curto para desencorajar tentativa em massa.
     await new Promise((r) => setTimeout(r, 600));
     return NextResponse.json({ erro: "Senha incorreta." }, { status: 401 });
   }
 
+  await limparTentativas("site", origem);
+
   const resposta = NextResponse.json({ ok: true });
 
   resposta.cookies.set({
     name: COOKIE_ACESSO,
-    value: montarValorAcesso(senhaCorreta),
+    value: await montarValorAcesso(senhaCorreta),
     // httpOnly: o cookie não fica exposto a scripts da página.
     httpOnly: true,
     sameSite: "lax",

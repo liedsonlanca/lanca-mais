@@ -10,7 +10,7 @@ export default function SairDoAdmin() {
     <button
       type="button"
       onClick={sair}
-      className="text-preto/55 transition-colors duration-300 hover:text-salmon-texto"
+      className="flex min-h-11 items-center rounded-full px-3 text-preto/55 transition-colors duration-300 hover:text-salmon-texto"
     >
       Sair
     </button>

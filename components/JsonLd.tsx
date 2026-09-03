@@ -6,6 +6,13 @@ function real(value: string) {
   return value.includes("[") ? undefined : value;
 }
 
+// JSON.stringify não escapa "</script>": um texto vindo do painel com essa
+// sequência fecharia a tag e o que viesse depois seria executado como código.
+// Trocar "<" pelo escape equivalente resolve, e o JSON continua válido.
+function jsonSeguro(dados: unknown) {
+  return JSON.stringify(dados).replace(/</g, "\\u003c");
+}
+
 export default function JsonLd() {
   const sameAs = [
     real(siteConfig.instagram) &&
@@ -66,7 +73,7 @@ export default function JsonLd() {
       type="application/ld+json"
       // JSON.stringify remove as chaves com valor undefined.
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify([organization, website]),
+        __html: jsonSeguro([organization, website]),
       }}
     />
   );

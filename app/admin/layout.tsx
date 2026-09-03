@@ -23,6 +23,7 @@ const SECOES = [
   { href: "/admin/logos", rotulo: "Logos" },
   { href: "/admin/numeros", rotulo: "Números" },
   { href: "/admin/blog", rotulo: "Blog" },
+  { href: "/admin/seguranca", rotulo: "Segurança" },
 ];
 
 export default async function AdminLayout({
@@ -58,34 +59,45 @@ export default async function AdminLayout({
 
   return (
     <div className="pagina-admin min-h-screen bg-areia">
+      {/* Cabeçalho pensado para o dedo.
+          Cada destino é uma pastilha de 44px de altura, que é o alvo mínimo
+          recomendado no toque: antes eram links de 20px enfileirados, e no
+          celular era fácil errar o vizinho. No computador nada muda além de um
+          respiro a mais. */}
       <header className="border-b border-linha bg-branco">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-3 px-6 py-4">
-          <Link href="/admin" className="font-heading text-lg font-semibold text-preto">
-            Painel <span className="text-salmon-texto">LANÇA+</span>
-          </Link>
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+          <div className="flex items-center justify-between gap-4">
+            <Link
+              href="/admin"
+              className="font-heading flex min-h-11 items-center text-lg font-semibold text-preto"
+            >
+              Painel <span className="ml-1.5 text-salmon-texto">LANÇA+</span>
+            </Link>
 
-          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+            <div className="flex items-center gap-1 text-sm">
+              <Link
+                href="/"
+                target="_blank"
+                className="flex min-h-11 items-center rounded-full px-3 text-preto/55 transition-colors duration-300 hover:text-preto"
+              >
+                Ver o site
+              </Link>
+              <SairDoAdmin />
+            </div>
+          </div>
+
+          {/* Rola de lado no celular em vez de quebrar em várias fileiras. */}
+          <nav className="sem-barra -mx-4 mt-1 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
             {SECOES.map((secao) => (
               <Link
                 key={secao.href}
                 href={secao.href}
-                className="text-preto/65 transition-colors duration-300 hover:text-salmon-texto"
+                className="flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm text-preto/65 transition-colors duration-300 hover:bg-areia hover:text-salmon-texto"
               >
                 {secao.rotulo}
               </Link>
             ))}
           </nav>
-
-          <div className="ml-auto flex items-center gap-4 text-sm">
-            <Link
-              href="/"
-              target="_blank"
-              className="text-preto/55 transition-colors duration-300 hover:text-preto"
-            >
-              Ver o site
-            </Link>
-            <SairDoAdmin />
-          </div>
         </div>
       </header>
 

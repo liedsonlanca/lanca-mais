@@ -33,7 +33,7 @@ const campo =
   "w-full rounded-xl border border-linha bg-branco px-4 py-2.5 text-sm text-preto outline-none transition-colors duration-300 focus:border-salmon";
 const rotulo = "block text-xs font-medium uppercase tracking-wider text-preto/50";
 const botao =
-  "rounded-full px-5 py-2 text-sm font-medium transition-colors duration-300";
+  "inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-medium transition-colors duration-300";
 
 export default async function AdminDepoimentos() {
   const depoimentos = await carregar();
@@ -157,7 +157,7 @@ export default async function AdminDepoimentos() {
                     type="submit"
                     disabled={i === 0}
                     aria-label="Mover para cima"
-                    className="rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-linha text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
                   >
                     ↑
                   </button>
@@ -170,7 +170,7 @@ export default async function AdminDepoimentos() {
                     type="submit"
                     disabled={i === depoimentos.length - 1}
                     aria-label="Mover para baixo"
-                    className="rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-linha text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
                   >
                     ↓
                   </button>

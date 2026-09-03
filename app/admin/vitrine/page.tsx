@@ -212,11 +212,11 @@ export default async function AdminVitrine() {
                       min={1}
                       max={pecas.length}
                       defaultValue={i + 1}
-                      className="w-16 rounded-full border border-linha bg-branco px-3 py-1 text-center text-sm text-preto outline-none focus:border-salmon"
+                      className="min-h-11 w-16 rounded-full border border-linha bg-branco px-3 text-center text-sm text-preto outline-none focus:border-salmon"
                     />
                     <button
                       type="submit"
-                      className="rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon hover:text-salmon-texto"
+                      className="flex min-h-11 items-center rounded-full border border-linha px-4 text-sm text-preto/60 transition-colors hover:border-salmon hover:text-salmon-texto"
                     >
                       Ir
                     </button>

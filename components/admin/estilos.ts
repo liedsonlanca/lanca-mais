@@ -12,8 +12,9 @@ export const rotulo =
 
 export const ajuda = "mt-2 text-xs leading-relaxed text-preto/50";
 
+// min-h-11: mesmo alvo minimo de toque das setas.
 export const botao =
-  "rounded-full px-5 py-2 text-sm font-medium transition-colors duration-300";
+  "inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-medium transition-colors duration-300";
 
 export const botaoPrimario = `${botao} bg-salmon text-preto hover:bg-salmon-escuro`;
 
@@ -28,5 +29,7 @@ export const cartao =
 export const arquivo =
   "mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto";
 
+// min-h-11 e o alvo minimo recomendado no toque (44px). Com py-1 as setas
+// ficavam com 26px e erravam o vizinho no celular.
 export const setaOrdem =
-  "rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30";
+  "flex min-h-11 min-w-11 items-center justify-center rounded-full border border-linha text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30";
