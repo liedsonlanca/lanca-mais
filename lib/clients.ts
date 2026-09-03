@@ -2,6 +2,13 @@ export type Cliente = {
   nome: string;
   /** Caminho do logo em public/images/clientes. Prefira PNG ou SVG com fundo transparente. */
   logo: string;
+  /**
+   * Tamanho relativo na faixa, em porcentagem. 100 é o padrão.
+   *
+   * Existe porque cada arquivo traz uma margem interna própria: dois logos na
+   * mesma caixa aparecem com pesos visuais diferentes, e só o olho resolve.
+   */
+  escala?: number;
 };
 
 // Marcas atendidas pela LANÇA+.

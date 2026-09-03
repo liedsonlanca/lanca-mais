@@ -128,6 +128,13 @@ const TABELAS = [
 // cada partida sem custo e sem tocar no dado que já está gravado.
 const EVOLUCOES = [
   `ALTER TABLE depoimentos ADD COLUMN IF NOT EXISTS foto TEXT`,
+  // Ajuste fino do tamanho de cada logo, em porcentagem.
+  //
+  // Arquivos de logo chegam com proporções e margens internas diferentes: um
+  // vem justo nas bordas, outro com muito espaço em volta. Encaixados na
+  // mesma caixa, um parece enorme e o outro minúsculo, e não há cálculo que
+  // resolva isso — o vazio faz parte da imagem. Quem equilibra é o olho.
+  `ALTER TABLE logos ADD COLUMN IF NOT EXISTS escala INTEGER NOT NULL DEFAULT 100`,
 ];
 
 export async function garantirEsquema() {

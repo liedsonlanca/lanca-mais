@@ -40,9 +40,13 @@ export default async function ClientLogos() {
           {/* animate-marquee corre sozinho e para quando o ponteiro encosta. */}
           <div className="animate-marquee flex w-max items-center gap-12 lg:gap-16">
             {trilha.map((cliente, i) => (
+              // A caixa é igual para todos e define o ritmo da faixa. O que
+              // varia é a escala de cada logo dentro dela, ajustada no painel:
+              // arquivos chegam com margens internas diferentes, e sem esse
+              // ajuste um aparece enorme ao lado de outro minúsculo.
               <div
                 key={`${cliente.nome}-${i}`}
-                className="relative h-9 w-32 shrink-0 lg:h-10 lg:w-36"
+                className="relative h-12 w-40 shrink-0 lg:h-14 lg:w-44"
               >
                 <Image
                   src={cliente.logo}
@@ -51,13 +55,14 @@ export default async function ClientLogos() {
                   // lista uma vez só.
                   aria-hidden={i >= clientes.length}
                   fill
-                  sizes="144px"
+                  sizes="176px"
+                  style={{ transform: `scale(${(cliente.escala ?? 100) / 100})` }}
                   // Cinza sobre o fundo claro, colorido ao passar o mouse.
                   //
                   // A versão anterior usava brightness-0 invert, que pinta o
                   // logo de branco. Funcionava quando a faixa era escura; com
                   // o fundo branco de hoje, os logos ficavam invisíveis.
-                  className="object-contain opacity-55 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0"
+                  className="object-contain opacity-55 grayscale transition-[opacity,filter] duration-500 hover:opacity-100 hover:grayscale-0"
                 />
               </div>
             ))}

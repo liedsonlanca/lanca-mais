@@ -147,7 +147,7 @@ export async function lerLogos(): Promise<Cliente[]> {
     });
 
     return (await sql!.query(
-      "SELECT nome, logo FROM logos ORDER BY ordem, id"
+      "SELECT nome, logo, escala FROM logos ORDER BY ordem, id"
     )) as Cliente[];
   }, clientes);
 }

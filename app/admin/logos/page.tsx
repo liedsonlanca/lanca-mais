@@ -15,13 +15,13 @@ import { criarLogo, salvarLogo, apagarLogo, moverLogo } from "./acoes";
 
 export const dynamic = "force-dynamic";
 
-type Linha = { id: number; nome: string; logo: string };
+type Linha = { id: number; nome: string; logo: string; escala: number };
 
 async function carregar(): Promise<Linha[]> {
   if (!sql) return [];
   await garantirEsquema();
   return (await sql.query(
-    "SELECT id, nome, logo FROM logos ORDER BY ordem, id"
+    "SELECT id, nome, logo, escala FROM logos ORDER BY ordem, id"
   )) as Linha[];
 }
 
@@ -85,14 +85,17 @@ export default async function AdminLogos() {
         {logos.map((l, i) => (
           <div key={l.id} className={cartao}>
             <div className="flex items-center gap-4">
-              {/* Fundo areia porque logo transparente some no branco do card. */}
-              <div className="relative h-14 w-28 shrink-0 rounded-xl border border-linha bg-areia">
+              {/* Prévia no tamanho real da faixa, com a escala aplicada: é
+                  assim que ela vai aparecer no site. Fundo areia porque logo
+                  transparente some no branco do card. */}
+              <div className="relative h-14 w-44 shrink-0 overflow-hidden rounded-xl border border-linha bg-areia">
                 <Image
                   src={l.logo}
                   alt={l.nome}
                   fill
-                  sizes="112px"
-                  className="object-contain p-2"
+                  sizes="176px"
+                  style={{ transform: `scale(${(l.escala ?? 100) / 100})` }}
+                  className="object-contain"
                 />
               </div>
 
@@ -140,6 +143,30 @@ export default async function AdminLogos() {
                   defaultValue={l.nome}
                   className={`${campo} mt-2`}
                 />
+              </div>
+
+              <div>
+                <label htmlFor={`escala-${l.id}`} className={rotulo}>
+                  Tamanho na faixa
+                </label>
+                <div className="mt-2 flex items-center gap-3">
+                  <input
+                    id={`escala-${l.id}`}
+                    name="escala"
+                    type="number"
+                    min={40}
+                    max={200}
+                    step={5}
+                    defaultValue={l.escala ?? 100}
+                    className={`${campo} w-28`}
+                  />
+                  <span className="text-sm text-preto/50">%</span>
+                </div>
+                <p className={ajuda}>
+                  100% é o padrão. Aumente o logo que ficou pequeno na faixa,
+                  diminua o que ficou dominante, e salve para ver o resultado
+                  na prévia acima.
+                </p>
               </div>
 
               <CampoArquivo
