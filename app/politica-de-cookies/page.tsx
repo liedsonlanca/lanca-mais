@@ -16,6 +16,11 @@ export const metadata: Metadata = {
 // cada item aqui corresponde a um cookie que existe no código. Um documento que
 // promete menos do que o site faz é um problema jurídico; um que promete mais é
 // um problema de confiança.
+//
+// Os cookies são descritos pela função, e não pelo nome técnico. O nome não é
+// segredo — qualquer pessoa o vê abrindo o navegador —, mas num texto feito
+// para ser lido ele vira ruído, e o que a pessoa precisa saber é para que
+// serve e quanto dura.
 export default function PoliticaDeCookies() {
   return (
     <>
@@ -48,15 +53,17 @@ export default function PoliticaDeCookies() {
             itens={[
               <>
                 <strong className="font-medium text-preto">
-                  lanca_acesso
+                  Acesso antecipado
                 </strong>{" "}
-                — lembra que você digitou a senha de acesso antecipado, enquanto
-                o site não está aberto ao público. Dura 30 minutos parado.
+                — lembra que você digitou a senha, enquanto o site ainda não
+                está aberto ao público. Dura 30 minutos parado.
               </>,
               <>
-                <strong className="font-medium text-preto">lanca_admin</strong>{" "}
-                — mantém a equipe da {siteConfig.name} conectada ao painel de
-                administração. Dura uma jornada de trabalho.
+                <strong className="font-medium text-preto">
+                  Sessão do painel
+                </strong>{" "}
+                — mantém a equipe da {siteConfig.name} conectada à área de
+                administração do site. Dura uma jornada de trabalho.
               </>,
             ]}
           />
