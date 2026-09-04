@@ -45,15 +45,28 @@ const MIDIA = [BLOB, R2].filter(Boolean).join(" ");
 // Endereço para onde o painel ENVIA, que não é o mesmo de onde o site LÊ.
 //
 // A leitura sai do domínio público (pub-....r2.dev); o envio vai para o
-// endpoint compatível com S3, que é <conta>.r2.cloudflarestorage.com. São
-// hosts diferentes, e connect-src precisa dos dois: sem este, o navegador
-// bloqueia o envio antes de abrir conexão, e o erro que chega ao painel é
-// uma falha de rede genérica que não diz nada sobre a causa.
+// endpoint compatível com S3. São hosts diferentes, e connect-src precisa
+// dos dois: sem o de envio, o navegador bloqueia antes de abrir conexão, e o
+// erro que chega ao painel é uma falha de rede genérica que não diz nada
+// sobre a causa — só o console do navegador nomeia o bloqueio.
+//
+// São duas formas de endereçar o mesmo endpoint, e o cliente S3 usa a
+// primeira: o bucket vira subdomínio (lanca-midia.<conta>.r2...), e não um
+// pedaço do caminho (<conta>.r2.../lanca-midia). Para o navegador são hosts
+// distintos, então as duas entram — a segunda porque a biblioteca pode
+// escolher o caminho em alguma operação.
 //
 // Vai o endereço exato da conta, e não um curinga em *.r2.cloudflarestorage
 // .com: o curinga liberaria a conta de qualquer pessoa na Cloudflare.
 const R2_ENVIO = process.env.R2_ACCOUNT_ID
-  ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+  ? [
+      process.env.R2_BUCKET
+        ? `https://${process.env.R2_BUCKET}.${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+        : "",
+      `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    ]
+      .filter(Boolean)
+      .join(" ")
   : "";
 
 function politicaDeConteudo(desenvolvimento: boolean) {
