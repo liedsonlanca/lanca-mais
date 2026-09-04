@@ -16,6 +16,9 @@ export const metadata: Metadata = {
 // conferir, e nenhuma tela do painel pode existir sem passar por ele. As
 // Server Actions conferem de novo por conta própria, porque são alcançáveis
 // por POST direto, sem passar por esta árvore.
+// A tela do blog continua existindo e funcionando; ela só sai do menu
+// enquanto BLOG_ATIVO for falso, para não oferecer a edição de uma seção que
+// ninguém vê no site.
 const SECOES = [
   { href: "/lncadmin/site", rotulo: "Estado do site" },
   { href: "/lncadmin/vitrine", rotulo: "Nosso trabalho" },
@@ -23,7 +26,6 @@ const SECOES = [
   { href: "/lncadmin/cases", rotulo: "Cases" },
   { href: "/lncadmin/logos", rotulo: "Logos" },
   { href: "/lncadmin/numeros", rotulo: "Números" },
-  { href: "/lncadmin/blog", rotulo: "Blog" },
   { href: "/lncadmin/seguranca", rotulo: "Segurança" },
 ];
 

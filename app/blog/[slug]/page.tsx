@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BLOG_ATIVO } from "@/lib/site-config";
 import type { Metadata } from "next";
 import { lerPosts } from "@/lib/conteudo";
 import CtaFinal from "@/components/CtaFinal";
@@ -46,6 +47,8 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  if (!BLOG_ATIVO) notFound();
+
   const { slug } = await params;
   const post = (await lerPosts()).find((p) => p.slug === slug);
   if (!post) notFound();

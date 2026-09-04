@@ -20,12 +20,24 @@ export const siteConfig = {
   tiktok: "@lancamais", // [TIKTOK], substitua pelo @ real
 };
 
+/**
+ * O blog está fora do ar, a pedido do cliente, até haver o que publicar.
+ *
+ * Uma chave só, e não código apagado: os textos, as páginas e a tela do
+ * painel continuam de pé. Voltar é trocar false por true aqui, e nada mais.
+ *
+ * Ela governa a navegação, o rodapé, a seção da home, o sitemap, as próprias
+ * páginas do blog (que respondem 404 enquanto isto for falso) e a alternância
+ * de fundos da home, que muda quando uma seção some do meio.
+ */
+export const BLOG_ATIVO = false;
+
 export const navLinks = [
   { href: "/", label: "Início" },
   { href: "/servicos", label: "Serviços" },
   { href: "/portfolio", label: "Portfólio" },
   { href: "/sobre", label: "Sobre" },
-  { href: "/blog", label: "Blog" },
+  ...(BLOG_ATIVO ? [{ href: "/blog", label: "Blog" }] : []),
   { href: "/contato", label: "Contato" },
 ];
 

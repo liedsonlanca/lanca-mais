@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { BLOG_ATIVO } from "@/lib/site-config";
 import type { Metadata } from "next";
 import { lerPosts } from "@/lib/conteudo";
 import PageHero from "@/components/PageHero";
@@ -20,6 +22,8 @@ function formatarData(data: string) {
 }
 
 export default async function BlogPage() {
+  if (!BLOG_ATIVO) notFound();
+
   const blogPosts = await lerPosts();
 
   return (

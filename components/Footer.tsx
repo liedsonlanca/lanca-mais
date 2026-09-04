@@ -3,7 +3,6 @@ import Link from "next/link";
 import { navLinks, services, siteConfig } from "@/lib/site-config";
 import FooterMap from "@/components/FooterMap";
 import GerenciarConsentimento from "@/components/GerenciarConsentimento";
-import { lerPosts } from "@/lib/conteudo";
 
 const socials = [
   {
@@ -20,21 +19,13 @@ const socials = [
   },
 ];
 
-function formatDate(date: string) {
-  return new Date(`${date}T00:00:00`).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 export default async function Footer() {
-  const blogPosts = await lerPosts();
 
   return (
     <footer className="border-t border-borda bg-abismo text-bege">
       <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="grid gap-10 md:grid-cols-5">
+        <div className="grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
           <Image
             src="/images/logo-1.png"
@@ -102,26 +93,6 @@ export default async function Footer() {
           </ul>
         </div>
 
-        <div>
-          <h3 className="eyebrow text-salmon">
-            Últimos posts
-          </h3>
-          <ul className="mt-4 space-y-4 text-sm">
-            {blogPosts.slice(0, 3).map((post) => (
-              <li key={post.slug}>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="block py-1.5 text-bege/92 hover:text-branco"
-                >
-                  {post.title}
-                </Link>
-                <span className="mt-1 block text-xs text-bege/70">
-                  {formatDate(post.date)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
         </div>
 
         <div className="mt-14">
@@ -158,6 +129,24 @@ export default async function Footer() {
             className="flex min-h-11 items-center underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
           >
             Política de Cookies
+          </Link>
+          <span aria-hidden className="text-bege/45">
+            ·
+          </span>
+          <Link
+            href="/aviso-legal"
+            className="flex min-h-11 items-center underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+          >
+            Aviso Legal
+          </Link>
+          <span aria-hidden className="text-bege/45">
+            ·
+          </span>
+          <Link
+            href="/termos-de-uso"
+            className="flex min-h-11 items-center underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+          >
+            Termos de Uso
           </Link>
           <span aria-hidden className="text-bege/45">
             ·

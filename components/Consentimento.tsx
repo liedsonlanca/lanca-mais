@@ -270,6 +270,13 @@ export default function Consentimento() {
                 >
                   Política de Privacidade
                 </Link>
+                <span className="mx-2">·</span>
+                <Link
+                  href="/aviso-legal"
+                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-salmon-texto"
+                >
+                  Aviso Legal
+                </Link>
               </p>
             </div>
           </div>

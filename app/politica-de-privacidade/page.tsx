@@ -124,21 +124,30 @@ export default function PoliticaDePrivacidade() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">Vercel</strong> —
-                hospeda o site e o banco de dados do conteúdo.
-              </>,
-              <>
-                <strong className="font-medium text-preto">Cloudflare</strong> —
-                guarda e entrega as imagens e os vídeos do portfólio.
-              </>,
-              <>
                 <strong className="font-medium text-preto">
-                  Google e Meta
+                  Provedores de hospedagem e de armazenamento
                 </strong>{" "}
-                — apenas se você aceitou medição e marketing, respectivamente.
+                — mantêm o site no ar e guardam as imagens e os vídeos do
+                portfólio. Eles operam a infraestrutura sob contrato, seguindo
+                as nossas instruções, e não usam nada disso para fins próprios.
+              </>,
+              <>
+                <strong className="font-medium text-preto">Google</strong> —
+                apenas se você aceitou medição de audiência.
+              </>,
+              <>
+                <strong className="font-medium text-preto">Meta</strong> —
+                apenas se você aceitou marketing.
               </>,
             ]}
           />
+          <p>
+            Não listamos aqui os nomes das empresas de infraestrutura, e a razão
+            é de segurança: saber exatamente onde um site se apoia é o primeiro
+            passo de quem procura por onde atacá-lo. Se você quiser a lista
+            nominal, ela é sua por direito — basta pedir pelo e-mail abaixo, e
+            respondemos.
+          </p>
           <p>
             Parte desses serviços mantém servidores fora do Brasil, o que
             caracteriza transferência internacional de dados (art. 33 da LGPD).

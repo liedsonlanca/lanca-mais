@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { services, siteUrl } from "@/lib/site-config";
+import { services, siteUrl, BLOG_ATIVO } from "@/lib/site-config";
 import { blogPosts } from "@/lib/blog-posts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -25,12 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.6,
     },
-    {
-      url: `${siteUrl}/blog`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
+
     {
       url: `${siteUrl}/contato`,
       lastModified: now,
@@ -51,6 +46,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.2,
     },
+    {
+      url: `${siteUrl}/aviso-legal`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
+    {
+      url: `${siteUrl}/termos-de-uso`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
   ];
 
   const rotasServicos: MetadataRoute.Sitemap = services.map((service) => ({
@@ -67,5 +74,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...rotasFixas, ...rotasServicos, ...rotasPosts];
+  // Com o blog fora do ar, os posts saem do sitemap: anunciar aos buscadores
+  // um endereço que responde 404 é pedir para ser penalizado por isso.
+  return [
+    ...rotasFixas,
+    ...rotasServicos,
+    ...(BLOG_ATIVO ? rotasPosts : []),
+  ];
 }

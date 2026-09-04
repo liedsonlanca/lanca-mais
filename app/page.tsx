@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { siteConfig, faq } from "@/lib/site-config";
+import { siteConfig, faq, BLOG_ATIVO } from "@/lib/site-config";
 import {
   lerVitrine,
   lerDepoimentos,
@@ -344,59 +344,65 @@ export default async function Home() {
       </section>
 
       {/* ---------- 7. Blog ---------- */}
-      <section className="relative overflow-hidden bg-areia">
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
-          <SectionHeading
-            eyebrow="Insights"
-            alinhamento="esquerda"
-            titulo={[
-              { texto: "O que a gente" },
-              { texto: "pensa sobre marca.", acento: "marca." },
-            ]}
-          />
+      {BLOG_ATIVO && (
+        <section className="relative overflow-hidden bg-areia">
+          <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+            <SectionHeading
+              eyebrow="Insights"
+              alinhamento="esquerda"
+              titulo={[
+                { texto: "O que a gente" },
+                { texto: "pensa sobre marca.", acento: "marca." },
+              ]}
+            />
 
-          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {posts.slice(0, 3).map((post) => (
-              <StaggerItem key={post.slug} className="h-full">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="group flex h-full flex-col rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
-                >
-                  {/* Categoria vira etiqueta: dá um ponto de cor ao card e
-                      separa a leitura do tempo estimado. */}
-                  <div className="flex items-center gap-3">
-                    <span className="eyebrow rounded-full bg-salmon/15 px-3 py-1.5 text-salmon-texto">
-                      {post.category}
-                    </span>
-                    <span className="text-xs text-preto/55">{post.readingTime}</span>
-                  </div>
+            <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
+              {posts.slice(0, 3).map((post) => (
+                <StaggerItem key={post.slug} className="h-full">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="group flex h-full flex-col rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
+                  >
+                    {/* Categoria vira etiqueta: dá um ponto de cor ao card e
+                        separa a leitura do tempo estimado. */}
+                    <div className="flex items-center gap-3">
+                      <span className="eyebrow rounded-full bg-salmon/15 px-3 py-1.5 text-salmon-texto">
+                        {post.category}
+                      </span>
+                      <span className="text-xs text-preto/55">{post.readingTime}</span>
+                    </div>
 
-                  <h3 className="mt-6 text-xl font-semibold leading-snug text-preto transition-colors duration-500 group-hover:text-salmon-texto">
-                    {post.title}
-                  </h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-preto/70">
-                    {post.excerpt}
-                  </p>
+                    <h3 className="mt-6 text-xl font-semibold leading-snug text-preto transition-colors duration-500 group-hover:text-salmon-texto">
+                      {post.title}
+                    </h3>
+                    <p className="mt-3 flex-1 text-sm leading-relaxed text-preto/70">
+                      {post.excerpt}
+                    </p>
 
-                  <span className="mt-7 flex items-center justify-between border-t border-linha pt-5">
-                    <span className="text-xs uppercase tracking-widest text-preto/50">
-                      {formatarData(post.date)}
+                    <span className="mt-7 flex items-center justify-between border-t border-linha pt-5">
+                      <span className="text-xs uppercase tracking-widest text-preto/50">
+                        {formatarData(post.date)}
+                      </span>
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-linha text-preto/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                          <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                      </span>
                     </span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-linha text-preto/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                        <path d="M5 12h14M13 6l6 6-6 6" />
-                      </svg>
-                    </span>
-                  </span>
-                </Link>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
+                  </Link>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </div>
+        </section>
+      )}
 
       {/* ---------- 8. FAQ ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section
+        className={`relative overflow-hidden ${
+          BLOG_ATIVO ? "bg-papel" : "bg-areia"
+        }`}
+      >
         <div className="mx-auto max-w-3xl px-6 py-28 lg:py-36">
           <SectionHeading
             eyebrow="Dúvidas frequentes"
@@ -435,7 +441,11 @@ export default async function Home() {
       </section>
 
       {/* ---------- 9. Quem somos ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      <section
+        className={`relative overflow-hidden ${
+          BLOG_ATIVO ? "bg-areia" : "bg-papel"
+        }`}
+      >
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div>
@@ -525,8 +535,15 @@ export default async function Home() {
           convite encostaria em "Quem somos" sem nenhuma mudança de fundo,
           virando uma seção só. Com papel, a alternância se sustenta com ou
           sem a faixa — e quando ela existe, o fio dela é que faz a divisão.
-          É também o mesmo fundo do convite das outras páginas. */}
-      <section className="relative overflow-hidden bg-papel">
+          É também o mesmo fundo do convite das outras páginas.
+
+          Com o blog fora, a alternância inverte daqui para cima, e o convite
+          acompanha: vira areia, porque "Quem somos" passa a ser papel. */}
+      <section
+        className={`relative overflow-hidden ${
+          BLOG_ATIVO ? "bg-papel" : "bg-areia"
+        }`}
+      >
         <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
         <div className="relative mx-auto max-w-4xl px-6 py-20 text-center lg:py-24">
