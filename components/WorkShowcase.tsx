@@ -23,7 +23,6 @@ const VELOCIDADE = 26; // pixels por segundo
 const LIMIAR_ARRASTO = 6;
 
 export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
-  const area = useRef<HTMLDivElement>(null);
   const trilho = useRef<HTMLDivElement>(null);
   const [aberta, setAberta] = useState<number | null>(null);
   const [arrastando, setArrastando] = useState(false);
@@ -32,6 +31,19 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
   const pausado = useRef(false);
   const inicio = useRef({ x: 0, scroll: 0 });
   const houveArrasto = useRef(false);
+  const retomada = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ouvindoRolagem = useRef<(() => void) | null>(null);
+
+  // Nada de temporizador nem de ouvinte solto quando a seção sai da tela.
+  useEffect(
+    () => () => {
+      if (retomada.current) clearTimeout(retomada.current);
+      if (ouvindoRolagem.current && trilho.current) {
+        trilho.current.removeEventListener("scroll", ouvindoRolagem.current);
+      }
+    },
+    []
+  );
 
   const pecas = [...vitrine, ...vitrine];
 
@@ -87,7 +99,12 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
     // Listeners nativos, e não handlers do React: pointerenter e pointerleave
     // não borbulham, e o React os deriva de pointerout delegado na raiz. Com
     // listener direto o comportamento é previsível e testável.
-    const alvo = area.current;
+    //
+    // Ficam no trilho, e não no contêiner de fora: aquele embrulha também a
+    // fileira de controles, então parar o mouse sobre o aviso ou sobre uma
+    // seta congelava o deslize sem que a pessoa tivesse pedido nada. Pausar
+    // faz sentido sobre uma peça, que é quando alguém parou para olhar.
+    const alvo = el;
     const pausar = () => {
       pausado.current = true;
     };
@@ -140,12 +157,44 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
   function deslocar(direcao: 1 | -1) {
     const el = trilho.current;
     if (!el) return;
+
+    // A seta precisa de pausa explícita.
+    //
+    // O laço acima não lê a posição do elemento: mantém um acumulador e
+    // escreve scrollLeft a cada quadro. Rolagem externa feita com ele ativo
+    // é sobrescrita no quadro seguinte, e o clique da seta não sai do lugar.
+    // Antes isso não aparecia porque parar o mouse sobre a seta já pausava
+    // tudo; agora que a pausa vive só no trilho, ela é feita aqui.
+    //
+    // A retomada espera a rolagem assentar, e não um prazo fixo: a duração
+    // da animação suave varia com a distância e com o aparelho, e um número
+    // chutado curto demais faz o laço atropelar a animação no meio.
+    pausado.current = true;
+
+    if (!ouvindoRolagem.current) {
+      const assentou = () => {
+        if (retomada.current) clearTimeout(retomada.current);
+        retomada.current = setTimeout(() => {
+          el.removeEventListener("scroll", assentou);
+          ouvindoRolagem.current = null;
+          pausado.current = false;
+        }, 250);
+      };
+
+      ouvindoRolagem.current = assentou;
+      el.addEventListener("scroll", assentou);
+    }
+
+    // Arma o prazo já, para o caso de a rolagem nem chegar a acontecer —
+    // no fim do trilho, por exemplo, onde não há para onde ir.
+    ouvindoRolagem.current();
+
     el.scrollBy({ left: el.clientWidth * 0.6 * direcao, behavior: "smooth" });
   }
 
   return (
     <>
-      <div ref={area} className="relative">
+      <div className="relative">
         {/* Máscaras laterais: as peças surgem e somem em vez de cortar seco. */}
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-areia to-transparent lg:w-24" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-areia to-transparent lg:w-24" />
