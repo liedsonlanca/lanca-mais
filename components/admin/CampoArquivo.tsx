@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 
 // Campo de arquivo do painel.
 //
@@ -14,6 +15,11 @@ import { useId, useRef, useState } from "react";
 //
 // Efeito colateral bom: ao clicar em Salvar o arquivo já subiu, então o
 // formulário responde na hora em vez de segurar a página durante o upload.
+//
+// O campo se limpa sozinho quando o formulário termina de salvar. Sem isso
+// a mensagem "enviado" ficava na tela depois de aplicada, e o campo
+// escondido seguia carregando a URL — um segundo clique em Salvar
+// reaplicaria o mesmo arquivo.
 type Props = {
   /** Nome do campo escondido que vai levar a URL ao formulário. */
   name: string;
@@ -45,6 +51,35 @@ export default function CampoArquivo({
   const [nome, setNome] = useState("");
   const [progresso, setProgresso] = useState<number | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+
+  function limpar() {
+    setUrl("");
+    setNome("");
+    setProgresso(null);
+    setErro(null);
+    if (entrada.current) entrada.current.value = "";
+  }
+
+  // useFormStatus enxerga o formulário que envolve este campo. Quando ele
+  // sai de "enviando" para parado, a gravação terminou e o que estava aqui
+  // já foi aplicado — então some.
+  //
+  // Precisa da referência ao estado anterior: o efeito também roda na
+  // montagem, quando nada foi enviado, e limpar ali apagaria um arquivo que
+  // a pessoa acabou de escolher.
+  const { pending } = useFormStatus();
+  const salvando = useRef(false);
+
+  useEffect(() => {
+    if (pending) {
+      salvando.current = true;
+      return;
+    }
+    if (salvando.current) {
+      salvando.current = false;
+      limpar();
+    }
+  }, [pending]);
 
   async function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0];
@@ -99,12 +134,10 @@ export default function CampoArquivo({
       setUrl(dados.url);
       setProgresso(100);
     } catch (falha) {
+      limpar();
       setErro(
         falha instanceof Error ? falha.message : "Não foi possível enviar."
       );
-      setProgresso(null);
-      setNome("");
-      if (entrada.current) entrada.current.value = "";
     }
   }
 
