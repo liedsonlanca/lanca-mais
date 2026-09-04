@@ -73,29 +73,39 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" aria-label="LANÇA+, página inicial" className="relative block h-7 w-[110px] shrink-0">
-            {/* Duas versões do logo em cross-fade: a clara vale sobre o hero
-                escuro, a escura vale sobre o corpo claro. */}
-            <Image
-              src="/images/logo-1.png"
-              alt="LANÇA+"
-              fill
-              priority
-              sizes="110px"
-              className={`object-contain object-left transition-opacity duration-500 ${
-                claro ? "opacity-0" : "opacity-100"
-              }`}
-            />
-            <Image
-              src="/images/logo-2.png"
-              alt=""
-              aria-hidden
-              fill
-              sizes="110px"
-              className={`object-contain object-left transition-opacity duration-500 ${
-                claro ? "opacity-100" : "opacity-0"
-              }`}
-            />
+          {/* A área de toque tem 44px de altura; a imagem continua com 28.
+              As duas medidas moram em caixas diferentes de propósito: os logos
+              usam `fill`, então esticar a caixa do link esticaria o logo
+              junto. A caixa interna preserva o tamanho desenhado. */}
+          <Link
+            href="/"
+            aria-label="LANÇA+, página inicial"
+            className="flex h-11 shrink-0 items-center"
+          >
+            <span className="relative block h-7 w-[110px]">
+              {/* Duas versões do logo em cross-fade: a clara vale sobre o hero
+                  escuro, a escura vale sobre o corpo claro. */}
+              <Image
+                src="/images/logo-1.png"
+                alt="LANÇA+"
+                fill
+                priority
+                sizes="110px"
+                className={`object-contain object-left transition-opacity duration-500 ${
+                  claro ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <Image
+                src="/images/logo-2.png"
+                alt=""
+                aria-hidden
+                fill
+                sizes="110px"
+                className={`object-contain object-left transition-opacity duration-500 ${
+                  claro ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-9 lg:flex">
@@ -137,7 +147,7 @@ export default function Header() {
               type="button"
               aria-label={aberto ? "Fechar menu" : "Abrir menu"}
               aria-expanded={aberto}
-              className="flex h-10 w-10 flex-col items-center justify-center gap-[5px] lg:hidden"
+              className="flex h-11 w-11 flex-col items-center justify-center gap-[5px] lg:hidden"
               onClick={() => setAberto((v) => !v)}
             >
               <span

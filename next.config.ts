@@ -1,12 +1,64 @@
 import type { NextConfig } from "next";
 
+// Content-Security-Policy: a lista do que a página pode carregar.
+//
+// Sem ela, um script injetado pode buscar o que quiser de onde quiser. Com
+// ela, o navegador recusa qualquer origem fora desta lista, mesmo que o
+// script já esteja rodando dentro da página.
+//
+// Sobre 'unsafe-inline' em script-src: o Next embute na página os dados da
+// hidratação como script inline. A alternativa recomendada é um nonce por
+// requisição, mas nonce obriga renderização dinâmica em toda página, e este
+// site é quase todo estático — trocaríamos a estática do site inteiro por uma
+// defesa contra um risco que aqui é pequeno, já que todo texto passa pelo
+// escape do React e o conteúdo vem do painel, não do visitante.
+//
+// O que a política entrega mesmo assim, e que não depende de script-src:
+//
+//   base-uri     impede injetar <base> e sequestrar todo link relativo;
+//   form-action  impede que um formulário da página poste em site de fora;
+//   object-src   mata <object> e <embed>, que são plugins e não têm uso aqui;
+//   frame-src    só o mapa do rodapé pode ser embutido, mais nada;
+//   img/media    prendem imagem e vídeo ao próprio site e ao Blob da Vercel;
+//   connect-src  limita para onde a página pode falar, então dado roubado não
+//                tem para onde ir.
+//
+// 'unsafe-eval' e o websocket só entram em desenvolvimento: o React usa eval
+// para remontar pilha de erro, e o recarregamento a quente fala por ws. Em
+// produção nem um nem outro existem.
+const BLOB = "https://*.public.blob.vercel-storage.com";
+
+function politicaDeConteudo(desenvolvimento: boolean) {
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    // O único iframe do site é o mapa do rodapé. Liberar a origem exata do
+    // Google Maps mantém a porta fechada para todo o resto.
+    "frame-src https://www.google.com",
+    `script-src 'self' 'unsafe-inline'${desenvolvimento ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    `img-src 'self' data: blob: ${BLOB}`,
+    `media-src 'self' blob: ${BLOB}`,
+    "font-src 'self' data:",
+    // blob.vercel-storage.com sem subdomínio é para onde vai o envio em
+    // partes; o subdomínio da loja é o destino do arquivo pronto.
+    `connect-src 'self' ${BLOB} https://blob.vercel-storage.com${desenvolvimento ? " ws: http://localhost:*" : ""}`,
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
 // Cabeçalhos de segurança.
 //
 // Nenhum deles muda o que a pessoa vê; todos fecham porta que estava aberta
-// por omissão. Sem Content-Security-Policy por enquanto: o site usa estilos
-// embutidos e um script de dados estruturados, e uma política mal calibrada
-// quebra a página em silêncio. Fica anotado como próximo passo.
+// por omissão.
 const CABECALHOS = [
+  {
+    key: "Content-Security-Policy",
+    value: politicaDeConteudo(process.env.NODE_ENV === "development"),
+  },
   {
     // O site não deve poder ser embutido em iframe de terceiro. É o que
     // impede clickjacking: uma página maliciosa sobrepor botões invisíveis

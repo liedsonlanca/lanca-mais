@@ -59,7 +59,7 @@ export default async function ServicoPage({
           <Reveal>
             <Link
               href="/servicos"
-              className="group inline-flex items-center gap-2 text-sm text-bege/70 transition-colors hover:text-salmon"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm text-bege/70 transition-colors hover:text-salmon"
             >
               <span
                 aria-hidden

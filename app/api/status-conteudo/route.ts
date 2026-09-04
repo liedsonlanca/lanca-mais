@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql, bancoConfigurado, garantirEsquema } from "@/lib/db";
+import { estadoDoAdmin } from "@/lib/admin";
 
 // Diagnóstico do painel.
 //
@@ -8,9 +9,18 @@ import { sql, bancoConfigurado, garantirEsquema } from "@/lib/db";
 // o painel parece simplesmente não gravar. Esta rota responde a pergunta de
 // forma direta, sem ninguém precisar caçar variável no painel da Vercel.
 //
-// Fica atrás do porteiro de pré-lançamento (o matcher em proxy.ts não a
-// exclui), então só quem tem a senha alcança. Ainda assim, nunca devolve a
-// string de conexão, apenas se ela existe e o que há nas tabelas.
+// Exige sessão do painel.
+//
+// Antes contava só com o porteiro de pré-lançamento. Isso protegia enquanto o
+// site estava fechado e deixava de proteger exatamente quando ele abrisse: com
+// o site público o porteiro deixa tudo passar, e esta rota entregaria a
+// qualquer visitante os nomes das tabelas, os nomes das colunas, a contagem de
+// linhas e o texto cru dos erros do Postgres. É material de reconhecimento
+// para quem estiver procurando por onde entrar.
+//
+// A senha do painel é o nível certo: é uma ferramenta de quem administra, não
+// de quem visita. E ela não depende do banco para funcionar, então continua
+// alcançável justamente quando o banco é o problema.
 export const dynamic = "force-dynamic";
 
 const TABELAS = [
@@ -23,6 +33,10 @@ const TABELAS = [
 ] as const;
 
 export async function GET() {
+  if ((await estadoDoAdmin()) !== "liberado") {
+    return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
+  }
+
   if (!bancoConfigurado || !sql) {
     return NextResponse.json({
       banco: false,

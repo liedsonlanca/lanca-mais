@@ -57,7 +57,7 @@ export default async function Footer() {
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-borda px-4 py-1.5 text-xs font-medium text-bege/92 transition-colors hover:border-salmon hover:text-salmon"
+                className="inline-flex min-h-11 items-center rounded-full border border-borda px-4 text-xs font-medium text-bege/92 transition-colors hover:border-salmon hover:text-salmon"
               >
                 {social.label}
               </a>
@@ -69,10 +69,13 @@ export default async function Footer() {
           <h3 className="eyebrow text-salmon">
             Navegação
           </h3>
-          <ul className="mt-4 space-y-2 text-sm">
+          <ul className="mt-3 text-sm">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="text-bege/92 hover:text-branco">
+                <Link
+                  href={link.href}
+                  className="flex min-h-11 items-center text-bege/92 hover:text-branco"
+                >
                   {link.label}
                 </Link>
               </li>
@@ -84,12 +87,12 @@ export default async function Footer() {
           <h3 className="eyebrow text-salmon">
             Serviços
           </h3>
-          <ul className="mt-4 space-y-2 text-sm">
+          <ul className="mt-3 text-sm">
             {services.map((service) => (
               <li key={service.slug}>
                 <Link
                   href={`/servicos/${service.slug}`}
-                  className="text-bege/92 hover:text-branco"
+                  className="flex min-h-11 items-center py-1 text-bege/92 hover:text-branco"
                 >
                   {service.name}
                 </Link>
@@ -107,7 +110,7 @@ export default async function Footer() {
               <li key={post.slug}>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="text-bege/92 hover:text-branco"
+                  className="block py-1.5 text-bege/92 hover:text-branco"
                 >
                   {post.title}
                 </Link>

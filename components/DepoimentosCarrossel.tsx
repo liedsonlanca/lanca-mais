@@ -177,7 +177,11 @@ export default function DepoimentosCarrossel({
             </svg>
           </button>
 
-          <div className="flex items-center gap-2">
+          {/* O respiro entre os pontos vive no padding de cada botão, e não
+              num gap: assim a área de toque de um encosta na do vizinho, sem
+              faixa morta no meio, e o ponto continua do mesmo tamanho. Com
+              44px de altura o alvo deixa de depender da pontaria. */}
+          <div className="flex items-center">
             {Array.from({ length: paginas }).map((_, i) => (
               <button
                 key={i}
@@ -185,10 +189,14 @@ export default function DepoimentosCarrossel({
                 onClick={() => irPara(i)}
                 aria-label={`Ir para a página ${i + 1} de depoimentos`}
                 aria-current={i === pagina}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  i === pagina ? "w-6 bg-salmon" : "w-1.5 bg-preto/20"
-                }`}
-              />
+                className="flex h-11 items-center justify-center px-1"
+              >
+                <span
+                  className={`block h-1.5 rounded-full transition-all duration-500 ${
+                    i === pagina ? "w-6 bg-salmon" : "w-1.5 bg-preto/20"
+                  }`}
+                />
+              </button>
             ))}
           </div>
 

@@ -29,7 +29,7 @@ export default function FooterMap() {
           href={`https://www.google.com/maps/search/?api=1&query=${consulta}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="group mt-6 inline-flex items-center gap-2 text-sm font-medium text-salmon"
+          className="group mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-salmon"
         >
           Abrir no Google Maps
           <span

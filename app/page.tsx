@@ -11,7 +11,6 @@ import {
 import Hero from "@/components/Hero";
 import NicheMarquee from "@/components/NicheMarquee";
 import ServiceRows from "@/components/ServiceRows";
-import SloganBand from "@/components/SloganBand";
 import MethodSteps from "@/components/MethodSteps";
 import WorkShowcase from "@/components/WorkShowcase";
 import ClientLogos from "@/components/ClientLogos";
@@ -156,7 +155,7 @@ export default async function Home() {
               <p className="text-preto/62">Precisa de algo específico?</p>
               <Link
                 href="/contato"
-                className="group inline-flex items-center gap-2 text-sm font-medium text-salmon-texto"
+                className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-salmon-texto"
               >
                 Solicitar orçamento
                 <span
@@ -344,10 +343,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <SloganBand />
-
       {/* ---------- 7. Blog ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section className="relative overflow-hidden bg-areia">
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <SectionHeading
             eyebrow="Insights"
@@ -399,7 +396,7 @@ export default async function Home() {
       </section>
 
       {/* ---------- 8. FAQ ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-papel">
         <div className="mx-auto max-w-3xl px-6 py-28 lg:py-36">
           <SectionHeading
             eyebrow="Dúvidas frequentes"
@@ -438,7 +435,7 @@ export default async function Home() {
       </section>
 
       {/* ---------- 9. Quem somos ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section className="relative overflow-hidden bg-areia">
         <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div>
@@ -516,14 +513,20 @@ export default async function Home() {
       {/* Prova social visual, encostada no convite final: a última coisa antes
           de pedir o contato é quem já confiou.
 
-          Divide o fundo branco com a apresentação da agência logo acima, de
-          propósito: o fio no topo da faixa já separa os dois, e assim a
-          alternância papel/areia continua valendo mesmo quando não há logos
-          cadastrados e a faixa não renderiza nada. */}
+          Ela é papel entre duas seções areia, com fio em cima e embaixo. Se
+          não houver logo cadastrado a faixa não renderiza nada, e as duas
+          seções areia encostam — por isso o fio, e não a cor, é o que separa
+          a faixa das vizinhas. */}
       <ClientLogos />
 
-      {/* ---------- CTA final ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      {/* ---------- CTA final ----------
+          Papel, e não areia, para o caso de a faixa de logos não renderizar:
+          sem logos cadastrados ela não desenha nada, e com areia aqui o
+          convite encostaria em "Quem somos" sem nenhuma mudança de fundo,
+          virando uma seção só. Com papel, a alternância se sustenta com ou
+          sem a faixa — e quando ela existe, o fio dela é que faz a divisão.
+          É também o mesmo fundo do convite das outras páginas. */}
+      <section className="relative overflow-hidden bg-papel">
         <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
         <div className="relative mx-auto max-w-4xl px-6 py-20 text-center lg:py-24">
