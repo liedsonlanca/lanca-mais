@@ -82,6 +82,12 @@ export const config = {
     // os assets e o robots.txt (que precisa continuar respondendo para os
     // buscadores enquanto o site está fechado).
     //
+    // As páginas legais também ficam de fora, e não por conveniência: o aviso
+    // de cookies aparece na Em breve e é obrigado a apontar para elas. Atrás
+    // do portão, clicar no link devolvia a pessoa para a própria Em breve, e
+    // o consentimento deixava de ser informado — que é o requisito que o
+    // aviso existe para cumprir.
+    //
     // O painel também fica de fora: ele tem senha própria (ADMIN_SENHA) e não
     // deve exigir as duas. Ficar fora daqui não o expõe — sem a senha do
     // painel ele não abre, e essa continua sendo a única porta.
@@ -90,6 +96,6 @@ export const config = {
     // souber o caminho continua chegando, e quem não souber continua parado na
     // senha. O ganho é tirar o painel da lista que os robôs varrem sozinhos, o
     // que reduz tentativa automática e limpa o registro de acessos.
-    "/((?!em-breve|manutencao|lncadmin|api/acesso|api/lncadmin|robots.txt|_next/static|_next/image|images|fonts|favicon.ico).*)",
+    "/((?!em-breve|manutencao|lncadmin|politica-de-cookies|politica-de-privacidade|aviso-legal|termos-de-uso|api/acesso|api/lncadmin|robots.txt|_next/static|_next/image|images|fonts|favicon.ico).*)",
   ],
 };

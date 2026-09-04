@@ -81,6 +81,7 @@ export default async function AdminLayout({
               <Link
                 href="/"
                 target="_blank"
+                rel="noopener"
                 className="flex min-h-11 items-center rounded-full px-3 text-preto/55 transition-colors duration-300 hover:text-preto"
               >
                 Ver o site
