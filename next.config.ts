@@ -42,6 +42,20 @@ const BLOB = "https://*.public.blob.vercel-storage.com";
 
 const MIDIA = [BLOB, R2].filter(Boolean).join(" ");
 
+// Endereço para onde o painel ENVIA, que não é o mesmo de onde o site LÊ.
+//
+// A leitura sai do domínio público (pub-....r2.dev); o envio vai para o
+// endpoint compatível com S3, que é <conta>.r2.cloudflarestorage.com. São
+// hosts diferentes, e connect-src precisa dos dois: sem este, o navegador
+// bloqueia o envio antes de abrir conexão, e o erro que chega ao painel é
+// uma falha de rede genérica que não diz nada sobre a causa.
+//
+// Vai o endereço exato da conta, e não um curinga em *.r2.cloudflarestorage
+// .com: o curinga liberaria a conta de qualquer pessoa na Cloudflare.
+const R2_ENVIO = process.env.R2_ACCOUNT_ID
+  ? `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
+  : "";
+
 function politicaDeConteudo(desenvolvimento: boolean) {
   return [
     "default-src 'self'",
@@ -59,7 +73,7 @@ function politicaDeConteudo(desenvolvimento: boolean) {
     "font-src 'self' data:",
     // O envio do painel vai do navegador direto para o R2, então a origem
     // dele precisa estar aqui: sem isso o upload é bloqueado pela política.
-    `connect-src 'self' ${MIDIA}${desenvolvimento ? " ws: http://localhost:*" : ""}`,
+    `connect-src 'self' ${[MIDIA, R2_ENVIO].filter(Boolean).join(" ")}${desenvolvimento ? " ws: http://localhost:*" : ""}`,
     "upgrade-insecure-requests",
   ].join("; ");
 }
