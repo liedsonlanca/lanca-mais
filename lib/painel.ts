@@ -1,5 +1,6 @@
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
+import { HOST_PUBLICO } from "@/lib/upload";
 
 
 // Peças comuns às Server Actions do painel.
@@ -54,10 +55,24 @@ export function urlEnviada(dados: FormData, campo: string) {
   const valor = texto(dados, campo);
   if (!valor) return null;
 
-  if (
-    !valor.startsWith("https://") ||
-    !valor.includes(".blob.vercel-storage.com/")
-  ) {
+  // O endereço do Blob continua aceito porque o banco ainda guarda os das
+  // peças enviadas antes da mudança para o R2. Elas seguem válidas até serem
+  // substituídas; recusar aqui impediria de salvar uma legenda numa peça
+  // antiga sem reenviar o arquivo.
+  let host = "";
+  try {
+    const endereco = new URL(valor);
+    if (endereco.protocol !== "https:") throw new Error("http");
+    host = endereco.hostname;
+  } catch {
+    throw new Error("Endereço de arquivo inválido.");
+  }
+
+  const conhecido =
+    (HOST_PUBLICO && host === HOST_PUBLICO) ||
+    host.endsWith(".blob.vercel-storage.com");
+
+  if (!conhecido) {
     throw new Error("Endereço de arquivo inválido.");
   }
 

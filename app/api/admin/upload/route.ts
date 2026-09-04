@@ -1,60 +1,100 @@
 import { NextResponse } from "next/server";
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { estadoDoAdmin } from "@/lib/admin";
-import { LIMITE_IMAGEM, LIMITE_VIDEO } from "@/lib/upload";
+import {
+  LIMITE_IMAGEM,
+  LIMITE_VIDEO,
+  TIPOS_IMAGEM,
+  TIPOS_VIDEO,
+  armazenamentoConfigurado,
+  FALTA_CONFIGURAR,
+  montarChave,
+  urlPublica,
+  assinarEnvio,
+} from "@/lib/upload";
 
-// Autoriza o navegador a enviar o arquivo direto para o Blob.
+// Autoriza um envio para o Cloudflare R2.
 //
-// Por que não mandar o arquivo pelo servidor, como era antes: uma Server
-// Action é uma requisição para a função da Vercel, e o corpo dela tem teto de
-// 4,5 MB. Um vídeo nunca passaria — a página caía com "This page couldn't
-// load", sem erro que ajudasse.
+// Por que o arquivo não passa pelo servidor: uma Server Action é uma
+// requisição para a função da Vercel, e o corpo dela tem teto de 4,5 MB. Um
+// vídeo nunca passaria — a página caía com "This page couldn't load", sem erro
+// que ajudasse.
 //
-// Aqui o servidor não recebe o arquivo. Ele só assina um token curto dizendo
-// "este navegador pode enviar um arquivo deste tipo, até este tamanho", e o
-// upload vai do computador da pessoa direto para o Blob. Sem teto de função no
-// caminho.
-const TIPOS_IMAGEM = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-const TIPOS_VIDEO = ["video/mp4", "video/webm", "video/quicktime"];
-
+// Aqui o servidor só assina uma URL de uso único dizendo "pode subir um
+// arquivo deste tipo, com este nome, nos próximos cinco minutos". O arquivo
+// vai do computador da pessoa direto para o R2.
+//
+// Três coisas que esta rota precisa fazer, e faz:
+//
+//   1. conferir a sessão do painel. A rota é pública como qualquer endpoint, e
+//      sem isso qualquer pessoa pediria uma URL e encheria o bucket;
+//   2. decidir o nome do arquivo aqui, e não aceitar o que o navegador manda.
+//      Nome vindo de fora poderia conter "../" e escrever fora da pasta;
+//   3. amarrar o tipo na assinatura. O R2 confere o content-type contra o que
+//      foi assinado, então uma URL para MP4 não serve para subir outra coisa.
+//
+// O tamanho é o único que o navegador poderia burlar, então ele também é
+// conferido ao salvar, quando a peça é gravada.
 export async function POST(request: Request) {
-  const body = (await request.json()) as HandleUploadBody;
+  if ((await estadoDoAdmin()) !== "liberado") {
+    return NextResponse.json({ erro: "Não autorizado." }, { status: 401 });
+  }
+
+  if (!armazenamentoConfigurado) {
+    return NextResponse.json({ erro: FALTA_CONFIGURAR }, { status: 503 });
+  }
+
+  let nome = "";
+  let tipo = "";
+  let tamanho = 0;
+  let pasta = "";
+  let aceitaVideo = false;
 
   try {
-    const resultado = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async (_caminho, cargaDoCliente) => {
-        // A checagem de sessão mora aqui, e não no componente: esta rota é
-        // pública como qualquer endpoint, e sem isto qualquer pessoa poderia
-        // pedir um token e encher o armazenamento.
-        if ((await estadoDoAdmin()) !== "liberado") {
-          throw new Error("Não autorizado.");
-        }
+    const corpo = await request.json();
+    nome = typeof corpo?.nome === "string" ? corpo.nome : "";
+    tipo = typeof corpo?.tipo === "string" ? corpo.tipo : "";
+    tamanho = Number(corpo?.tamanho) || 0;
+    pasta = typeof corpo?.pasta === "string" ? corpo.pasta : "";
+    aceitaVideo = corpo?.aceita === "video";
+  } catch {
+    return NextResponse.json({ erro: "Requisição inválida." }, { status: 400 });
+  }
 
-        const aceitaVideo = cargaDoCliente === "video";
+  // A pasta vem do formulário, então é escolhida de uma lista, nunca aceita
+  // como texto livre: "../" no meio escreveria fora do lugar previsto.
+  const PASTAS = ["vitrine", "depoimentos", "cases", "logos", "blog"];
+  if (!PASTAS.includes(pasta)) {
+    return NextResponse.json({ erro: "Destino inválido." }, { status: 400 });
+  }
 
-        // O limite vai no token: quem manda é o Blob, não o navegador. Fosse
-        // só no formulário, bastaria abrir o console para burlar.
-        return {
-          allowedContentTypes: aceitaVideo
-            ? [...TIPOS_IMAGEM, ...TIPOS_VIDEO]
-            : TIPOS_IMAGEM,
-          maximumSizeInBytes: aceitaVideo ? LIMITE_VIDEO : LIMITE_IMAGEM,
-          addRandomSuffix: true,
-        };
-      },
+  const permitidos = aceitaVideo
+    ? [...TIPOS_IMAGEM, ...TIPOS_VIDEO]
+    : TIPOS_IMAGEM;
 
-      // O Blob avisa quando termina. Não gravamos nada aqui: quem grava é o
-      // formulário, ao salvar, com a URL que o navegador recebeu.
-      onUploadCompleted: async () => {},
-    });
-
-    return NextResponse.json(resultado);
-  } catch (erro) {
+  if (!permitidos.includes(tipo)) {
     return NextResponse.json(
-      { error: erro instanceof Error ? erro.message : "Falha no envio." },
+      {
+        erro: aceitaVideo
+          ? "Formato não aceito. Use JPG, PNG, WEBP, MP4 ou MOV."
+          : "Formato não aceito. Use JPG, PNG ou WEBP.",
+      },
       { status: 400 }
     );
   }
+
+  const limite = TIPOS_VIDEO.includes(tipo) ? LIMITE_VIDEO : LIMITE_IMAGEM;
+  if (tamanho > limite) {
+    const mb = Math.round(limite / 1024 / 1024);
+    return NextResponse.json(
+      { erro: `Arquivo grande demais. O limite é ${mb} MB.` },
+      { status: 400 }
+    );
+  }
+
+  const chave = montarChave(pasta, nome);
+
+  return NextResponse.json({
+    envio: await assinarEnvio(chave, tipo),
+    url: urlPublica(chave),
+  });
 }

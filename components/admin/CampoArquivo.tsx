@@ -1,14 +1,16 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
 
 // Campo de arquivo do painel.
 //
 // O envio acontece assim que a pessoa escolhe o arquivo, direto do navegador
-// para o Blob, e o formulário guarda só a URL resultante num campo escondido.
-// O arquivo nunca passa pela função da Vercel, que tem teto de 4,5 MB por
-// requisição — era o que derrubava a página ao salvar vídeo.
+// para o Cloudflare R2, e o formulário guarda só a URL resultante num campo
+// escondido. O arquivo nunca passa pela função da Vercel, que tem teto de
+// 4,5 MB por requisição — era o que derrubava a página ao salvar vídeo.
+//
+// São dois passos: o servidor assina uma URL de uso único (conferindo sessão,
+// tipo e tamanho), e o navegador manda o arquivo para lá.
 //
 // Efeito colateral bom: ao clicar em Salvar o arquivo já subiu, então o
 // formulário responde na hora em vez de segurar a página durante o upload.
@@ -54,18 +56,47 @@ export default function CampoArquivo({
     setProgresso(0);
 
     try {
-      const enviado = await upload(`${pasta}/${arquivo.name}`, arquivo, {
-        access: "public",
-        handleUploadUrl: "/api/admin/upload",
-        // Diz ao servidor que limite e que tipos valem para este campo.
-        clientPayload: aceita,
-        // Divide o arquivo em partes, envia em paralelo e refaz a que falhar.
-        // É o que torna vídeo grande viável numa conexão instável.
-        multipart: true,
-        onUploadProgress: ({ percentage }) => setProgresso(percentage),
+      // 1. Pedir autorização. O servidor decide o nome, confere o tipo e o
+      //    tamanho, e devolve uma URL que vale cinco minutos.
+      const resposta = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: arquivo.name,
+          tipo: arquivo.type,
+          tamanho: arquivo.size,
+          pasta,
+          aceita,
+        }),
       });
 
-      setUrl(enviado.url);
+      const dados = await resposta.json();
+      if (!resposta.ok) throw new Error(dados?.erro ?? "Envio recusado.");
+
+      // 2. Mandar o arquivo. XMLHttpRequest, e não fetch, porque só ele
+      //    informa o progresso do envio — e sem a barra um vídeo de 12 MB
+      //    parece a página travada.
+      await new Promise<void>((resolver, rejeitar) => {
+        const pedido = new XMLHttpRequest();
+        pedido.open("PUT", dados.envio);
+        pedido.setRequestHeader("Content-Type", arquivo.type);
+
+        pedido.upload.onprogress = (evento) => {
+          if (evento.lengthComputable) {
+            setProgresso((evento.loaded / evento.total) * 100);
+          }
+        };
+
+        pedido.onload = () =>
+          pedido.status >= 200 && pedido.status < 300
+            ? resolver()
+            : rejeitar(new Error("O armazenamento recusou o arquivo."));
+
+        pedido.onerror = () => rejeitar(new Error("Falha de conexão no envio."));
+        pedido.send(arquivo);
+      });
+
+      setUrl(dados.url);
       setProgresso(100);
     } catch (falha) {
       setErro(

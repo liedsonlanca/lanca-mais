@@ -26,7 +26,21 @@ import type { NextConfig } from "next";
 // 'unsafe-eval' e o websocket só entram em desenvolvimento: o React usa eval
 // para remontar pilha de erro, e o recarregamento a quente fala por ws. Em
 // produção nem um nem outro existem.
+
+// Os arquivos do painel moram no Cloudflare R2. O domínio publico vem do
+// ambiente porque muda por instalação, e este arquivo roda no build, onde a
+// variável já existe. Sem ela a política não deixaria de valer: só ficaria
+// sem a origem do R2, e imagem e vídeo não apareceriam — daí o aviso no
+// painel quando as variáveis faltam.
+const R2 = process.env.R2_PUBLIC_HOST
+  ? `https://${process.env.R2_PUBLIC_HOST.replace(/^https?:\/\//, "")}`
+  : "";
+
+// O Blob segue liberado porque o banco ainda guarda endereços dele nas peças
+// enviadas antes da mudança. Sai quando não houver mais nenhuma.
 const BLOB = "https://*.public.blob.vercel-storage.com";
+
+const MIDIA = [BLOB, R2].filter(Boolean).join(" ");
 
 function politicaDeConteudo(desenvolvimento: boolean) {
   return [
@@ -40,12 +54,12 @@ function politicaDeConteudo(desenvolvimento: boolean) {
     "frame-src https://www.google.com",
     `script-src 'self' 'unsafe-inline'${desenvolvimento ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${BLOB}`,
-    `media-src 'self' blob: ${BLOB}`,
+    `img-src 'self' data: blob: ${MIDIA}`,
+    `media-src 'self' blob: ${MIDIA}`,
     "font-src 'self' data:",
-    // blob.vercel-storage.com sem subdomínio é para onde vai o envio em
-    // partes; o subdomínio da loja é o destino do arquivo pronto.
-    `connect-src 'self' ${BLOB} https://blob.vercel-storage.com${desenvolvimento ? " ws: http://localhost:*" : ""}`,
+    // O envio do painel vai do navegador direto para o R2, então a origem
+    // dele precisa estar aqui: sem isso o upload é bloqueado pela política.
+    `connect-src 'self' ${MIDIA}${desenvolvimento ? " ws: http://localhost:*" : ""}`,
     "upgrade-insecure-requests",
   ].join("; ");
 }
@@ -102,6 +116,15 @@ const nextConfig: NextConfig = {
         hostname: "*.public.blob.vercel-storage.com",
         pathname: "/**",
       },
+      ...(process.env.R2_PUBLIC_HOST
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: process.env.R2_PUBLIC_HOST.replace(/^https?:\/\//, ""),
+              pathname: "/**",
+            },
+          ]
+        : []),
     ],
   },
 

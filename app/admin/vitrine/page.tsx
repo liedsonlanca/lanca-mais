@@ -2,7 +2,7 @@ import CampoArquivo from "@/components/admin/CampoArquivo";
 import SeletorTipoPeca from "@/components/admin/SeletorTipoPeca";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
-import { blobConfigurado } from "@/lib/upload";
+import { armazenamentoConfigurado } from "@/lib/upload";
 import {
   campo,
   rotulo,
@@ -67,11 +67,11 @@ export default async function AdminVitrine() {
         </p>
       )}
 
-      {!blobConfigurado && (
+      {!armazenamentoConfigurado && (
         <p className="mt-4 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm leading-relaxed text-preto/75">
-          Armazenamento de arquivos não configurado. Falta o
-          <span className="text-salmon-texto"> BLOB_READ_WRITE_TOKEN</span> no
-          projeto da Vercel, então o envio de imagem e vídeo vai falhar.
+          Armazenamento de arquivos não configurado. Faltam as variáveis do
+          <span className="text-salmon-texto"> Cloudflare R2</span> no projeto
+          da Vercel, então o envio de imagem e vídeo vai falhar.
         </p>
       )}
 

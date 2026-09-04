@@ -1,10 +1,24 @@
-import { put, del } from "@vercel/blob";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { del } from "@vercel/blob";
 
-// Envio de arquivos para o Vercel Blob.
+// Armazenamento dos arquivos do painel: Cloudflare R2.
 //
-// A biblioteca lê o BLOB_READ_WRITE_TOKEN sozinha, mas conferimos aqui para
-// poder dar uma mensagem que diz o que fazer, em vez do erro cru dela.
-export const blobConfigurado = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+// Por que saímos do Vercel Blob: lá a banda entregue é cobrada e contada, e o
+// trilho da home toca vídeo em toda visita. A franquia de 10 GB acabou, o
+// armazenamento foi pausado por trinta dias e os vídeos sumiram do site e do
+// painel ao mesmo tempo. No R2 a saída de dados não é cobrada nem medida —
+// guardar custa, entregar não. Para um vídeo que toca sozinho em toda visita,
+// é a diferença entre um problema que volta todo mês e um que deixa de
+// existir.
+//
+// O R2 fala o protocolo do S3, então usamos o cliente oficial da AWS apontado
+// para o endereço da Cloudflare. É biblioteca só de servidor: não entra no
+// pacote que o visitante baixa.
 
 /** 8 MB para imagem. Foto de perfil e capa não precisam de mais que isso. */
 export const LIMITE_IMAGEM = 8 * 1024 * 1024;
@@ -12,74 +26,137 @@ export const LIMITE_IMAGEM = 8 * 1024 * 1024;
 /**
  * 12 MB para vídeo.
  *
- * Era 60, e 60 era generoso demais. O custo do Blob é por banda entregue,
- * não por arquivo guardado: um vídeo no trilho é pago em toda visita, e não
- * uma vez. A franquia gratuita de 10 GB já acabou uma vez por causa disso, e
- * o armazenamento inteiro ficou pausado por trinta dias.
- *
- * A conta que define o número: com 12 MB por peça, mil visitas que carreguem
- * um vídeo cada gastam 12 GB. Com 60 MB seriam 60. O trilho mostra o vídeo
- * num ladrilho de 280 pixels de largura — nenhuma peça precisa de mais que
- * isso, e o que passa de 12 MB ali é resolução que ninguém vê.
+ * No R2 a banda não é o gargalo, mas o peso continua importando: o ladrilho
+ * do trilho tem 280 pixels de largura, e o que passa disso é resolução que
+ * ninguém vê, custando espera de carregamento no celular de quem visita.
  */
 export const LIMITE_VIDEO = 12 * 1024 * 1024;
 
-const IMAGENS = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-const VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
+export const TIPOS_IMAGEM = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
+export const TIPOS_VIDEO = ["video/mp4", "video/webm", "video/quicktime"];
 
-export type Enviado = { url: string } | { erro: string };
+const CONTA = process.env.R2_ACCOUNT_ID ?? "";
+const BUCKET = process.env.R2_BUCKET ?? "";
+const CHAVE = process.env.R2_ACCESS_KEY_ID ?? "";
+const SEGREDO = process.env.R2_SECRET_ACCESS_KEY ?? "";
 
-export async function enviarArquivo(
-  arquivo: File,
-  pasta: string,
-  aceita: "imagem" | "video" = "imagem"
-): Promise<Enviado> {
-  if (!blobConfigurado) {
-    return {
-      erro: "Armazenamento de arquivos não configurado. Falta o BLOB_READ_WRITE_TOKEN no projeto da Vercel.",
-    };
-  }
+/** Domínio público do bucket, sem protocolo. Ex: midia.lancamais.com */
+export const HOST_PUBLICO = (process.env.R2_PUBLIC_HOST ?? "").replace(
+  /^https?:\/\//,
+  ""
+);
 
-  const permitidos = aceita === "video" ? [...IMAGENS, ...VIDEOS] : IMAGENS;
-  if (!permitidos.includes(arquivo.type)) {
-    return {
-      erro:
-        aceita === "video"
-          ? "Formato não aceito. Use JPG, PNG, WEBP, MP4 ou MOV."
-          : "Formato não aceito. Use JPG, PNG ou WEBP.",
-    };
-  }
+export const armazenamentoConfigurado = Boolean(
+  CONTA && BUCKET && CHAVE && SEGREDO && HOST_PUBLICO
+);
 
-  const limite = VIDEOS.includes(arquivo.type) ? LIMITE_VIDEO : LIMITE_IMAGEM;
-  if (arquivo.size > limite) {
-    const mb = Math.round(limite / 1024 / 1024);
-    return { erro: `Arquivo grande demais. O limite é ${mb} MB.` };
-  }
+export const FALTA_CONFIGURAR =
+  "Armazenamento de arquivos não configurado. Faltam as variáveis R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY e R2_PUBLIC_HOST no projeto da Vercel.";
 
+function cliente() {
+  return new S3Client({
+    // O R2 não tem regiões como a AWS, mas o protocolo exige o campo.
+    region: "auto",
+    endpoint: `https://${CONTA}.r2.cloudflarestorage.com`,
+    credentials: { accessKeyId: CHAVE, secretAccessKey: SEGREDO },
+  });
+}
+
+/**
+ * Nome do arquivo dentro do bucket.
+ *
+ * Leva um sufixo aleatório porque dois clientes podem mandar "logo.png", e sem
+ * isso o segundo apagaria o primeiro sem avisar ninguém. O nome original fica
+ * no fim para o arquivo continuar reconhecível ao olhar a lista do bucket.
+ */
+export function montarChave(pasta: string, nomeOriginal: string) {
+  const limpo = nomeOriginal
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(-60);
+
+  const sufixo = crypto.randomUUID().slice(0, 8);
+  return `${pasta}/${sufixo}-${limpo || "arquivo"}`;
+}
+
+/** Endereço final do arquivo, o que vai para o banco e para a página. */
+export function urlPublica(chave: string) {
+  return `https://${HOST_PUBLICO}/${chave}`;
+}
+
+/**
+ * Autoriza um envio só, com tipo e tamanho já decididos pelo servidor.
+ *
+ * O navegador manda o arquivo direto para o R2 com esta URL. O servidor não
+ * recebe o arquivo em momento nenhum — e isso não é só economia: o corpo de
+ * uma requisição para a função da Vercel tem teto de 4,5 MB, então vídeo
+ * nenhum passaria por ali.
+ *
+ * O tipo entra na assinatura: a URL assinada para um MP4 não serve para subir
+ * outra coisa, porque o R2 confere o content-type contra o que foi assinado.
+ */
+export async function assinarEnvio(chave: string, tipo: string) {
+  const comando = new PutObjectCommand({
+    Bucket: BUCKET,
+    Key: chave,
+    ContentType: tipo,
+  });
+
+  // Cinco minutos: tempo de sobra para um arquivo de 12 MB numa conexão ruim,
+  // e curto o bastante para uma URL vazada não valer muito.
+  return getSignedUrl(cliente(), comando, { expiresIn: 300 });
+}
+
+/** A chave de volta, a partir da URL pública guardada no banco. */
+function chaveDaUrl(url: string) {
   try {
-    // addRandomSuffix evita que dois arquivos de mesmo nome se sobrescrevam:
-    // "foto.jpg" de dois clientes diferentes não pode virar um só.
-    const { url } = await put(`${pasta}/${arquivo.name}`, arquivo, {
-      access: "public",
-      addRandomSuffix: true,
-    });
-    return { url };
-  } catch (erro) {
-    return {
-      erro: erro instanceof Error ? erro.message : "Falha ao enviar o arquivo.",
-    };
+    const endereco = new URL(url);
+    if (endereco.hostname !== HOST_PUBLICO) return null;
+    return decodeURIComponent(endereco.pathname.replace(/^\//, "")) || null;
+  } catch {
+    return null;
   }
 }
 
-// Apagar é "melhor esforço": se falhar, o arquivo fica órfão no Blob, o que é
-// bem menos grave do que impedir a pessoa de apagar o conteúdo no painel.
+/**
+ * Apaga o arquivo que deixou de ser usado.
+ *
+ * É "melhor esforço": falhar aqui deixa um arquivo órfão ocupando espaço, o
+ * que é bem menos grave do que impedir a pessoa de apagar o conteúdo.
+ *
+ * Ainda aceita endereços do Vercel Blob porque o banco guarda os das peças
+ * antigas: enquanto elas não forem substituídas, apagar uma precisa apagar o
+ * arquivo no lugar certo.
+ */
 export async function apagarArquivo(url: string | null | undefined) {
-  if (!url || !blobConfigurado) return;
-  if (!url.includes("blob.vercel-storage.com")) return;
+  if (!url) return;
+
+  if (url.includes(".blob.vercel-storage.com")) {
+    try {
+      await del(url);
+    } catch {
+      // Silêncio proposital: ver comentário acima.
+    }
+    return;
+  }
+
+  if (!armazenamentoConfigurado) return;
+  const chave = chaveDaUrl(url);
+  if (!chave) return;
 
   try {
-    await del(url);
+    await cliente().send(
+      new DeleteObjectCommand({ Bucket: BUCKET, Key: chave })
+    );
   } catch {
-    // Silêncio proposital: ver comentário acima.
+    // idem
   }
 }
