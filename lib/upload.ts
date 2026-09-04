@@ -24,13 +24,23 @@ import { del } from "@vercel/blob";
 export const LIMITE_IMAGEM = 8 * 1024 * 1024;
 
 /**
- * 12 MB para vídeo.
+ * 30 MB para vídeo.
  *
- * No R2 a banda não é o gargalo, mas o peso continua importando: o ladrilho
- * do trilho tem 280 pixels de largura, e o que passa disso é resolução que
- * ninguém vê, custando espera de carregamento no celular de quem visita.
+ * Eram 12, e o número respondia ao custo: no Vercel Blob cada visita que
+ * assistia era cobrada. No R2 a entrega não é cobrada nem medida, então esse
+ * motivo deixou de existir.
+ *
+ * O que limita agora é quem assiste. O trilho toca sozinho, em laço, sem
+ * ninguém pedir: quem abre o site pelo celular baixa o arquivo inteiro sem
+ * ter escolhido nada. O teto protege o pacote de dados do visitante, não a
+ * conta da agência.
+ *
+ * Por que 30 e não 50: um vertical em 1080p bem exportado fica por volta de
+ * 3 Mbps, então 30 MB dão cerca de um minuto e vinte de vídeo — mais do que
+ * qualquer peça de portfólio costuma ter. Os 20 MB a mais comprariam duração
+ * que ninguém usa, ou resolução que o ladrilho de 280 pixels não mostra.
  */
-export const LIMITE_VIDEO = 12 * 1024 * 1024;
+export const LIMITE_VIDEO = 30 * 1024 * 1024;
 
 export const TIPOS_IMAGEM = [
   "image/jpeg",
