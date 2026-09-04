@@ -14,7 +14,7 @@ import {
 // O trilho "Nosso trabalho" fica na home.
 function atualizarSite() {
   revalidatePath("/");
-  revalidatePath("/admin/vitrine");
+  revalidatePath("/lncadmin/vitrine");
 }
 
 export async function criarPeca(dados: FormData) {

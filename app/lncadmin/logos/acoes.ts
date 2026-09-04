@@ -15,7 +15,7 @@ import {
 // quando há pelo menos um logo cadastrado.
 function atualizarSite() {
   revalidatePath("/");
-  revalidatePath("/admin/logos");
+  revalidatePath("/lncadmin/logos");
 }
 
 export async function criarLogo(dados: FormData) {

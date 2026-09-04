@@ -33,7 +33,7 @@ export default function LoginAdmin() {
     setErro(null);
 
     try {
-      const resposta = await fetch("/api/admin/entrar", {
+      const resposta = await fetch("/api/lncadmin/entrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // Na primeira etapa o código nem é enviado: é ele que faz o servidor

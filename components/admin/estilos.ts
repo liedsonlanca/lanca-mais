@@ -5,7 +5,7 @@
 // só atrapalharia isso.
 
 export const campo =
-  "w-full rounded-xl border border-linha bg-branco px-4 py-2.5 text-sm text-preto outline-none transition-colors duration-300 focus:border-salmon";
+  "min-h-11 w-full rounded-xl border border-linha bg-branco px-4 py-2.5 text-sm text-preto outline-none transition-colors duration-300 focus:border-salmon";
 
 export const rotulo =
   "block text-xs font-medium uppercase tracking-wider text-preto/50";

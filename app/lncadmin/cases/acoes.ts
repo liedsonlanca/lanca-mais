@@ -15,7 +15,7 @@ import {
 function atualizarSite() {
   revalidatePath("/");
   revalidatePath("/portfolio");
-  revalidatePath("/admin/cases");
+  revalidatePath("/lncadmin/cases");
 }
 
 // Os serviços vêm numa linha só, separados por vírgula: é mais rápido de

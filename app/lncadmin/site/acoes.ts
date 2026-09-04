@@ -30,7 +30,7 @@ async function gravar(chave: string, valor: string | null) {
 // no vencimento. Por isso o painel avisa que pode levar até meio minuto.
 function aplicar() {
   esquecerConfig();
-  revalidatePath("/admin/site");
+  revalidatePath("/lncadmin/site");
   revalidatePath("/em-breve");
   revalidatePath("/", "layout");
 }

@@ -2,8 +2,8 @@
 
 export default function SairDoAdmin() {
   async function sair() {
-    await fetch("/api/admin/entrar", { method: "DELETE" });
-    window.location.href = "/admin";
+    await fetch("/api/lncadmin/entrar", { method: "DELETE" });
+    window.location.href = "/lncadmin";
   }
 
   return (

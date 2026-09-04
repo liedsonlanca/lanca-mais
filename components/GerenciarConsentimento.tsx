@@ -17,7 +17,7 @@ export default function GerenciarConsentimento() {
     <button
       type="button"
       onClick={() => window.dispatchEvent(new Event("lanca:consentimento"))}
-      className="underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+      className="flex min-h-11 items-center underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
     >
       Gerenciar cookies
     </button>

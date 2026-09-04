@@ -146,7 +146,7 @@ export default async function Footer() {
         <p className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
           <Link
             href="/politica-de-privacidade"
-            className="underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+            className="flex min-h-11 items-center underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
           >
             Política de Privacidade
           </Link>
@@ -155,7 +155,7 @@ export default async function Footer() {
           </span>
           <Link
             href="/politica-de-cookies"
-            className="underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+            className="flex min-h-11 items-center underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
           >
             Política de Cookies
           </Link>

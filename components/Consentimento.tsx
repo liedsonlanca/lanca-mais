@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Rastreadores, { temRastreadores } from "@/components/Rastreadores";
 import {
@@ -54,7 +55,23 @@ const LINHAS: Array<{
   },
 ];
 
+/** O painel não é o site: ver o comentário em `foraDoPainel`. */
+const PAINEL = "/lncadmin";
+
 export default function Consentimento() {
+  const caminho = usePathname();
+
+  // O painel fica fora do consentimento inteiro, e por dois motivos.
+  //
+  // O primeiro é de dado: quem usa o painel é a própria equipe, e contar
+  // isso como visita encheria o Analytics de tráfego interno — os números
+  // que a agência olha para decidir ficariam medindo a agência.
+  //
+  // O segundo é de tela: pedir consentimento de cookie a quem está entrando
+  // na própria ferramenta de trabalho não faz sentido nenhum.
+  const foraDoPainel =
+    !caminho?.startsWith(PAINEL);
+
   // Começa nulo, e não como "ainda não decidiu": no servidor não existe
   // localStorage, e assumir qualquer coisa faria o aviso piscar na tela de
   // quem já respondeu.
@@ -101,7 +118,7 @@ export default function Consentimento() {
 
   // Sem nenhum rastreador configurado no ambiente não há o que consentir, e o
   // aviso some. Pedir permissão para nada é ruído, não conformidade.
-  if (!temRastreadores) return null;
+  if (!temRastreadores || !foraDoPainel) return null;
 
   return (
     <>

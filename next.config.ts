@@ -188,7 +188,7 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: CABECALHOS },
       {
         // O painel nunca deve ser guardado em cache nem indexado.
-        source: "/admin/:path*",
+        source: "/lncadmin/:path*",
         headers: [
           { key: "Cache-Control", value: "no-store, max-age=0" },
           { key: "X-Robots-Tag", value: "noindex, nofollow" },

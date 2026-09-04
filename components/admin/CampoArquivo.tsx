@@ -93,7 +93,7 @@ export default function CampoArquivo({
     try {
       // 1. Pedir autorização. O servidor decide o nome, confere o tipo e o
       //    tamanho, e devolve uma URL que vale cinco minutos.
-      const resposta = await fetch("/api/admin/upload", {
+      const resposta = await fetch("/api/lncadmin/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

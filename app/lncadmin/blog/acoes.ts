@@ -9,7 +9,7 @@ function atualizarSite(slug?: string) {
   revalidatePath("/");
   revalidatePath("/blog");
   if (slug) revalidatePath(`/blog/${slug}`);
-  revalidatePath("/admin/blog");
+  revalidatePath("/lncadmin/blog");
 }
 
 // O texto chega numa área única, com parágrafos separados por linha em branco,

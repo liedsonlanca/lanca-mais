@@ -14,7 +14,7 @@ async function preparar() {
 // Os números aparecem no hero e na apresentação da agência, as duas na home.
 function atualizarSite() {
   revalidatePath("/");
-  revalidatePath("/admin/numeros");
+  revalidatePath("/lncadmin/numeros");
 }
 
 function texto(dados: FormData, campo: string) {

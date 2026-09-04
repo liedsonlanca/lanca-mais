@@ -22,7 +22,7 @@ async function preparar() {
 // edição só apareceria no próximo deploy.
 function atualizarSite() {
   revalidatePath("/");
-  revalidatePath("/admin/depoimentos");
+  revalidatePath("/lncadmin/depoimentos");
 }
 
 function texto(dados: FormData, campo: string) {

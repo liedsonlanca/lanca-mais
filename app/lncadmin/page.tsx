@@ -5,42 +5,42 @@ export const dynamic = "force-dynamic";
 
 const SECOES = [
   {
-    href: "/admin/vitrine",
+    href: "/lncadmin/vitrine",
     tabela: "vitrine",
     rotulo: "Nosso trabalho",
     descricao: "As fotos e vídeos do trilho que roda na home.",
     pronto: true,
   },
   {
-    href: "/admin/depoimentos",
+    href: "/lncadmin/depoimentos",
     tabela: "depoimentos",
     rotulo: "Depoimentos",
     descricao: "O que os clientes dizem, na home.",
     pronto: true,
   },
   {
-    href: "/admin/cases",
+    href: "/lncadmin/cases",
     tabela: "cases",
     rotulo: "Cases",
     descricao: "Os trabalhos com foto, resumo e resultado.",
     pronto: true,
   },
   {
-    href: "/admin/logos",
+    href: "/lncadmin/logos",
     tabela: "logos",
     rotulo: "Logos de clientes",
     descricao: "A faixa de marcas atendidas.",
     pronto: true,
   },
   {
-    href: "/admin/numeros",
+    href: "/lncadmin/numeros",
     tabela: "numeros",
     rotulo: "Números",
     descricao: "Os contadores de prova social.",
     pronto: true,
   },
   {
-    href: "/admin/blog",
+    href: "/lncadmin/blog",
     tabela: "posts",
     rotulo: "Blog",
     descricao: "Os textos publicados.",

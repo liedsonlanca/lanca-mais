@@ -24,7 +24,7 @@ export async function ativarDuasEtapas(dados: FormData) {
   }
 
   await guardarSegredoTotp(segredo);
-  revalidatePath("/admin/seguranca");
+  revalidatePath("/lncadmin/seguranca");
 }
 
 // Desativar exige um código válido também: quem estiver com a sessão aberta
@@ -41,5 +41,5 @@ export async function desativarDuasEtapas(dados: FormData) {
   }
 
   await removerSegredoTotp();
-  revalidatePath("/admin/seguranca");
+  revalidatePath("/lncadmin/seguranca");
 }

@@ -17,14 +17,14 @@ export const metadata: Metadata = {
 // Server Actions conferem de novo por conta própria, porque são alcançáveis
 // por POST direto, sem passar por esta árvore.
 const SECOES = [
-  { href: "/admin/site", rotulo: "Estado do site" },
-  { href: "/admin/vitrine", rotulo: "Nosso trabalho" },
-  { href: "/admin/depoimentos", rotulo: "Depoimentos" },
-  { href: "/admin/cases", rotulo: "Cases" },
-  { href: "/admin/logos", rotulo: "Logos" },
-  { href: "/admin/numeros", rotulo: "Números" },
-  { href: "/admin/blog", rotulo: "Blog" },
-  { href: "/admin/seguranca", rotulo: "Segurança" },
+  { href: "/lncadmin/site", rotulo: "Estado do site" },
+  { href: "/lncadmin/vitrine", rotulo: "Nosso trabalho" },
+  { href: "/lncadmin/depoimentos", rotulo: "Depoimentos" },
+  { href: "/lncadmin/cases", rotulo: "Cases" },
+  { href: "/lncadmin/logos", rotulo: "Logos" },
+  { href: "/lncadmin/numeros", rotulo: "Números" },
+  { href: "/lncadmin/blog", rotulo: "Blog" },
+  { href: "/lncadmin/seguranca", rotulo: "Segurança" },
 ];
 
 export default async function AdminLayout({
@@ -69,7 +69,7 @@ export default async function AdminLayout({
         <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
           <div className="flex items-center justify-between gap-4">
             <Link
-              href="/admin"
+              href="/lncadmin"
               className="font-heading flex min-h-11 items-center text-lg font-semibold text-preto"
             >
               Painel <span className="ml-1.5 text-salmon-texto">LANÇA+</span>
