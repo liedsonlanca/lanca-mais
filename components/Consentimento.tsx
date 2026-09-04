@@ -108,11 +108,16 @@ export default function Consentimento() {
       {decidido && <Rastreadores de={decidido} />}
 
       {aberto && (
+        /* z-[110] fica acima de tudo, inclusive das capas de Em breve e de
+           manutenção, que ocupam a tela inteira em z-[100]. Atrás delas o
+           aviso existia no documento e não podia ser respondido — e como
+           nada carrega sem resposta, a página que todo visitante vê antes do
+           lançamento não media nada. */
         <div
           role="dialog"
           aria-modal="false"
           aria-labelledby="consentimento-titulo"
-          className="fixed inset-x-0 bottom-0 z-[90] p-3 sm:p-5"
+          className="fixed inset-x-0 bottom-0 z-[110] p-3 sm:p-5"
         >
           <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-linha bg-branco shadow-[0_30px_70px_-30px_rgba(10,10,8,0.45)]">
             <div className="p-6 sm:p-8">
