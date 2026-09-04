@@ -10,6 +10,15 @@ export const metadata: Metadata = {
     "As regras de uso do site da LANÇA+: para que ele serve, o que é permitido, o que não é, e a quem pertence o que está publicado aqui.",
 };
 
+// Renderizada a cada visita, e não congelada no build.
+//
+// A moldura muda conforme o site esteja aberto ou não, e essa resposta mora
+// no banco. Congelada, a página nasceria com o estado do dia da publicação e
+// continuaria mostrando a moldura de pré-lançamento depois que o site
+// abrisse — inclusive quando ele abre sozinho, pela contagem regressiva, sem
+// ninguém tocar no painel para disparar uma revalidação.
+export const dynamic = "force-dynamic";
+
 // Termos de Uso.
 //
 // Divide função com o Aviso Legal de propósito, e a divisa é clara: aqui ficam

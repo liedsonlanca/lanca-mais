@@ -10,6 +10,15 @@ export const metadata: Metadata = {
     "O que o site da LANÇA+ guarda no seu navegador, para quê, e como mudar a sua escolha a qualquer momento.",
 };
 
+// Renderizada a cada visita, e não congelada no build.
+//
+// A moldura muda conforme o site esteja aberto ou não, e essa resposta mora
+// no banco. Congelada, a página nasceria com o estado do dia da publicação e
+// continuaria mostrando a moldura de pré-lançamento depois que o site
+// abrisse — inclusive quando ele abre sozinho, pela contagem regressiva, sem
+// ninguém tocar no painel para disparar uma revalidação.
+export const dynamic = "force-dynamic";
+
 // Política de Cookies.
 //
 // Escrita a partir do que o site realmente faz, e não de um modelo genérico:

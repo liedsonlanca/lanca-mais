@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { montarSessao, sessaoValida } from "@/lib/seguranca";
-import { lerConfigSite, siteAberto } from "@/lib/modo-site";
+import { lerConfigSite, siteEstaAberto } from "@/lib/modo-site";
 
 export const COOKIE_ACESSO = "lanca_acesso";
 
@@ -37,10 +37,10 @@ export async function montarValorAcesso(senha: string) {
 //
 // No Next 16 o arquivo `middleware` foi renomeado para `proxy`.
 export async function proxy(request: NextRequest) {
-  if (process.env.SITE_PUBLICO === "1") return NextResponse.next();
-
-  const config = await lerConfigSite();
-  const aberto = siteAberto(config);
+  // A leitura do banco fica para depois de propósito: SITE_PUBLICO responde
+  // sem consultar nada, e essa é a razão de ela existir — vale quando o
+  // banco, e portanto o painel, está fora do ar.
+  const aberto = await siteEstaAberto();
 
   const senha = process.env.SENHA_PREVIA;
   const temSenha =
@@ -72,6 +72,7 @@ export async function proxy(request: NextRequest) {
 
   // Reescreve, não redireciona: a URL original permanece na barra, então quem
   // tem o link de uma página interna volta direto para ela depois de entrar.
+  const config = await lerConfigSite();
   const destino = config.modo === "manutencao" ? "/manutencao" : "/em-breve";
   return NextResponse.rewrite(new URL(destino, request.url));
 }

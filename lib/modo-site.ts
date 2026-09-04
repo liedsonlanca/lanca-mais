@@ -93,6 +93,22 @@ export function siteAberto(config: ConfigSite, agora = Date.now()) {
   return Number.isFinite(alvo) && agora >= alvo;
 }
 
+/**
+ * O site está aberto, considerando tudo — inclusive a alavanca de emergência.
+ *
+ * Existe porque `siteAberto` responde só pelo que está no banco, e o porteiro
+ * confere antes disso a variável SITE_PUBLICO. Quem perguntasse só ao banco
+ * chegaria a uma resposta diferente da do porteiro, e o site passaria a se
+ * contradizer: as páginas legais mostrariam a moldura de pré-lançamento num
+ * site que, para o visitante, já estava aberto.
+ *
+ * Uma pergunta, uma resposta, um lugar só.
+ */
+export async function siteEstaAberto() {
+  if (process.env.SITE_PUBLICO === "1") return true;
+  return siteAberto(await lerConfigSite());
+}
+
 /** Zera o cache depois de uma alteração no painel. */
 export function esquecerConfig() {
   cache = null;

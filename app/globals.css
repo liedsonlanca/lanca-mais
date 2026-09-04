@@ -167,6 +167,21 @@ body:has(.pagina-em-breve) {
   overflow: hidden;
 }
 
+/* Páginas legais antes do lançamento.
+
+   Elas atravessam o portão de propósito: o aviso de cookies da Em breve é
+   obrigado a apontar para elas. Só que, chegando lá, a pessoa encontrava o
+   menu do site inteiro — e clicar em qualquer item devolvia para a Em breve,
+   porque o resto continua fechado. Um labirinto.
+
+   Com o site fechado, elas ficam sem o menu e sem o rodapé, e ganham uma
+   saída própria de volta. O botão do WhatsApp fica, porque ali ele é a única
+   coisa que ainda leva a algum lugar. */
+body:has(.pagina-legal-fechada) header,
+body:has(.pagina-legal-fechada) footer {
+  display: none;
+}
+
 /* Abertura suave do FAQ.
    O <details> nativo abre e fecha de um quadro para o outro, o que fica seco
    numa lista de perguntas. ::details-content dá acesso ao bloco que o
