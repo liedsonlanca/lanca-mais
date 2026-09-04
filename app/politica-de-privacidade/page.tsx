@@ -75,16 +75,41 @@ export default function PoliticaDePrivacidade() {
           />
         </Secao>
 
-        <Secao titulo="Por que tratamos cada um">
+        <Secao titulo="Com que base legal">
           <p>
-            O que você escreve no formulário tratamos para responder e, se fizer
-            sentido, apresentar uma proposta. É o que a Lei Geral de Proteção de
-            Dados chama de procedimentos preliminares de contrato, a pedido do
-            titular.
+            A Lei Geral de Proteção de Dados exige uma base legal para cada
+            tratamento. Aqui são três, e cada uma cobre uma coisa só:
+          </p>
+          <Lista
+            itens={[
+              <>
+                <strong className="font-medium text-preto">
+                  Procedimentos preliminares de contrato
+                </strong>{" "}
+                (art. 7º, V) — para o que você escreve no formulário. Você pede
+                contato, nós respondemos e, se fizer sentido, apresentamos uma
+                proposta.
+              </>,
+              <>
+                <strong className="font-medium text-preto">Consentimento</strong>{" "}
+                (art. 7º, I) — para medição e marketing, e apenas enquanto ele
+                durar. Nada é carregado antes do seu sim.
+              </>,
+              <>
+                <strong className="font-medium text-preto">Obrigação legal</strong>{" "}
+                (art. 7º, II) — para guardar o que a lei manda guardar, como
+                registros fiscais de contratos fechados.
+              </>,
+            ]}
+          />
+          <p>
+            Não invocamos legítimo interesse para medir ou anunciar. É uma base
+            usada com frequência para isso, mas dispensaria o seu consentimento
+            justamente onde ele deveria valer, e a autoridade brasileira já
+            sinalizou que a leitura correta é a outra.
           </p>
           <p>
-            Medição e marketing tratamos com base no seu consentimento, e apenas
-            enquanto ele durar. Retirar é tão simples quanto dar: o link{" "}
+            Retirar o consentimento é tão simples quanto dar: o link{" "}
             <strong className="font-medium text-preto">Gerenciar cookies</strong>{" "}
             no rodapé reabre a escolha.
           </p>
@@ -116,8 +141,9 @@ export default function PoliticaDePrivacidade() {
           />
           <p>
             Parte desses serviços mantém servidores fora do Brasil, o que
-            caracteriza transferência internacional de dados, feita com as
-            salvaguardas contratuais que cada um oferece.
+            caracteriza transferência internacional de dados (art. 33 da LGPD).
+            Ela se apoia nas cláusulas contratuais padrão e nos compromissos de
+            proteção que cada um desses fornecedores publica.
           </p>
         </Secao>
 
@@ -167,6 +193,25 @@ export default function PoliticaDePrivacidade() {
             Nenhuma medida elimina risco por completo. Se ocorrer um incidente
             que possa trazer risco relevante a você, comunicamos você e a
             autoridade, como manda a lei.
+          </p>
+        </Secao>
+
+        <Secao titulo="Quem responde por isso">
+          <p>
+            Pedidos sobre os seus dados, dúvidas e reclamações vão para{" "}
+            <a
+              href={`mailto:${siteConfig.email}`}
+              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+            >
+              {siteConfig.email}
+            </a>
+            , que é o canal do encarregado pelo tratamento de dados pessoais da{" "}
+            {siteConfig.name}, previsto no art. 41 da LGPD. Respondemos por esse
+            mesmo canal, no prazo legal.
+          </p>
+          <p>
+            Se a resposta não resolver, você pode levar o caso à Autoridade
+            Nacional de Proteção de Dados.
           </p>
         </Secao>
 

@@ -91,6 +91,21 @@ export default function PoliticaDeCookies() {
           />
         </Secao>
 
+        <Secao titulo="Quanto tempo cada um dura">
+          <p>
+            Cookie de sessão desaparece quando você fecha o navegador. Cookie
+            persistente fica no aparelho até vencer o prazo dele ou até você
+            apagar. Os dois nossos são persistentes, com prazo curto e
+            conferido no servidor: 30 minutos parado para a senha do site, e
+            uma jornada de trabalho para o painel.
+          </p>
+          <p>
+            Os de medição e marketing seguem os prazos definidos pelo Google e
+            pela Meta, que costumam ser de meses e estão descritos nas
+            políticas de cada um, ligadas abaixo.
+          </p>
+        </Secao>
+
         <Secao titulo="Como mudar de ideia">
           <p>
             No rodapé de qualquer página existe o link{" "}
@@ -100,11 +115,70 @@ export default function PoliticaDeCookies() {
             rodando por inércia.
           </p>
           <p>
-            Você também pode apagar cookies e bloquear novos pelas configurações
-            do seu navegador. Se bloquear tudo, o site continua funcionando; o
-            que deixa de funcionar é o acesso ao painel e a lembrança da senha
-            de acesso antecipado.
+            Você também pode apagar cookies e bloquear novos pelo próprio
+            navegador, o que vale para todos os sites e não só para este:
           </p>
+          <Lista
+            itens={[
+              <>
+                <strong className="font-medium text-preto">Chrome</strong> —
+                Configurações, Privacidade e segurança, Cookies e outros dados
+                do site
+              </>,
+              <>
+                <strong className="font-medium text-preto">Safari</strong> —
+                Ajustes, Safari, Privacidade e segurança
+              </>,
+              <>
+                <strong className="font-medium text-preto">Firefox</strong> —
+                Configurações, Privacidade e Segurança, Cookies e dados de
+                sites
+              </>,
+              <>
+                <strong className="font-medium text-preto">Edge</strong> —
+                Configurações, Cookies e permissões de site
+              </>,
+            ]}
+          />
+          <p>
+            Se bloquear tudo, o site continua funcionando. O que deixa de
+            funcionar é o acesso ao painel e a lembrança da senha de acesso
+            antecipado.
+          </p>
+        </Secao>
+
+        <Secao titulo="As políticas de quem recebe">
+          <p>
+            Quando você permite medição ou marketing, quem passa a receber
+            aquele dado é o Google ou a Meta, e o tratamento dali em diante
+            segue as regras deles:
+          </p>
+          <Lista
+            itens={[
+              <>
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+                >
+                  Política de Privacidade do Google
+                </a>{" "}
+                — vale para o Analytics e para o Google Maps do rodapé
+              </>,
+              <>
+                <a
+                  href="https://www.facebook.com/privacy/policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+                >
+                  Política de Privacidade da Meta
+                </a>{" "}
+                — vale para o Pixel
+              </>,
+            ]}
+          />
         </Secao>
 
         <Secao titulo="Outros conteúdos">
