@@ -74,6 +74,24 @@ function cliente() {
     region: "auto",
     endpoint: `https://${CONTA}.r2.cloudflarestorage.com`,
     credentials: { accessKeyId: CHAVE, secretAccessKey: SEGREDO },
+
+    // Sem isto, nenhum envio funciona.
+    //
+    // A biblioteca da AWS passou a calcular uma soma de verificação por
+    // padrão e a embutir na assinatura. Ao assinar uma URL ainda não existe
+    // arquivo, então ela assina a soma de um corpo vazio — e a URL sai com
+    // x-amz-checksum-crc32=AAAAAA==, que é o CRC32 de nada. Quando o
+    // navegador manda o arquivo de verdade, o R2 compara as duas somas, elas
+    // não batem e o envio é recusado.
+    //
+    // Pior: a recusa vem sem os cabeçalhos de permissão de origem, então o
+    // navegador não consegue expor o erro e reporta como falha de conexão —
+    // que aponta para tudo, menos para a causa.
+    //
+    // "WHEN_REQUIRED" faz a soma só onde o protocolo exige, e URL assinada
+    // não exige.
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
 }
 
