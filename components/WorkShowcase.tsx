@@ -186,6 +186,7 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                     src={peca.video}
                     poster={peca.src || undefined}
                     alt={copia ? "" : peca.alt}
+                    legenda={peca.legenda ?? peca.alt}
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] group-hover:scale-[1.05]"
                   />
                 ) : (

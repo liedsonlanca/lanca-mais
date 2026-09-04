@@ -69,7 +69,7 @@ export default function SeletorTipoPeca() {
             aceita="video"
             label="Vídeo"
             obrigatorio
-            ajuda="MP4, WEBM ou MOV, até 60 MB. Toca sozinho e sem som no trilho, então prefira o arquivo mais leve que mantenha a qualidade."
+            ajuda="MP4, até 12 MB. O trilho toca sozinho em toda visita, e a Vercel cobra por banda entregue — então o peso do arquivo é multiplicado por cada pessoa que abre o site. Exporte em 1080p vertical, que já é mais do que o ladrilho mostra."
           />
         )}
       </div>

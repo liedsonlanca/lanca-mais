@@ -9,9 +9,20 @@ export const blobConfigurado = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 /** 8 MB para imagem. Foto de perfil e capa não precisam de mais que isso. */
 export const LIMITE_IMAGEM = 8 * 1024 * 1024;
 
-/** 60 MB para vídeo — o custo do Blob é por banda entregue, não por arquivo
- *  guardado, então um vídeo pesado no trilho é caro a cada visita. */
-export const LIMITE_VIDEO = 60 * 1024 * 1024;
+/**
+ * 12 MB para vídeo.
+ *
+ * Era 60, e 60 era generoso demais. O custo do Blob é por banda entregue,
+ * não por arquivo guardado: um vídeo no trilho é pago em toda visita, e não
+ * uma vez. A franquia gratuita de 10 GB já acabou uma vez por causa disso, e
+ * o armazenamento inteiro ficou pausado por trinta dias.
+ *
+ * A conta que define o número: com 12 MB por peça, mil visitas que carreguem
+ * um vídeo cada gastam 12 GB. Com 60 MB seriam 60. O trilho mostra o vídeo
+ * num ladrilho de 280 pixels de largura — nenhuma peça precisa de mais que
+ * isso, e o que passa de 12 MB ali é resolução que ninguém vê.
+ */
+export const LIMITE_VIDEO = 12 * 1024 * 1024;
 
 const IMAGENS = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 const VIDEOS = ["video/mp4", "video/webm", "video/quicktime"];
