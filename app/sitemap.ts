@@ -37,6 +37,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.9,
     },
+    // As políticas entram com prioridade baixa: precisam ser encontráveis
+    // por quem procura, sem competir com as páginas que vendem.
+    {
+      url: `${siteUrl}/politica-de-privacidade`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
+    {
+      url: `${siteUrl}/politica-de-cookies`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
   ];
 
   const rotasServicos: MetadataRoute.Sitemap = services.map((service) => ({

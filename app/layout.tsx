@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import Consentimento from "@/components/Consentimento";
 import JsonLd from "@/components/JsonLd";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import MotionProvider from "@/components/motion/MotionProvider";
@@ -58,6 +59,10 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <WhatsAppButton />
+
+          {/* Monta os rastreadores por dentro, quando houver permissão.
+              Fica no fim para não atrasar nada do que a pessoa veio ver. */}
+          <Consentimento />
         </MotionProvider>
       </body>
     </html>

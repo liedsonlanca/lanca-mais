@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { navLinks, services, siteConfig } from "@/lib/site-config";
 import FooterMap from "@/components/FooterMap";
+import GerenciarConsentimento from "@/components/GerenciarConsentimento";
 import { lerPosts } from "@/lib/conteudo";
 
 const socials = [
@@ -129,9 +130,40 @@ export default async function Footer() {
       </div>
 
       <div className="border-t border-borda px-6 py-6 text-center text-xs text-bege/70">
-        © {new Date().getFullYear()} {siteConfig.name}. Todos os direitos reservados.
-        <span className="mx-2 text-bege/45">·</span>
-        CNPJ {siteConfig.cnpj}
+        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <span>
+            © {new Date().getFullYear()} {siteConfig.name}. Todos os direitos
+            reservados.
+          </span>
+          <span aria-hidden className="text-bege/45">
+            ·
+          </span>
+          <span>CNPJ {siteConfig.cnpj}</span>
+        </p>
+
+        {/* Linha legal separada da assinatura: são coisas de naturezas
+            diferentes, e juntas viravam uma frase longa demais no celular. */}
+        <p className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <Link
+            href="/politica-de-privacidade"
+            className="underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+          >
+            Política de Privacidade
+          </Link>
+          <span aria-hidden className="text-bege/45">
+            ·
+          </span>
+          <Link
+            href="/politica-de-cookies"
+            className="underline underline-offset-4 transition-colors duration-300 hover:text-salmon"
+          >
+            Política de Cookies
+          </Link>
+          <span aria-hidden className="text-bege/45">
+            ·
+          </span>
+          <GerenciarConsentimento />
+        </p>
       </div>
     </footer>
   );

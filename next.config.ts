@@ -42,6 +42,34 @@ const BLOB = "https://*.public.blob.vercel-storage.com";
 
 const MIDIA = [BLOB, R2].filter(Boolean).join(" ");
 
+// Origens do Google Analytics e do Pixel da Meta.
+//
+// Só entram na política quando o identificador correspondente existe no
+// ambiente. Enquanto a agência não criar a conta, a porta permanece fechada:
+// liberar de antemão seria abrir caminho para um script que ainda não tem
+// dono no projeto.
+//
+// Isto libera o navegador a baixar, e não decide se ele vai. Quem decide é
+// a resposta da pessoa no aviso de cookies, em components/Consentimento.
+const ANALYTICS = process.env.NEXT_PUBLIC_GA_ID
+  ? {
+      script: "https://www.googletagmanager.com",
+      conexao:
+        "https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+      imagem: "https://www.google-analytics.com https://www.googletagmanager.com",
+    }
+  : { script: "", conexao: "", imagem: "" };
+
+const PIXEL = process.env.NEXT_PUBLIC_META_PIXEL_ID
+  ? {
+      script: "https://connect.facebook.net",
+      conexao: "https://www.facebook.com https://connect.facebook.net",
+      imagem: "https://www.facebook.com",
+    }
+  : { script: "", conexao: "", imagem: "" };
+
+const juntar = (...partes: string[]) => partes.filter(Boolean).join(" ");
+
 // Endereço para onde o painel ENVIA, que não é o mesmo de onde o site LÊ.
 //
 // A leitura sai do domínio público (pub-....r2.dev); o envio vai para o
@@ -79,14 +107,14 @@ function politicaDeConteudo(desenvolvimento: boolean) {
     // O único iframe do site é o mapa do rodapé. Liberar a origem exata do
     // Google Maps mantém a porta fechada para todo o resto.
     "frame-src https://www.google.com",
-    `script-src 'self' 'unsafe-inline'${desenvolvimento ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'unsafe-inline' ${juntar(ANALYTICS.script, PIXEL.script)}${desenvolvimento ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${MIDIA}`,
+    `img-src 'self' data: blob: ${juntar(MIDIA, ANALYTICS.imagem, PIXEL.imagem)}`,
     `media-src 'self' blob: ${MIDIA}`,
     "font-src 'self' data:",
     // O envio do painel vai do navegador direto para o R2, então a origem
     // dele precisa estar aqui: sem isso o upload é bloqueado pela política.
-    `connect-src 'self' ${[MIDIA, R2_ENVIO].filter(Boolean).join(" ")}${desenvolvimento ? " ws: http://localhost:*" : ""}`,
+    `connect-src 'self' ${juntar(MIDIA, R2_ENVIO, ANALYTICS.conexao, PIXEL.conexao)}${desenvolvimento ? " ws: http://localhost:*" : ""}`,
     "upgrade-insecure-requests",
   ].join("; ");
 }
