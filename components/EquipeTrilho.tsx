@@ -140,25 +140,32 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
           tabIndex={0}
           role="group"
           aria-label="Equipe da LANÇA+"
-          // Alinhado à esquerda com o título, solto à direita.
+          // Duas arrumações, porque são duas situações diferentes.
           //
-          // A margem esquerda repete a conta da caixa central: metade do que
-          // sobra da tela além dos 72rem, mais o respiro de 2,5rem. Sem isso o
-          // primeiro card começava colado na borda enquanto o título começava
-          // no meio da tela, e numa tela de 1920 os dois ficavam a 380px de
-          // distância um do outro, com um vão vazio do outro lado.
+          // Quando a equipe inteira cabe na tela, ela é um bloco parado, e
+          // bloco parado se centraliza. Encostado à esquerda, sobrava um vão
+          // de meia tela do outro lado e a fileira parecia torta.
+          //
+          // Quando não cabe, virou trilho, e trilho tem começo: a margem
+          // esquerda repete a conta da caixa do título — metade do que sobra
+          // da tela além dos 72rem, mais o respiro —, e a direita fica livre
+          // para o card sair da tela, que é o que diz que dá para passar.
+          // Centralizar aqui seria pior que feio: com o conteúdo maior que a
+          // caixa, o primeiro card escaparia pela esquerda e ficaria fora do
+          // alcance da rolagem.
           //
           // O max() cobre as telas menores que a caixa, onde a conta daria
           // negativo e o valor certo é o próprio respiro.
           //
-          // A direita continua livre para o card sair da tela: é ela que diz
-          // que o trilho anda.
-          //
-          // scroll-px acompanha o padding: sem ele o snap encosta o primeiro
+          // scroll-pl acompanha o padding: sem ele o snap encosta o primeiro
           // card na borda do scrollport, que fica dentro do respiro. O trilho
           // nascia adiantado, o card colado na borda e a seta de voltar acesa
           // apontando para nada.
-          className="sem-barra flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 lg:scroll-pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pr-10"
+          className={`sem-barra flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 ${
+            transborda
+              ? "scroll-pl-6 pl-6 pr-6 lg:scroll-pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pr-10"
+              : "justify-center px-6 lg:px-10"
+          }`}
         >
           {equipe.map((pessoa) => (
             <div
