@@ -7,13 +7,22 @@ import { type Pessoa } from "@/lib/equipe";
 // Trilho da equipe, na página Sobre.
 //
 // A grade fixa que existia aqui antes tinha um teto: com quatro colunas dentro
-// da caixa central, cada retrato ficava com 250px, e cadastrar a quinta pessoa
-// só pioraria isso. Um trilho horizontal desata os dois nós de uma vez — o
-// card cresce, e a lista deixa de ter tamanho máximo.
+// da coluna da página, cada retrato ficava com 250px, e cadastrar a quinta
+// pessoa só pioraria isso. Um trilho horizontal desata os dois nós de uma vez:
+// o card cresce, e a lista deixa de ter tamanho máximo.
 //
-// As setas só aparecem quando há mais gente do que cabe na tela. Com a equipe
-// inteira à vista, um par de botões que não levam a lugar nenhum seria ruído,
-// e desabilitados seriam pior ainda.
+// O trilho fica dentro da mesma coluna do título, e não sangrando até as
+// bordas da tela. Foram duas tentativas até chegar aqui, e as duas erraram
+// pelo mesmo motivo: sangrando, o trilho não tem como concordar com o título.
+// Encostado à esquerda da tela, o card começava 380px antes do título e sobrava
+// meia tela vazia do outro lado; centralizado na tela, a folga ficava igual dos
+// dois lados mas o card passava a começar antes do título. Dentro da coluna, as
+// duas bordas batem com o título e com todas as seções acima, que é o que faz a
+// seção parecer parte da página.
+//
+// As setas só aparecem quando há mais gente do que cabe. Com a equipe inteira à
+// vista, um par de botões que não levam a lugar nenhum seria ruído, e
+// desabilitados seriam pior ainda.
 //
 // Diferente do trilho da vitrine, este não anda sozinho: lá o movimento é o
 // convite para olhar o trabalho; aqui a pessoa lê nomes e cargos, e um texto
@@ -122,7 +131,7 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
         </div>
       )}
 
-      <div className="relative mt-8">
+      <div className="relative mx-auto mt-8 max-w-6xl">
         {/* Véus laterais, cada um só quando há conteúdo escondido daquele
             lado. Fixos, escureceriam um card inteiramente visível. */}
         {transborda && !noInicio && (
@@ -140,37 +149,28 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
           tabIndex={0}
           role="group"
           aria-label="Equipe da LANÇA+"
-          // Duas arrumações, porque são duas situações diferentes.
+          // O respiro é o mesmo px do resto da página, e é ele que alinha o
+          // primeiro card com o título.
           //
-          // Quando a equipe inteira cabe na tela, ela é um bloco parado, e
-          // bloco parado se centraliza. Encostado à esquerda, sobrava um vão
-          // de meia tela do outro lado e a fileira parecia torta.
+          // Sem encaixe de rolagem, de propósito. O encaixe obrigatório exige
+          // que o trilho pare sempre sobre um ponto de encaixe, e aqui o que
+          // sobra para rolar (200px com quatro pessoas) é menor que um card
+          // (324px com o vão): o único ponto além do começo ficava fora do
+          // alcance, então o navegador devolvia o trilho ao zero e a seta não
+          // saía do lugar. Encaixar o último pela direita também não resolveu.
           //
-          // Quando não cabe, virou trilho, e trilho tem começo: a margem
-          // esquerda repete a conta da caixa do título — metade do que sobra
-          // da tela além dos 72rem, mais o respiro —, e a direita fica livre
-          // para o card sair da tela, que é o que diz que dá para passar.
-          // Centralizar aqui seria pior que feio: com o conteúdo maior que a
-          // caixa, o primeiro card escaparia pela esquerda e ficaria fora do
-          // alcance da rolagem.
-          //
-          // O max() cobre as telas menores que a caixa, onde a conta daria
-          // negativo e o valor certo é o próprio respiro.
-          //
-          // scroll-pl acompanha o padding: sem ele o snap encosta o primeiro
-          // card na borda do scrollport, que fica dentro do respiro. O trilho
-          // nascia adiantado, o card colado na borda e a seta de voltar acesa
-          // apontando para nada.
-          className={`sem-barra flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 ${
-            transborda
-              ? "scroll-pl-6 pl-6 pr-6 lg:scroll-pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pr-10"
-              : "justify-center px-6 lg:px-10"
-          }`}
+          // Como a peça mostra um card cortado de propósito, encaixar nunca foi
+          // o objetivo: o passo certo já vem do clique na seta, que anda um
+          // card exato.
+          className="sem-barra flex gap-6 overflow-x-auto px-6 pb-2 lg:px-10"
         >
           {equipe.map((pessoa) => (
             <div
               key={pessoa.nome}
-              className="w-[248px] shrink-0 snap-start sm:w-[288px] lg:w-[316px]"
+              // 300 dentro da coluna deixa três retratos inteiros e cem pixels
+              // do quarto à mostra. O pedaço que sobra é o que diz, sem texto
+              // nenhum, que a fileira continua.
+              className="w-[248px] shrink-0 sm:w-[288px] lg:w-[300px]"
             >
               {/* A foto ocupa o card inteiro e o nome vem sobre ela, num véu
                   que sobe no hover. A função fica numa etiqueta salmão, o
@@ -180,7 +180,7 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
                   src={pessoa.foto}
                   alt={pessoa.nome}
                   fill
-                  sizes="(max-width: 640px) 248px, (max-width: 1024px) 288px, 316px"
+                  sizes="(max-width: 640px) 248px, (max-width: 1024px) 288px, 300px"
                   className="object-cover object-top grayscale transition-all duration-[1.2s] group-hover:scale-[1.06] group-hover:grayscale-0"
                 />
 
