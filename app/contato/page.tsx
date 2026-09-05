@@ -30,7 +30,7 @@ export default function ContatoPage() {
       />
 
       <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10 lg:py-28">
+        <div className="mx-auto max-w-6xl px-6 py-12 lg:px-10 lg:py-16">
           <div className="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
             <Reveal>
               <dl className="space-y-8">

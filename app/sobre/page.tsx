@@ -54,7 +54,7 @@ export default async function SobrePage() {
 
       {/* Missão */}
       <section className="relative overflow-hidden bg-areia">
-        <div className="mx-auto grid max-w-6xl gap-14 px-6 py-24 lg:px-10 lg:py-32 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl gap-14 px-6 py-14 lg:px-10 lg:py-20 md:grid-cols-2">
           <Reveal distance={40} className="md:h-full">
             {/* No desktop a imagem acompanha a altura do texto; no celular
                 volta a ter proporção fixa, já que não há coluna vizinha. */}
@@ -98,9 +98,12 @@ export default async function SobrePage() {
         </div>
       </section>
 
-      {/* Princípios — respiro claro */}
-      <section className="relative overflow-hidden bg-areia text-preto">
-        <div className="mx-auto max-w-6xl px-6 py-24 lg:px-10 lg:py-32">
+      {/* Princípios. Fundo branco entre duas seções de areia: com a mesma cor
+          das vizinhas, a única separação era o vão, e por isso ele precisava
+          ser enorme para a seção começar. A troca de cor faz o corte, e o
+          respiro pode ser curto. */}
+      <section className="relative overflow-hidden bg-papel text-preto">
+        <div className="mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Como trabalhamos"
             alinhamento="esquerda"
@@ -132,7 +135,7 @@ export default async function SobrePage() {
           Some inteira quando não há ninguém cadastrado: um título "Quem
           constrói a sua marca" sobre um vazio diz o contrário do que promete. */}
       {equipe.length > 0 && (
-      <section className="relative overflow-hidden bg-papel py-24 lg:py-32">
+      <section className="relative overflow-hidden bg-areia py-14 lg:py-20">
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <SectionHeading
             eyebrow="Nosso time"

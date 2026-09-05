@@ -31,7 +31,7 @@ export async function PaginaLegal({
         aberto ? "" : "pagina-legal-fechada"
       }`}
     >
-      <div className="mx-auto max-w-2xl px-6 py-20 lg:py-28">
+      <div className="mx-auto max-w-2xl px-6 py-12 lg:py-16">
         <p className="eyebrow text-preto/45">
           Atualizada em {atualizadoEm}
         </p>

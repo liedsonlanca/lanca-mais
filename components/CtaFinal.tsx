@@ -43,7 +43,7 @@ export default function CtaFinal({
     <section className="relative overflow-hidden bg-papel">
       <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
-      <div className="relative mx-auto max-w-4xl px-6 py-20 text-center lg:py-24">
+      <div className="relative mx-auto max-w-4xl px-6 py-12 text-center lg:py-16">
         <h2 className="font-heading text-3xl font-semibold leading-[1.08] text-preto md:text-5xl">
           {titulo}
           <span className="block">{comRealce(destaque, realce)}</span>

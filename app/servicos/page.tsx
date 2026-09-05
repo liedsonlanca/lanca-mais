@@ -26,8 +26,11 @@ export default function ServicosPage() {
 
       {/* Grade de serviços. Em lista longa as sete frentes viravam rolagem;
           em grade elas se comparam de relance, que é o que a página precisa. */}
-      <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-28">
+      {/* Areia, e não branco: a seção seguinte é a chamada final, que é
+          branca. Duas brancas coladas não têm borda, e sem borda só o vão diz
+          que uma acabou e a outra começou. */}
+      <section className="relative overflow-hidden bg-areia">
+        <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10 lg:py-16">
           <Stagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service, i) => (
               <StaggerItem key={service.slug} className="h-full">

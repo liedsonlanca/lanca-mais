@@ -24,7 +24,7 @@ export default async function ClientLogos() {
 
   return (
     <section className="relative overflow-hidden border-y border-linha bg-papel">
-      <div className="py-16 lg:py-20">
+      <div className="py-10 lg:py-14">
         <Reveal>
           <p className="eyebrow text-center text-preto/58">
             Marcas que confiam na LANÇA+

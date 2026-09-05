@@ -137,7 +137,7 @@ export default async function ServicoPage({
 
       {/* ---------- Manifesto ---------- */}
       <section className="relative overflow-hidden bg-bege">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-24 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-32">
+        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-14 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-20">
           <Reveal>
             <h2 className="font-heading border-l-2 border-salmon pl-7 text-3xl font-semibold leading-snug text-preto md:text-4xl">
               {page.manifesto.statement}
@@ -166,7 +166,7 @@ export default async function ServicoPage({
         id="como-funciona"
         className="relative scroll-mt-28 overflow-hidden bg-papel"
       >
-        <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Como funciona"
             titulo={[
@@ -200,7 +200,7 @@ export default async function ServicoPage({
       <section className="relative overflow-hidden bg-bege text-preto">
         {/* items-center: as duas colunas têm alturas diferentes, e sem isso a
             nuvem de entregáveis ficava colada no topo com um vazio embaixo. */}
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-32">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Entregáveis"
             alinhamento="esquerda"
@@ -222,7 +222,7 @@ export default async function ServicoPage({
 
       {/* ---------- Diferenciais ---------- */}
       <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-6xl px-6 py-24 lg:px-10 lg:py-32">
+        <div className="mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Por que a LANÇA+"
             alinhamento="esquerda"
@@ -261,7 +261,7 @@ export default async function ServicoPage({
 
       {/* ---------- Serviços relacionados ---------- */}
       <section className="relative overflow-hidden bg-bege">
-        <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-28">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Continue explorando"
             alinhamento="esquerda"

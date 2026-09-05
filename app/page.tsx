@@ -137,7 +137,7 @@ export default async function Home() {
       <section className="relative overflow-hidden bg-areia">
         <div className="glow-salmon pointer-events-none absolute -left-32 bottom-0 h-[480px] w-[480px] opacity-25 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="O que fazemos"
             alinhamento="esquerda"
@@ -174,7 +174,7 @@ export default async function Home() {
       <section className="relative overflow-hidden bg-papel">
         <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="O problema que resolvemos"
             titulo={[
@@ -245,7 +245,7 @@ export default async function Home() {
 
       {/* ---------- 4. Método ---------- */}
       <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Nosso método"
             alinhamento="esquerda"
@@ -262,7 +262,7 @@ export default async function Home() {
 
       {/* ---------- 5. Cases ---------- */}
       <section className="relative overflow-hidden bg-areia">
-        <div className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Cases"
             alinhamento="esquerda"
@@ -326,7 +326,7 @@ export default async function Home() {
 
       {/* ---------- 6. Depoimentos ---------- */}
       <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Depoimentos"
             titulo={[
@@ -346,7 +346,7 @@ export default async function Home() {
       {/* ---------- 7. Blog ---------- */}
       {BLOG_ATIVO && (
         <section className="relative overflow-hidden bg-areia">
-          <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
             <SectionHeading
               eyebrow="Insights"
               alinhamento="esquerda"
@@ -403,7 +403,7 @@ export default async function Home() {
           BLOG_ATIVO ? "bg-papel" : "bg-areia"
         }`}
       >
-        <div className="mx-auto max-w-3xl px-6 py-28 lg:py-36">
+        <div className="mx-auto max-w-3xl px-6 py-14 lg:py-20">
           <SectionHeading
             eyebrow="Dúvidas frequentes"
             titulo={[
@@ -446,7 +446,7 @@ export default async function Home() {
           BLOG_ATIVO ? "bg-areia" : "bg-papel"
         }`}
       >
-        <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div>
               <SectionHeading
@@ -546,7 +546,7 @@ export default async function Home() {
       >
         <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
-        <div className="relative mx-auto max-w-4xl px-6 py-20 text-center lg:py-24">
+        <div className="relative mx-auto max-w-4xl px-6 py-12 text-center lg:py-16">
           <h2 className="font-heading text-4xl font-semibold leading-[1.06] text-preto md:text-6xl">
             Pronto para lançar sua marca
             <span className="block">

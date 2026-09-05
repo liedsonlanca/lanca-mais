@@ -38,7 +38,7 @@ export default async function BlogPage() {
       />
 
       <section className="relative overflow-hidden bg-areia">
-        <div className="mx-auto max-w-4xl px-6 py-20 lg:py-28">
+        <div className="mx-auto max-w-4xl px-6 py-12 lg:py-16">
           <Stagger className="flex flex-col divide-y divide-linha">
             {blogPosts.map((post) => (
               <StaggerItem key={post.slug}>

@@ -135,10 +135,10 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
         {/* Véus laterais, cada um só quando há conteúdo escondido daquele
             lado. Fixos, escureceriam um card inteiramente visível. */}
         {transborda && !noInicio && (
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-papel to-transparent lg:w-16" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-areia to-transparent lg:w-16" />
         )}
         {transborda && !noFim && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-papel to-transparent lg:w-16" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-areia to-transparent lg:w-16" />
         )}
 
         {/* tabIndex torna o trilho alcançável pelo teclado: os cards não são

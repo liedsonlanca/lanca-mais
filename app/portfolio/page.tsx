@@ -26,7 +26,7 @@ export default async function PortfolioPage() {
       />
 
       <section className="relative overflow-hidden bg-areia">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10 lg:py-28">
+        <div className="mx-auto max-w-6xl px-6 py-12 lg:px-10 lg:py-16">
           <Stagger className="grid gap-6 sm:grid-cols-2">
             {caseStudies.map((item) => (
               <StaggerItem key={item.slug}>
