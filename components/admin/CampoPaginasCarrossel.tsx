@@ -27,6 +27,9 @@ type Props = {
 
 const MINIMO = 2;
 
+/** Igual ao teto conferido no servidor, ao gravar. */
+const MAXIMO = 20;
+
 export default function CampoPaginasCarrossel({
   name,
   pasta,
@@ -86,6 +89,16 @@ export default function CampoPaginasCarrossel({
       a.name.localeCompare(b.name, "pt-BR", { numeric: true, sensitivity: "base" })
     );
     if (arquivos.length === 0) return;
+
+    // Confere antes de subir: recusar no fim faria a pessoa esperar o envio
+    // inteiro para descobrir que não valia.
+    if (paginas.length + arquivos.length > MAXIMO) {
+      setErro(
+        `Um carrossel aceita no máximo ${MAXIMO} páginas, e você já tem ${paginas.length}.`
+      );
+      if (entrada.current) entrada.current.value = "";
+      return;
+    }
 
     setErro(null);
     setEnviando({ feitas: 0, total: arquivos.length });

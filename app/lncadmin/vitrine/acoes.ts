@@ -12,6 +12,9 @@ import {
   reposicionarItem,
 } from "@/lib/painel";
 
+/** Teto de páginas por carrossel, igual ao das redes de onde vem o post. */
+const MAXIMO_PAGINAS = 20;
+
 // O trilho "Nosso trabalho" fica na home.
 function atualizarSite() {
   revalidatePath("/");
@@ -34,6 +37,19 @@ export async function criarPeca(dados: FormData) {
   }
   if (tipo === "carrossel" && paginas.length < 2) {
     throw new Error("Um carrossel precisa de pelo menos duas páginas.");
+  }
+
+  // Teto, além do piso.
+  //
+  // Não é defesa contra invasor — só quem tem sessão do painel chega aqui.
+  // É defesa contra o acidente de selecionar uma pasta inteira no seletor
+  // de arquivos, que criaria um carrossel de centenas de páginas e um
+  // trabalho grande para desfazer. Vinte é o teto das próprias redes de
+  // onde esse conteúdo vem.
+  if (tipo === "carrossel" && paginas.length > MAXIMO_PAGINAS) {
+    throw new Error(
+      `Um carrossel aceita no máximo ${MAXIMO_PAGINAS} páginas.`
+    );
   }
   if (tipo === "imagem" && !capa) {
     throw new Error("Escolha a imagem.");
