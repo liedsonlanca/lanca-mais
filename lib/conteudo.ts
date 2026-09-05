@@ -93,7 +93,9 @@ export async function lerVitrine(): Promise<PecaVitrine[]> {
           ? "video"
           : l.tipo === "carrossel" && imagens.length > 1
             ? "carrossel"
-            : "imagem";
+            : l.tipo === "trinca"
+              ? "trinca"
+              : "imagem";
 
       return {
         src: l.src,

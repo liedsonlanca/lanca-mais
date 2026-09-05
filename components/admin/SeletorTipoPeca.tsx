@@ -4,15 +4,20 @@ import { useId, useState } from "react";
 import CampoArquivo from "./CampoArquivo";
 import CampoPaginasCarrossel from "./CampoPaginasCarrossel";
 
-// Escolha entre os três tipos de peça, uma coisa ou outra.
+// Escolha entre os quatro tipos de peça, uma coisa ou outra.
 //
 // Estático é uma imagem só. Vídeo toca sozinho no trilho, e por isso não pede
 // capa: quem mostra o primeiro quadro é o próprio vídeo. Carrossel é um post
 // de várias imagens, e no trilho aparece só a primeira.
 //
+// Trinca é uma imagem panorâmica, das que ocupam três quadros do feed lado a
+// lado. Guarda exatamente o mesmo que a estática — uma imagem —, e por isso
+// divide o campo de envio com ela. O que muda é só a apresentação: o trilho
+// mostra o recorte central, e ao abrir se vê a peça inteira, larga.
+//
 // O campo escondido leva o tipo escolhido, para o servidor não precisar
 // adivinhar pelo que veio preenchido.
-type Tipo = "imagem" | "video" | "carrossel";
+type Tipo = "imagem" | "video" | "carrossel" | "trinca";
 
 const TIPOS: Array<{ valor: Tipo; rotulo: string }> = [
   // O valor guardado para o estático continua sendo "imagem": renomear
@@ -21,6 +26,7 @@ const TIPOS: Array<{ valor: Tipo; rotulo: string }> = [
   { valor: "imagem", rotulo: "Estático" },
   { valor: "video", rotulo: "Vídeo" },
   { valor: "carrossel", rotulo: "Carrossel" },
+  { valor: "trinca", rotulo: "Trinca" },
 ];
 
 export default function SeletorTipoPeca() {
@@ -74,6 +80,19 @@ export default function SeletorTipoPeca() {
             label="Imagem"
             obrigatorio
             ajuda="JPG, PNG ou WEBP, até 8 MB, em pé (4:5)."
+          />
+        )}
+
+        {/* Mesmo campo da estática, com outra orientação de formato: aqui a
+            imagem é deitada, e mandá-la em pé desperdiçaria a peça. */}
+        {tipo === "trinca" && (
+          <CampoArquivo
+            key="trinca"
+            name="capa"
+            pasta="vitrine"
+            label="Imagem da trinca"
+            obrigatorio
+            ajuda="JPG, PNG ou WEBP, até 8 MB, deitada — os três quadros do feed lado a lado, por volta de 2,4:1. No trilho aparece o recorte do meio; ao abrir, a peça inteira."
           />
         )}
 

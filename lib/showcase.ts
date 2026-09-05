@@ -8,15 +8,22 @@ export type PecaVitrine = {
   src: string;
   alt: string;
   /**
-   * Estático abre ampliado; vídeo abre com player; carrossel abre
-   * folheável.
+   * O que a peça é, e como ela abre.
+   *
+   * - `imagem` — estático, uma imagem no formato do feed. Abre ampliado.
+   * - `video` — toca sozinho no trilho, e abre com som e controles.
+   * - `carrossel` — várias imagens; o trilho mostra a capa e abre folheável.
+   * - `trinca` — uma imagem panorâmica, das que ocupam três quadros do feed
+   *   lado a lado. Guarda exatamente o mesmo que a estática, e é só na
+   *   apresentação que difere: no trilho aparece um recorte, e ao abrir se vê
+   *   a peça inteira, larga como um outdoor.
    *
    * O valor guardado para o estático continua sendo "imagem", e não
    * "estatico": renomear obrigaria a migrar as peças já cadastradas, e um
    * banco meio migrado é pior do que um nome menos bonito. Na tela do
    * painel ele aparece como "Estático", que é como a agência fala.
    */
-  tipo?: "imagem" | "video" | "carrossel";
+  tipo?: "imagem" | "video" | "carrossel" | "trinca";
   /** Arquivo do vídeo, quando `tipo` for "video". */
   video?: string;
   /**

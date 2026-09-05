@@ -29,6 +29,7 @@ export default function Lightbox({
 
   const paginas = peca?.imagens ?? [];
   const ehCarrossel = peca?.tipo === "carrossel" && paginas.length > 1;
+  const ehTrinca = peca?.tipo === "trinca";
 
   // Trocar de peça recomeça a leitura. Sem isto, abrir um carrossel de três
   // páginas na terceira e passar para o próximo o abriria na terceira também
@@ -148,7 +149,16 @@ export default function Lightbox({
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="flex max-h-full w-full max-w-[min(92vw,560px)] flex-col items-center"
+            // A trinca precisa de largura, e não da caixa estreita das outras.
+            //
+            // As demais peças são do formato do feed, em pé, e 560px já as
+            // mostram maiores do que qualquer celular. A trinca é o contrário:
+            // são três quadros lado a lado, perto de 2,4 por 1. Presa naquela
+            // largura ela viraria uma tirinha de dois centímetros de altura, e
+            // o que a peça tem de melhor é justamente a largura.
+            className={`flex max-h-full w-full flex-col items-center ${
+              ehTrinca ? "max-w-[min(96vw,1400px)]" : "max-w-[min(92vw,560px)]"
+            }`}
           >
             {ehCarrossel ? (
               <Carrossel
@@ -172,9 +182,17 @@ export default function Lightbox({
                   <Image
                     src={peca.src}
                     alt={peca.alt}
-                    width={1000}
-                    height={1250}
-                    sizes="(max-width: 640px) 92vw, 560px"
+                    // As medidas dizem ao navegador a proporção esperada, e
+                    // é isso que reserva o espaço certo antes de a imagem
+                    // chegar. Com as da peça em pé, a trinca abriria alta e
+                    // encolheria de repente ao carregar.
+                    width={ehTrinca ? 2400 : 1000}
+                    height={ehTrinca ? 1000 : 1250}
+                    sizes={
+                      ehTrinca
+                        ? "(max-width: 640px) 96vw, 1400px"
+                        : "(max-width: 640px) 92vw, 560px"
+                    }
                     priority
                     className="h-auto max-h-[78vh] w-full object-contain"
                   />

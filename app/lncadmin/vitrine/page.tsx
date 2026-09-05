@@ -48,6 +48,7 @@ function tipoDaPeca(p: Linha) {
   if (p.tipo === "carrossel" && (p.imagens?.length ?? 0) > 1) {
     return "carrossel" as const;
   }
+  if (p.tipo === "trinca") return "trinca" as const;
   return "imagem" as const;
 }
 
@@ -172,7 +173,8 @@ export default async function AdminVitrine() {
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       tipoDaPeca(p) === "video"
                         ? "bg-salmon/15 text-salmon-texto"
-                        : tipoDaPeca(p) === "carrossel"
+                        : tipoDaPeca(p) === "carrossel" ||
+                            tipoDaPeca(p) === "trinca"
                           ? "bg-preto/8 text-preto/70"
                           : "border border-linha text-preto/45"
                     }`}
@@ -181,7 +183,9 @@ export default async function AdminVitrine() {
                       ? "vídeo"
                       : tipoDaPeca(p) === "carrossel"
                         ? `carrossel · ${p.imagens?.length ?? 0}`
-                        : "estático"}
+                        : tipoDaPeca(p) === "trinca"
+                          ? "trinca"
+                          : "estático"}
                   </span>
                 </span>
 
@@ -289,11 +293,18 @@ export default async function AdminVitrine() {
                 />
               )}
 
-              {tipoDaPeca(p) === "imagem" && (
+              {/* Estática e trinca dividem o campo: as duas guardam uma
+                  imagem só, e o que muda entre elas é a apresentação. */}
+              {(tipoDaPeca(p) === "imagem" ||
+                tipoDaPeca(p) === "trinca") && (
                 <CampoArquivo
                   name="capa"
                   pasta="vitrine"
-                  label="Trocar a imagem"
+                  label={
+                    tipoDaPeca(p) === "trinca"
+                      ? "Trocar a imagem da trinca"
+                      : "Trocar a imagem"
+                  }
                 />
               )}
 

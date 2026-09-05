@@ -51,12 +51,16 @@ export async function criarPeca(dados: FormData) {
       `Um carrossel aceita no máximo ${MAXIMO_PAGINAS} páginas.`
     );
   }
-  if (tipo === "imagem" && !capa) {
+  if ((tipo === "imagem" || tipo === "trinca") && !capa) {
     throw new Error("Escolha a imagem.");
   }
 
   // `src` é sempre o que o trilho mostra: a imagem, a primeira página do
   // carrossel, ou nada quando é vídeo, que se desenha sozinho.
+  //
+  // A trinca cai no mesmo caminho da estática, porque guarda a mesma coisa:
+  // uma imagem. A diferença entre as duas vive só na apresentação — o trilho
+  // recorta, e ao abrir se vê a peça inteira.
   const noTrilho =
     tipo === "video" ? "" : tipo === "carrossel" ? paginas[0] : capa;
 

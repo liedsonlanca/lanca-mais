@@ -228,7 +228,9 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                 aria-label={
                   peca.tipo === "carrossel"
                     ? `Abrir carrossel de ${peca.imagens?.length} imagens: ${peca.legenda ?? peca.alt}`
-                    : `Ampliar: ${peca.legenda ?? peca.alt}`
+                    : peca.tipo === "trinca"
+                      ? `Abrir trinca por inteiro: ${peca.legenda ?? peca.alt}`
+                      : `Ampliar: ${peca.legenda ?? peca.alt}`
                 }
                 className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 hover:border-salmon/60 hover:shadow-[0_28px_60px_-30px_rgba(10,10,8,0.6)] focus-visible:border-salmon focus-visible:outline-none sm:w-[240px] lg:w-[280px]"
               >
@@ -261,6 +263,33 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                     pelo trilho não faz hover em nada, e ficaria sem saber
                     que aquele ladrilho guarda mais imagens. O selo diz isso
                     de longe, e o número diz quantas. */}
+                {/* Selo da trinca.
+
+                    O ladrilho mostra só o recorte do meio de uma imagem que é
+                    quase três vezes mais larga. Sem dizer isso, a peça parece
+                    um estático mal enquadrado — e o que ela tem de melhor,
+                    que é a largura, fica escondido atrás de um clique que
+                    ninguém tem motivo para dar. */}
+                {peca.tipo === "trinca" && (
+                  <span
+                    aria-hidden
+                    className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-abismo/65 px-2 py-1 text-[11px] font-medium text-branco backdrop-blur-sm"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinejoin="round"
+                      className="h-3.5 w-3.5"
+                    >
+                      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+                      <path d="M8.8 6v12M15.2 6v12" />
+                    </svg>
+                    trinca
+                  </span>
+                )}
+
                 {peca.tipo === "carrossel" && (
                   <span
                     aria-hidden
