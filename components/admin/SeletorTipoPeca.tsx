@@ -92,7 +92,7 @@ export default function SeletorTipoPeca() {
             pasta="vitrine"
             label="Imagem da trinca"
             obrigatorio
-            ajuda="JPG, PNG ou WEBP, até 8 MB, deitada — os três quadros do feed lado a lado, por volta de 2,4:1. No trilho aparece o recorte do meio; ao abrir, a peça inteira."
+            ajuda="JPG, PNG ou WEBP, até 8 MB, deitada: os três quadros do feed lado a lado, por volta de 2,4:1. No trilho aparece o recorte do meio, e ao abrir, a peça inteira."
           />
         )}
 
