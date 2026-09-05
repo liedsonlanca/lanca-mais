@@ -5,35 +5,14 @@ import CtaFinal from "@/components/CtaFinal";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
+import EquipeTrilho from "@/components/EquipeTrilho";
+import { lerEquipe } from "@/lib/conteudo";
 
 export const metadata: Metadata = {
   title: "Sobre",
   description:
     "Conheça a LANÇA+, agência de marketing completa que atende clientes de todos os nichos com estratégia, conteúdo e identidade de marca.",
 };
-
-const team = [
-  {
-    name: "Liédson Rodrigues",
-    role: "CEO & Social Media",
-    image: "/images/team/liedson-rodrigues.jpg",
-  },
-  {
-    name: "Vitória Dantas",
-    role: "Designer e Arquiteta",
-    image: "/images/team/vitoria-dantas.jpg",
-  },
-  {
-    name: "Diógenes Mesquita",
-    role: "Designer",
-    image: "/images/team/diogenes-mesquita.jpg",
-  },
-  {
-    name: "Silas Oliveira",
-    role: "Filmmaker e Fotógrafo",
-    image: "/images/team/silas-oliveira.jpg",
-  },
-];
 
 const values = [
   {
@@ -58,7 +37,9 @@ const values = [
   },
 ];
 
-export default function SobrePage() {
+export default async function SobrePage() {
+  const equipe = await lerEquipe();
+
   return (
     <>
       <PageHero
@@ -79,8 +60,8 @@ export default function SobrePage() {
                 volta a ter proporção fixa, já que não há coluna vizinha. */}
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl md:aspect-auto md:h-full">
               <Image
-                src="/images/team/LFF_0519_resized.jpg"
-                alt="Time da LANÇA+"
+                src="/images/sobre.webp"
+                alt="Símbolo da LANÇA+"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
@@ -147,9 +128,12 @@ export default function SobrePage() {
         </div>
       </section>
 
-      {/* Time */}
-      <section className="relative overflow-hidden bg-papel">
-        <div className="mx-auto max-w-6xl px-6 py-24 lg:px-10 lg:py-32">
+      {/* Time.
+          Some inteira quando não há ninguém cadastrado: um título "Quem
+          constrói a sua marca" sobre um vazio diz o contrário do que promete. */}
+      {equipe.length > 0 && (
+      <section className="relative overflow-hidden bg-papel py-24 lg:py-32">
+        <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <SectionHeading
             eyebrow="Nosso time"
             alinhamento="esquerda"
@@ -159,47 +143,16 @@ export default function SobrePage() {
             ]}
             lead="Estratégia, social media, design, arquitetura, vídeo e fotografia debaixo do mesmo teto."
           />
-
-          {/* Uma coluna por pessoa: com quatro na equipe, a grade de cinco
-              deixava um vão no fim da fileira e espremia todos os cards para
-              caber a coluna vazia. A largura por card sobe cerca de um terço. */}
-          <Stagger className="mt-14 grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {team.map((member) => (
-              <StaggerItem key={member.name}>
-                {/* A foto ocupa o card inteiro e o nome vem sobre ela, num véu
-                    que sobe no hover. A função fica numa etiqueta salmão, o
-                    mesmo selo de acento usado nas etiquetas do blog. */}
-                <div className="group relative aspect-[3/4] overflow-hidden rounded-3xl border border-linha bg-areia shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:shadow-[0_30px_60px_-36px_rgba(10,10,8,0.55)]">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    sizes="(max-width: 1024px) 50vw, 20vw"
-                    className="object-cover object-top grayscale transition-all duration-[1.2s] group-hover:scale-[1.06] group-hover:grayscale-0"
-                  />
-
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-abismo via-abismo/80 to-transparent p-5 pt-20">
-                    {/* Rótulo sem cápsula: os cargos reais são longos e, em card estreito,
-                        a pílula quebrava em duas linhas com alturas desiguais na fileira. */}
-                    <span className="block text-[11px] font-semibold uppercase leading-tight tracking-[0.14em] text-salmon">
-                      {member.role}
-                    </span>
-                    <h3 className="mt-2.5 text-base font-semibold leading-tight text-branco lg:text-lg">
-                      {member.name}
-                    </h3>
-                    {/* Régua de lançamento, como nas abas e no método. */}
-                    <span
-                      aria-hidden
-                      className="mt-3 block h-[3px] w-8 bg-salmon transition-all duration-700 ease-out group-hover:w-16"
-                    />
-                  </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
-
         </div>
+
+        {/* O trilho sai da caixa central e corre até as bordas da tela. É o
+            que deixa o retrato crescer: preso à caixa, ele voltaria aos 250px
+            de antes. O título fica na caixa, alinhado com o resto da página. */}
+        <Reveal distance={40}>
+          <EquipeTrilho equipe={equipe} />
+        </Reveal>
       </section>
+      )}
 
       <CtaFinal
         titulo="Vamos construir o"

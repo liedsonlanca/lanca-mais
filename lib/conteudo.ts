@@ -3,6 +3,7 @@ import { vitrine as vitrineEstatica, type PecaVitrine } from "@/lib/showcase";
 import { testimonials, stats } from "@/lib/site-config";
 import { caseStudies, type CaseStudy } from "@/lib/portfolio";
 import { clientes, type Cliente } from "@/lib/clients";
+import { equipe as equipeEstatica, type Pessoa } from "@/lib/equipe";
 import { blogPosts, type BlogPost } from "@/lib/blog-posts";
 
 // Leitura do conteúdo editável do site.
@@ -132,6 +133,25 @@ export async function lerDepoimentos(): Promise<Depoimento[]> {
       "SELECT citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"
     )) as Depoimento[];
   }, reserva);
+}
+
+/* ---------------- Equipe ---------------- */
+
+export async function lerEquipe(): Promise<Pessoa[]> {
+  return lerDoBanco(async () => {
+    await semear("equipe", async () => {
+      for (const [i, p] of equipeEstatica.entries()) {
+        await sql!.query(
+          "INSERT INTO equipe (nome, funcao, foto, ordem) VALUES ($1,$2,$3,$4)",
+          [p.nome, p.funcao, p.foto, i]
+        );
+      }
+    });
+
+    return (await sql!.query(
+      "SELECT nome, funcao, foto FROM equipe ORDER BY ordem, id"
+    )) as Pessoa[];
+  }, equipeEstatica);
 }
 
 /* ---------------- Cases ---------------- */

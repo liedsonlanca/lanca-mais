@@ -19,6 +19,13 @@ const SECOES = [
     pronto: true,
   },
   {
+    href: "/lncadmin/equipe",
+    tabela: "equipe",
+    rotulo: "Equipe",
+    descricao: "Quem aparece na página Sobre, com foto e função.",
+    pronto: true,
+  },
+  {
     href: "/lncadmin/cases",
     tabela: "cases",
     rotulo: "Cases",

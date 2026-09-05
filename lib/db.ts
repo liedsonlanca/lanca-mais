@@ -89,6 +89,15 @@ const TABELAS = [
      criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
 
+  `CREATE TABLE IF NOT EXISTS equipe (
+     id         SERIAL PRIMARY KEY,
+     nome       TEXT NOT NULL,
+     funcao     TEXT NOT NULL DEFAULT '',
+     foto       TEXT NOT NULL,
+     ordem      INTEGER NOT NULL DEFAULT 0,
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+
   `CREATE TABLE IF NOT EXISTS logos (
      id         SERIAL PRIMARY KEY,
      nome       TEXT NOT NULL,
