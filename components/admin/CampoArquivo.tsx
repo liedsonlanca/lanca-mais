@@ -29,7 +29,39 @@ type Props = {
   pasta: string;
   ajuda?: string;
   obrigatorio?: boolean;
+  /**
+   * Avisa, sem impedir, quando a imagem escolhida for mais estreita que isto.
+   *
+   * Existe por causa da trinca. Uma peça panorâmica é mostrada no trilho pelo
+   * recorte do meio, ampliada até a altura encaixar: só um terço da largura do
+   * arquivo aparece, e é esse terço que precisa ter pixel. Um arquivo de 1080
+   * de largura, que numa peça estática é de sobra, vira um terço de 360 e
+   * chega borrado.
+   *
+   * Não bloqueia porque não é erro: a peça funciona, só fica menos nítida, e
+   * essa é uma escolha de quem publica. O que faltava era saber disso antes de
+   * o site ir ao ar, e não depois.
+   */
+  larguraMinima?: number;
 };
+
+/** Largura do arquivo escolhido. Zero quando não der para medir. */
+async function medirLargura(arquivo: File) {
+  const endereco = URL.createObjectURL(arquivo);
+  try {
+    const img = document.createElement("img");
+    await new Promise((pronto, falhou) => {
+      img.onload = pronto;
+      img.onerror = falhou;
+      img.src = endereco;
+    });
+    return img.naturalWidth;
+  } catch {
+    return 0;
+  } finally {
+    URL.revokeObjectURL(endereco);
+  }
+}
 
 const ACEITE = {
   imagem: "image/jpeg,image/png,image/webp",
@@ -43,6 +75,7 @@ export default function CampoArquivo({
   pasta,
   ajuda,
   obrigatorio = false,
+  larguraMinima,
 }: Props) {
   const entrada = useRef<HTMLInputElement>(null);
   // useId dá um identificador único por instância: várias peças na mesma
@@ -52,12 +85,14 @@ export default function CampoArquivo({
   const [nome, setNome] = useState("");
   const [progresso, setProgresso] = useState<number | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
 
   function limpar() {
     setUrl("");
     setNome("");
     setProgresso(null);
     setErro(null);
+    setAviso(null);
     if (entrada.current) entrada.current.value = "";
   }
 
@@ -87,8 +122,21 @@ export default function CampoArquivo({
     if (!arquivo) return;
 
     setErro(null);
+    setAviso(null);
     setUrl("");
     setNome(arquivo.name);
+
+    // Mede antes de subir, e não depois: descobrir no fim faria a pessoa
+    // esperar o envio inteiro para só então saber que valia reexportar.
+    if (larguraMinima && aceita === "imagem") {
+      const largura = await medirLargura(arquivo);
+      if (largura > 0 && largura < larguraMinima) {
+        setAviso(
+          `Esta imagem tem ${largura} pixels de largura. No trilho aparece só o terço do meio, então ela vai ficar menos nítida que as outras peças. O ideal são ${larguraMinima} ou mais. Dá para enviar assim mesmo.`
+        );
+      }
+    }
+
     setProgresso(0);
 
     try {
@@ -165,7 +213,19 @@ export default function CampoArquivo({
         </p>
       )}
 
-      {ajuda && !enviando && !erro && (
+      {/* Aviso, não erro: o envio segue, e a peça funciona. Por isso fica em
+          caixa própria em vez de vermelho, e por isso o texto termina dizendo
+          que dá para enviar assim mesmo. */}
+      {aviso && (
+        <p
+          role="status"
+          className="mt-2 rounded-xl border border-linha bg-areia px-3 py-2 text-xs leading-relaxed text-preto/70"
+        >
+          {aviso}
+        </p>
+      )}
+
+      {ajuda && !enviando && !erro && !aviso && (
         <p className="mt-2 text-xs leading-relaxed text-preto/50">{ajuda}</p>
       )}
     </div>

@@ -252,7 +252,24 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                     // Sem isto o navegador inicia o arrasto nativo da imagem e o
                     // gesto do trilho morre no meio.
                     draggable={false}
-                    sizes="(max-width: 640px) 200px, (max-width: 1024px) 240px, 280px"
+                    // A trinca pede o triplo da largura do ladrilho.
+                    //
+                    // `sizes` diz ao navegador qual arquivo baixar, e o que
+                    // vale não é a largura da caixa, é a largura em que a
+                    // imagem acaba desenhada. Com object-cover, uma peça de
+                    // 2,4:1 numa caixa 4:5 é ampliada até a altura encaixar, e
+                    // aí ela fica exatamente três vezes mais larga que a caixa:
+                    // 280 de caixa, 350 de altura, 350 x 2,4 = 840 de imagem.
+                    // Só o terço do meio aparece.
+                    //
+                    // Declarando 280, o navegador baixava um arquivo de 280 e
+                    // o esticava para 840. A peça chegava borrada, e não por
+                    // culpa do arquivo enviado.
+                    sizes={
+                      peca.tipo === "trinca"
+                        ? "(max-width: 640px) 600px, (max-width: 1024px) 720px, 840px"
+                        : "(max-width: 640px) 200px, (max-width: 1024px) 240px, 280px"
+                    }
                     className="object-cover transition-transform duration-[1.2s] group-hover:scale-[1.05]"
                   />
                 )}

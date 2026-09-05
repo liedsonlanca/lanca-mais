@@ -305,6 +305,9 @@ export default async function AdminVitrine() {
                       ? "Trocar a imagem da trinca"
                       : "Trocar a imagem"
                   }
+                  larguraMinima={
+                    tipoDaPeca(p) === "trinca" ? 2400 : undefined
+                  }
                 />
               )}
 
