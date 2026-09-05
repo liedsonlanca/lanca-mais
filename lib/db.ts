@@ -144,18 +144,51 @@ const EVOLUCOES = [
   `ALTER TABLE vitrine ADD COLUMN IF NOT EXISTS imagens TEXT[]`,
 ];
 
+/**
+ * Garante o esquema numa ida só ao banco.
+ *
+ * A memória de que isso já rodou vive na instância do servidor, e a Vercel
+ * desliga instância ociosa. Como o painel é usado de vez em quando, quase toda
+ * visita pegava uma instância fria e pagava o esquema inteiro antes de a
+ * página conseguir ler qualquer coisa.
+ *
+ * Em sequência eram doze idas e voltas até o banco, uma por comando, e cada
+ * ida custa o tempo da rede — não o do banco, que resolve `IF NOT EXISTS` em
+ * microssegundos. Numa transação, os doze viajam juntos numa requisição só.
+ *
+ * A conta muda de doze para uma, e a tela do painel passa de treze idas para
+ * duas: o esquema e a consulta dela.
+ */
 export async function garantirEsquema() {
   if (!sql) return;
 
   if (!criacao) {
+    const banco = sql;
+    const comandos = [...TABELAS, ...EVOLUCOES];
+
     criacao = (async () => {
-      for (const comando of TABELAS) {
-        await sql.query(comando);
+      try {
+        await banco.transaction((txn) =>
+          comandos.map((comando) => txn.query(comando))
+        );
+      } catch {
+        // Volta ao caminho antigo, um comando por vez.
+        //
+        // A transação é a otimização; a corretude não pode depender dela. Se
+        // o driver ou o banco recusarem esse formato, o esquema ainda precisa
+        // existir — e um site servindo conteúdo estático porque o esquema não
+        // subiu seria um preço alto por uma economia de rede.
+        for (const comando of comandos) {
+          await banco.query(comando);
+        }
       }
-      for (const comando of EVOLUCOES) {
-        await sql.query(comando);
-      }
-    })();
+    })().catch((erro) => {
+      // Falhou dos dois jeitos: esquece, para a próxima visita tentar de novo.
+      // Guardada, uma promessa rejeitada envenenaria toda chamada seguinte até
+      // um novo deploy — o banco voltaria e o site continuaria quebrado.
+      criacao = null;
+      throw erro;
+    });
   }
 
   await criacao;
