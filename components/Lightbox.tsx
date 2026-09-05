@@ -150,42 +150,14 @@ export default function Lightbox({
             onClick={(e) => e.stopPropagation()}
             className="flex max-h-full w-full max-w-[min(92vw,560px)] flex-col items-center"
           >
-            {/* Vizinhas espiando dos lados.
-
-                Não são navegáveis nem clicáveis: existem para dizer, num
-                relance, que há mais páginas antes e depois. Sem elas o
-                carrossel parece uma imagem só até alguém arriscar a seta.
-
-                Ficam atrás da atual e para fora da caixa dela, encolhidas e
-                apagadas, e são cortadas pela borda da tela — que é o que dá a
-                sensação de continuidade. `pointer-events-none` para o clique
-                atravessar e fechar o overlay, como em qualquer área vazia. */}
-            <div className="relative w-full">
-              {ehCarrossel &&
-                [-1, 1].map((lado) => {
-                  const vizinha = paginas[pagina + lado];
-                  if (!vizinha) return null;
-
-                  return (
-                    <span
-                      key={lado}
-                      aria-hidden
-                      className={`pointer-events-none absolute inset-y-0 w-full overflow-hidden rounded-3xl opacity-30 ${
-                        lado === -1 ? "right-[62%]" : "left-[62%]"
-                      }`}
-                    >
-                      <Image
-                        src={vizinha}
-                        alt=""
-                        width={1000}
-                        height={1250}
-                        sizes="(max-width: 640px) 60vw, 360px"
-                        className="h-full w-full scale-[0.88] object-cover"
-                      />
-                    </span>
-                  );
-                })}
-
+            {ehCarrossel ? (
+              <Carrossel
+                paginas={paginas}
+                pagina={pagina}
+                aoTrocar={setPagina}
+                alt={peca.alt}
+              />
+            ) : (
               <div className="relative w-full overflow-hidden rounded-3xl border border-borda bg-grafite">
                 {peca.tipo === "video" && peca.video ? (
                   <video
@@ -198,13 +170,8 @@ export default function Lightbox({
                   />
                 ) : (
                   <Image
-                    key={ehCarrossel ? paginas[pagina] : peca.src}
-                    src={ehCarrossel ? paginas[pagina] : peca.src}
-                    alt={
-                      ehCarrossel
-                        ? `${peca.alt} — página ${pagina + 1} de ${paginas.length}`
-                        : peca.alt
-                    }
+                    src={peca.src}
+                    alt={peca.alt}
                     width={1000}
                     height={1250}
                     sizes="(max-width: 640px) 92vw, 560px"
@@ -213,7 +180,7 @@ export default function Lightbox({
                   />
                 )}
               </div>
-            </div>
+            )}
 
             {peca.legenda && (
               <p className="mt-5 max-w-md text-center text-sm text-bege/78">
@@ -229,8 +196,20 @@ export default function Lightbox({
                 shrink-0 porque a coluna que envolve isto tem altura limitada,
                 e filho de flex encolhe por padrão: sem ele os botões perdiam
                 2px e caíam abaixo do mínimo de toque. */}
+            {/* Dizer que é carrossel, e que dá para arrastar.
+
+                As vizinhas espiando sugerem, mas sugestão não é instrução: a
+                pessoa precisa saber que o gesto existe antes de arriscá-lo. O
+                trilho da home usa a mesma frase, e repetir o vocabulário é o
+                que faz o site parecer um só. */}
             {ehCarrossel && (
-              <div className="mt-4 flex shrink-0 items-center">
+              <p className="eyebrow mt-4 shrink-0 text-bege/45">
+                Carrossel · arraste para ver as {paginas.length} páginas
+              </p>
+            )}
+
+            {ehCarrossel && (
+              <div className="mt-3 flex shrink-0 items-center">
                 {paginas.map((_, i) => (
                   <button
                     key={i}
@@ -259,6 +238,101 @@ export default function Lightbox({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/**
+ * As páginas de um carrossel, com as vizinhas espiando dos lados.
+ *
+ * As três ficam empilhadas em posição absoluta e cada uma anima para o próprio
+ * lugar: a atual no centro, inteira; as vizinhas deslocadas, encolhidas e
+ * apagadas. Trocar de página anima as três de uma vez, e é isso que substitui
+ * a troca seca de antes — a imagem nova entra vindo do lado, e não aparecendo
+ * do nada.
+ *
+ * O contêiner tem proporção fixa porque os filhos são absolutos e não lhe dão
+ * altura. 4:5 é o formato do feed, que é o que a agência produz e o que o
+ * painel pede no envio.
+ *
+ * O arrasto move o grupo inteiro com o dedo, e não só troca a página no fim:
+ * sem esse acompanhamento o gesto parece um botão escondido, e é justamente o
+ * que fazia a navegação parecer bruta.
+ */
+function Carrossel({
+  paginas,
+  pagina,
+  aoTrocar,
+  alt,
+}: {
+  paginas: string[];
+  pagina: number;
+  aoTrocar: (nova: number) => void;
+  alt: string;
+}) {
+  // Mola, e não duração fixa: o movimento desacelera como coisa com massa, e
+  // é o que separa "suave" de "lento".
+  const molejo = { type: "spring" as const, stiffness: 260, damping: 34 };
+
+  return (
+    <motion.div
+      drag="x"
+      dragElastic={0.14}
+      dragMomentum={false}
+      dragConstraints={{ left: 0, right: 0 }}
+      onDragEnd={(_, info) => {
+        // Decide por distância ou por velocidade: um empurrão curto e rápido
+        // vale tanto quanto um arrasto longo e lento, que é como o dedo
+        // espera que funcione.
+        const distancia = info.offset.x;
+        const impulso = info.velocity.x;
+        const passou = Math.abs(distancia) > 60 || Math.abs(impulso) > 380;
+        if (!passou) return;
+
+        const destino = distancia < 0 ? pagina + 1 : pagina - 1;
+        if (destino >= 0 && destino < paginas.length) aoTrocar(destino);
+      }}
+      className="relative w-full cursor-grab touch-pan-y active:cursor-grabbing"
+      style={{ aspectRatio: "4 / 5", maxHeight: "72vh" }}
+    >
+      {paginas.map((endereco, i) => {
+        const distancia = i - pagina;
+
+        // Só a atual e as duas vizinhas existem no documento. Um carrossel de
+        // doze páginas não precisa manter dez imagens fora da tela.
+        if (Math.abs(distancia) > 1) return null;
+
+        const atual = distancia === 0;
+
+        return (
+          <motion.div
+            key={endereco}
+            initial={false}
+            animate={{
+              x: `${distancia * 68}%`,
+              scale: atual ? 1 : 0.86,
+              opacity: atual ? 1 : 0.3,
+            }}
+            transition={molejo}
+            style={{ zIndex: atual ? 2 : 1 }}
+            className="absolute inset-0 overflow-hidden rounded-3xl border border-borda bg-grafite"
+          >
+            <Image
+              src={endereco}
+              alt={
+                atual ? `${alt} — página ${i + 1} de ${paginas.length}` : ""
+              }
+              fill
+              sizes="(max-width: 640px) 92vw, 560px"
+              priority={atual}
+              // draggable falso: sem isso o navegador inicia o arrasto nativo
+              // da imagem e o gesto do carrossel morre no meio.
+              draggable={false}
+              className="object-cover"
+            />
+          </motion.div>
+        );
+      })}
+    </motion.div>
   );
 }
 

@@ -59,7 +59,20 @@ export default function CampoPaginasCarrossel({
   }, [pending]);
 
   async function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
-    const arquivos = [...(e.target.files ?? [])];
+    // Ordena pelo nome do arquivo, e não pela ordem em que o sistema os
+    // entrega.
+    //
+    // A janela do Windows devolve os arquivos na ordem em que estavam
+    // listados na tela, que costuma ser do mais recente para o mais antigo:
+    // escolher seis páginas exportadas como 01 a 06 montava o carrossel de
+    // trás para frente. Não é escolha da pessoa, é ordem de exibição — e
+    // respeitá-la é respeitar um acidente.
+    //
+    // A comparação é numérica: sem isso, "10" viria antes de "2", que é o
+    // erro clássico de ordenar número como texto.
+    const arquivos = [...(e.target.files ?? [])].sort((a, b) =>
+      a.name.localeCompare(b.name, "pt-BR", { numeric: true, sensitivity: "base" })
+    );
     if (arquivos.length === 0) return;
 
     setErro(null);
@@ -222,7 +235,7 @@ export default function CampoPaginasCarrossel({
         <p className="mt-3 text-xs leading-relaxed text-preto/50">
           {faltam > 0
             ? `Escolha pelo menos ${MINIMO} imagens. Um carrossel de uma página só é uma peça estática.`
-            : "A primeira é a capa: é ela que aparece no trilho da home. As outras aparecem quando alguém abre a peça. JPG, PNG ou WEBP, até 8 MB cada, em pé (4:5)."}
+            : "As páginas entram na ordem do nome do arquivo, então exportar como 01, 02, 03 já resolve. A primeira é a capa, e é ela que aparece no trilho da home. JPG, PNG ou WEBP, até 8 MB cada, em pé (4:5)."}
         </p>
       )}
     </div>
