@@ -1,5 +1,5 @@
 import QRCode from "qrcode";
-import { segredoTotp } from "@/lib/admin";
+import { segredoTotp, painelLiberado } from "@/lib/admin";
 import { gerarSegredo, uriDeConfiguracao } from "@/lib/totp";
 import { siteConfig } from "@/lib/site-config";
 import { sql } from "@/lib/db";
@@ -18,6 +18,11 @@ import { ativarDuasEtapas, desativarDuasEtapas } from "./acoes";
 export const dynamic = "force-dynamic";
 
 export default async function AdminSeguranca() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const ativo = await segredoTotp();
 
   // Segredo proposto para esta visita. Só vira permanente depois que a pessoa

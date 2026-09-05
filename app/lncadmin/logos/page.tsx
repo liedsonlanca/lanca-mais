@@ -1,4 +1,5 @@
 import CampoArquivo from "@/components/admin/CampoArquivo";
+import { painelLiberado } from "@/lib/admin";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
@@ -26,6 +27,11 @@ async function carregar(): Promise<Linha[]> {
 }
 
 export default async function AdminLogos() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const logos = await carregar();
 
   return (

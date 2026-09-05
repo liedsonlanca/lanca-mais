@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { enviarArquivo } from "@/lib/envio-arquivo";
+import { type Pasta } from "@/lib/pastas";
 
 // Páginas do carrossel.
 //
@@ -20,7 +21,7 @@ import { enviarArquivo } from "@/lib/envio-arquivo";
 type Props = {
   /** Nome dos campos escondidos que levam as URLs ao formulário. */
   name: string;
-  pasta: string;
+  pasta: Pasta;
   /** Páginas já salvas, ao editar uma peça que já existe. */
   inicial?: string[];
 };

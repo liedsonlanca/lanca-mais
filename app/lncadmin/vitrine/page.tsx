@@ -1,4 +1,5 @@
 import CampoArquivo from "@/components/admin/CampoArquivo";
+import { painelLiberado } from "@/lib/admin";
 import CampoPaginasCarrossel from "@/components/admin/CampoPaginasCarrossel";
 import SeletorTipoPeca from "@/components/admin/SeletorTipoPeca";
 import Image from "next/image";
@@ -53,6 +54,11 @@ function tipoDaPeca(p: Linha) {
 }
 
 export default async function AdminVitrine() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const pecas = await carregar();
 
   return (

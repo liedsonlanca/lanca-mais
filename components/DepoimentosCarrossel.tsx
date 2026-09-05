@@ -179,8 +179,12 @@ export default function DepoimentosCarrossel({
 
           {/* O respiro entre os pontos vive no padding de cada botão, e não
               num gap: assim a área de toque de um encosta na do vizinho, sem
-              faixa morta no meio, e o ponto continua do mesmo tamanho. Com
-              44px de altura o alvo deixa de depender da pontaria. */}
+              faixa morta no meio, e o ponto continua do mesmo tamanho.
+
+              A altura já era de 44px, mas a largura ficava em 14, e num alvo
+              de dedo as duas contam: acertar uma tira de 14px de largura no
+              celular é sorte. Agora são 44 nos dois sentidos, e o desenho não
+              muda porque quem cresce é a área invisível em volta do ponto. */}
           <div className="flex items-center">
             {Array.from({ length: paginas }).map((_, i) => (
               <button
@@ -189,7 +193,7 @@ export default function DepoimentosCarrossel({
                 onClick={() => irPara(i)}
                 aria-label={`Ir para a página ${i + 1} de depoimentos`}
                 aria-current={i === pagina}
-                className="flex h-11 items-center justify-center px-1"
+                className="flex h-11 min-w-11 items-center justify-center"
               >
                 <span
                   className={`block h-1.5 rounded-full transition-all duration-500 ${

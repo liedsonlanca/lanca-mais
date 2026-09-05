@@ -1,4 +1,5 @@
 import { sql, garantirEsquema } from "@/lib/db";
+import { painelLiberado } from "@/lib/admin";
 import {
   campo,
   rotulo,
@@ -33,6 +34,11 @@ async function carregar(): Promise<Linha[]> {
 }
 
 export default async function AdminBlog() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const posts = await carregar();
 
   return (
@@ -127,7 +133,7 @@ export default async function AdminBlog() {
             />
           </div>
 
-          <label className="flex items-center gap-3 text-sm text-preto/70">
+          <label className="flex min-h-11 items-center gap-3 text-sm text-preto/70">
             <input
               type="checkbox"
               name="publicado"
@@ -246,7 +252,7 @@ export default async function AdminBlog() {
                 />
               </div>
 
-              <label className="flex items-center gap-3 text-sm text-preto/70">
+              <label className="flex min-h-11 items-center gap-3 text-sm text-preto/70">
                 <input
                   type="checkbox"
                   name="publicado"

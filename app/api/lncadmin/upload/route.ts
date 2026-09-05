@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { estadoDoAdmin } from "@/lib/admin";
+import { pastaValida } from "@/lib/pastas";
 import {
   LIMITE_IMAGEM,
   LIMITE_VIDEO,
@@ -62,8 +63,7 @@ export async function POST(request: Request) {
 
   // A pasta vem do formulário, então é escolhida de uma lista, nunca aceita
   // como texto livre: "../" no meio escreveria fora do lugar previsto.
-  const PASTAS = ["vitrine", "depoimentos", "cases", "logos", "blog"];
-  if (!PASTAS.includes(pasta)) {
+  if (!pastaValida(pasta)) {
     return NextResponse.json({ erro: "Destino inválido." }, { status: 400 });
   }
 

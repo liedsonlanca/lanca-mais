@@ -26,8 +26,11 @@ export const botaoDiscreto =
 export const cartao =
   "rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)]";
 
+// file:py-3: quem se toca aqui e o botao de dentro do campo, e nao o campo.
+// Com file:py-2 ele ficava com 36px de altura, abaixo do alvo minimo, e no
+// celular a pessoa errava para o texto ao lado.
 export const arquivo =
-  "mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto";
+  "mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-5 file:py-3 file:text-sm file:font-medium file:text-salmon-texto";
 
 // min-h-11 e o alvo minimo recomendado no toque (44px). Com py-1 as setas
 // ficavam com 26px e erravam o vizinho no celular.

@@ -1,4 +1,6 @@
 import CampoArquivo from "@/components/admin/CampoArquivo";
+import { campo, rotulo, botao } from "@/components/admin/estilos";
+import { painelLiberado } from "@/lib/admin";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
@@ -27,16 +29,16 @@ async function carregar(): Promise<Linha[]> {
   )) as Linha[];
 }
 
-const campo =
-  "w-full rounded-xl border border-linha bg-branco px-4 py-2.5 text-sm text-preto outline-none transition-colors duration-300 focus:border-salmon";
-const rotulo = "block text-xs font-medium uppercase tracking-wider text-preto/50";
-const botao =
-  "inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-medium transition-colors duration-300";
 
 const AJUDA_FOTO =
   "JPG, PNG ou WEBP, até 8 MB, em pé (3:4). O card mostra a foto alinhada pelo topo, então deixe o rosto na parte de cima. Ela aparece em preto e branco e ganha cor quando o visitante passa o mouse, então fundos limpos funcionam melhor.";
 
 export default async function AdminEquipe() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const equipe = await carregar();
 
   return (

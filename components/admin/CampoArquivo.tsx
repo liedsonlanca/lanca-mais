@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { enviarArquivo } from "@/lib/envio-arquivo";
+import { type Pasta } from "@/lib/pastas";
+import { arquivo } from "@/components/admin/estilos";
 
 // Campo de arquivo do painel.
 //
@@ -26,7 +28,7 @@ type Props = {
   name: string;
   label: string;
   aceita?: "imagem" | "video";
-  pasta: string;
+  pasta: Pasta;
   ajuda?: string;
   obrigatorio?: boolean;
   /**
@@ -169,7 +171,7 @@ export default function CampoArquivo({
         type="file"
         accept={ACEITE[aceita]}
         onChange={aoEscolher}
-        className="mt-2 block w-full text-sm text-preto/70 file:mr-4 file:rounded-full file:border-0 file:bg-salmon/15 file:px-4 file:py-2 file:text-sm file:font-medium file:text-salmon-texto"
+        className={arquivo}
       />
 
       <input type="hidden" name={name} value={url} />

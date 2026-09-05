@@ -1,4 +1,6 @@
 import { sql, garantirEsquema } from "@/lib/db";
+import { campo, botao } from "@/components/admin/estilos";
+import { painelLiberado } from "@/lib/admin";
 import { criarNumero, salvarNumero, apagarNumero, moverNumero } from "./acoes";
 
 export const dynamic = "force-dynamic";
@@ -19,14 +21,15 @@ async function carregar(): Promise<Linha[]> {
   )) as Linha[];
 }
 
-const campo =
-  "w-full rounded-xl border border-linha bg-branco px-4 py-2.5 text-sm text-preto outline-none transition-colors duration-300 focus:border-salmon";
 const rotuloClasse =
   "block text-xs font-medium uppercase tracking-wider text-preto/50";
-const botao =
-  "rounded-full px-5 py-2 text-sm font-medium transition-colors duration-300";
 
 export default async function AdminNumeros() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const numeros = await carregar();
 
   return (

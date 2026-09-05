@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { painelLiberado } from "@/lib/admin";
 import { sql, garantirEsquema } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -75,6 +76,11 @@ async function contar() {
 }
 
 export default async function AdminInicio() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const totais = await contar();
 
   return (

@@ -45,6 +45,23 @@ export async function exigirAdmin() {
   }
 }
 
+/**
+ * Portão das telas do painel. Toda página do painel começa com isto.
+ *
+ * Também não é redundante com o portão do layout, e por um motivo que não é
+ * óbvio: no App Router o layout não decide se a página roda. Os dois são
+ * renderizados, e o layout apenas escolhe se coloca o resultado da página na
+ * tela. Sem sessão, a pessoa via a tela de login, mas a página protegida tinha
+ * rodado assim mesmo — consultado o banco e ido serializada dentro do HTML da
+ * resposta. Invisível na tela, e visível para quem lesse o corpo dela.
+ *
+ * Devolve falso em vez de lançar: quem mostra o login é o layout, e uma página
+ * que estoura no meio disso trocaria a tela de login por uma tela de erro.
+ */
+export async function painelLiberado() {
+  return (await estadoDoAdmin()) === "liberado";
+}
+
 /* ---------------- Segunda etapa ---------------- */
 
 /** Segredo da verificação em duas etapas, ou null quando não está ativada. */

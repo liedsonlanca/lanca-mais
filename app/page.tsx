@@ -421,7 +421,10 @@ export default async function Home() {
                   name="faq-home"
                   className="faq-suave group rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-preto [&::-webkit-details-marker]:hidden">
+                  {/* min-h-11 no summary, e nao no details: o padding do details nao
+                      abre nada ao ser tocado, so o summary abre. Sem isto o
+                      alvo real era a linha de texto, com 28px de altura. */}
+                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-medium text-preto [&::-webkit-details-marker]:hidden">
                     {item.question}
                     <span
                       aria-hidden

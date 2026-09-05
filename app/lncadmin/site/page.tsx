@@ -1,4 +1,5 @@
 import { sql } from "@/lib/db";
+import { painelLiberado } from "@/lib/admin";
 import { lerConfigSite, siteAberto, type ModoSite } from "@/lib/modo-site";
 import {
   campo,
@@ -42,6 +43,11 @@ function partesDoLancamento(iso: string | null) {
 }
 
 export default async function AdminSite() {
+  // Portão próprio, além do layout: no App Router o layout não impede a
+  // página de rodar, só escolhe se a mostra. Sem isto, uma visita sem sessão
+  // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
+  if (!(await painelLiberado())) return null;
+
   const config = await lerConfigSite();
   const aberto = siteAberto(config);
   const { data, hora } = partesDoLancamento(config.lancamento);
