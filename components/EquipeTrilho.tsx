@@ -78,7 +78,7 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
   return (
     <>
       {transborda && (
-        <div className="mt-8 flex justify-end gap-3 px-6 lg:px-10">
+        <div className="mx-auto mt-8 flex max-w-6xl justify-end gap-3 px-6 lg:px-10">
           <button
             type="button"
             onClick={() => passar(-1)}
@@ -140,11 +140,25 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
           tabIndex={0}
           role="group"
           aria-label="Equipe da LANÇA+"
-          // scroll-px acompanha o px: sem ele o snap encosta o primeiro card
-          // na borda do scrollport, que fica dentro do respiro lateral. O
-          // trilho nascia 40px adiantado, o card colado na borda da tela e a
-          // seta de voltar acesa apontando para nada.
-          className="sem-barra flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-px-6 px-6 pb-2 lg:scroll-px-10 lg:px-10"
+          // Alinhado à esquerda com o título, solto à direita.
+          //
+          // A margem esquerda repete a conta da caixa central: metade do que
+          // sobra da tela além dos 72rem, mais o respiro de 2,5rem. Sem isso o
+          // primeiro card começava colado na borda enquanto o título começava
+          // no meio da tela, e numa tela de 1920 os dois ficavam a 380px de
+          // distância um do outro, com um vão vazio do outro lado.
+          //
+          // O max() cobre as telas menores que a caixa, onde a conta daria
+          // negativo e o valor certo é o próprio respiro.
+          //
+          // A direita continua livre para o card sair da tela: é ela que diz
+          // que o trilho anda.
+          //
+          // scroll-px acompanha o padding: sem ele o snap encosta o primeiro
+          // card na borda do scrollport, que fica dentro do respiro. O trilho
+          // nascia adiantado, o card colado na borda e a seta de voltar acesa
+          // apontando para nada.
+          className="sem-barra flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-pl-6 pb-2 pl-6 pr-6 lg:scroll-pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pl-[max(2.5rem,calc((100%_-_72rem)_/_2_+_2.5rem))] lg:pr-10"
         >
           {equipe.map((pessoa) => (
             <div
