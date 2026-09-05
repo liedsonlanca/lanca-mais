@@ -225,7 +225,11 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                   if (houveArrasto.current) return;
                   setAberta(indiceReal);
                 }}
-                aria-label={`Ampliar: ${peca.legenda ?? peca.alt}`}
+                aria-label={
+                  peca.tipo === "carrossel"
+                    ? `Abrir carrossel de ${peca.imagens?.length} imagens: ${peca.legenda ?? peca.alt}`
+                    : `Ampliar: ${peca.legenda ?? peca.alt}`
+                }
                 className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 hover:border-salmon/60 hover:shadow-[0_28px_60px_-30px_rgba(10,10,8,0.6)] focus-visible:border-salmon focus-visible:outline-none sm:w-[240px] lg:w-[280px]"
               >
                 {peca.tipo === "video" && peca.video ? (
@@ -249,6 +253,32 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                     sizes="(max-width: 640px) 200px, (max-width: 1024px) 240px, 280px"
                     className="object-cover transition-transform duration-[1.2s] group-hover:scale-[1.05]"
                   />
+                )}
+
+                {/* Selo do carrossel, sempre visível.
+
+                    O ícone do hover não serve para isto: quem passa a vista
+                    pelo trilho não faz hover em nada, e ficaria sem saber
+                    que aquele ladrilho guarda mais imagens. O selo diz isso
+                    de longe, e o número diz quantas. */}
+                {peca.tipo === "carrossel" && (
+                  <span
+                    aria-hidden
+                    className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-abismo/65 px-2 py-1 text-[11px] font-medium text-branco backdrop-blur-sm"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinejoin="round"
+                      className="h-3.5 w-3.5"
+                    >
+                      <rect x="8" y="3" width="13" height="13" rx="2.5" />
+                      <path d="M16 19.5A1.5 1.5 0 0 1 14.5 21H5.5A2.5 2.5 0 0 1 3 18.5V9" />
+                    </svg>
+                    {peca.imagens?.length}
+                  </span>
                 )}
 
                 <span

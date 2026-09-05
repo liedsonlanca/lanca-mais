@@ -44,29 +44,66 @@ export async function lerVitrine(): Promise<PecaVitrine[]> {
     await semear("vitrine", async () => {
       for (const [i, peca] of vitrineEstatica.entries()) {
         await sql!.query(
-          "INSERT INTO vitrine (src, alt, tipo, video, legenda, ordem) VALUES ($1,$2,$3,$4,$5,$6)",
-          [peca.src, peca.alt, peca.tipo ?? "imagem", peca.video ?? null, peca.legenda ?? null, i]
+          "INSERT INTO vitrine (src, alt, tipo, video, legenda, imagens, ordem) VALUES ($1,$2,$3,$4,$5,$6,$7)",
+          [
+            peca.src,
+            peca.alt,
+            peca.tipo ?? "imagem",
+            peca.video ?? null,
+            peca.legenda ?? null,
+            peca.imagens ?? null,
+            i,
+          ]
         );
       }
     });
 
-    const linhas = (await sql!.query(
-      "SELECT src, alt, tipo, video, legenda FROM vitrine ORDER BY ordem, id"
-    )) as Array<{
+    type Linha = {
       src: string;
       alt: string;
       tipo: string;
       video: string | null;
       legenda: string | null;
-    }>;
+      imagens?: string[] | null;
+    };
 
-    return linhas.map((l) => ({
-      src: l.src,
-      alt: l.alt,
-      tipo: l.tipo === "video" ? ("video" as const) : ("imagem" as const),
-      video: l.video ?? undefined,
-      legenda: l.legenda ?? undefined,
-    }));
+    // A coluna `imagens` é recente. Se a evolução do esquema ainda não tiver
+    // rodado neste banco, a consulta falha inteira e o trilho sumiria da home
+    // — foi assim que a faixa de logos desapareceu uma vez. Melhor a peça
+    // aparecer sem as páginas extras do que a home aparecer sem o trilho.
+    let linhas: Linha[];
+    try {
+      linhas = (await sql!.query(
+        "SELECT src, alt, tipo, video, legenda, imagens FROM vitrine ORDER BY ordem, id"
+      )) as Linha[];
+    } catch {
+      linhas = (await sql!.query(
+        "SELECT src, alt, tipo, video, legenda FROM vitrine ORDER BY ordem, id"
+      )) as Linha[];
+    }
+
+    return linhas.map((l) => {
+      const imagens = (l.imagens ?? []).filter(Boolean);
+
+      // Carrossel sem imagens guardadas volta a ser peça de uma imagem só:
+      // sem página nenhuma para folhear, abrir folheável seria uma promessa
+      // vazia.
+      const tipo: PecaVitrine["tipo"] =
+        l.tipo === "video"
+          ? "video"
+          : l.tipo === "carrossel" && imagens.length > 1
+            ? "carrossel"
+            : "imagem";
+
+      return {
+        src: l.src,
+        alt: l.alt,
+        tipo,
+        video: l.video ?? undefined,
+        legenda: l.legenda ?? undefined,
+        imagens: tipo === "carrossel" ? imagens : undefined,
+      };
+    });
   }, vitrineEstatica);
 }
 

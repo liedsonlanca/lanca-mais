@@ -1,4 +1,5 @@
 import CampoArquivo from "@/components/admin/CampoArquivo";
+import CampoPaginasCarrossel from "@/components/admin/CampoPaginasCarrossel";
 import SeletorTipoPeca from "@/components/admin/SeletorTipoPeca";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
@@ -30,14 +31,24 @@ type Linha = {
   tipo: string;
   video: string | null;
   legenda: string | null;
+  imagens: string[] | null;
 };
 
 async function carregar(): Promise<Linha[]> {
   if (!sql) return [];
   await garantirEsquema();
   return (await sql.query(
-    "SELECT id, src, alt, tipo, video, legenda FROM vitrine ORDER BY ordem, id"
+    "SELECT id, src, alt, tipo, video, legenda, imagens FROM vitrine ORDER BY ordem, id"
   )) as Linha[];
+}
+
+/** O que a peça é, decidido num lugar só. */
+function tipoDaPeca(p: Linha) {
+  if (p.video) return "video" as const;
+  if (p.tipo === "carrossel" && (p.imagens?.length ?? 0) > 1) {
+    return "carrossel" as const;
+  }
+  return "imagem" as const;
 }
 
 export default async function AdminVitrine() {
@@ -159,12 +170,18 @@ export default async function AdminVitrine() {
                       visível de relance enquanto se monta a sequência. */}
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      p.video
+                      tipoDaPeca(p) === "video"
                         ? "bg-salmon/15 text-salmon-texto"
-                        : "border border-linha text-preto/45"
+                        : tipoDaPeca(p) === "carrossel"
+                          ? "bg-preto/8 text-preto/70"
+                          : "border border-linha text-preto/45"
                     }`}
                   >
-                    {p.video ? "vídeo" : "imagem"}
+                    {tipoDaPeca(p) === "video"
+                      ? "vídeo"
+                      : tipoDaPeca(p) === "carrossel"
+                        ? `carrossel · ${p.imagens?.length ?? 0}`
+                        : "estático"}
                   </span>
                 </span>
 
@@ -252,16 +269,27 @@ export default async function AdminVitrine() {
                 />
               </div>
 
-              {/* Só o campo do tipo que a peça já é: trocar imagem por vídeo
-                  seria outra peça, e é mais claro apagar e criar de novo. */}
-              {p.video ? (
+              {/* Só o campo do tipo que a peça já é: trocar estático por
+                  vídeo seria outra peça, e é mais claro apagar e criar de
+                  novo. */}
+              {tipoDaPeca(p) === "video" && (
                 <CampoArquivo
                   name="video"
                   pasta="vitrine"
                   aceita="video"
                   label="Trocar o vídeo"
                 />
-              ) : (
+              )}
+
+              {tipoDaPeca(p) === "carrossel" && (
+                <CampoPaginasCarrossel
+                  name="paginas"
+                  pasta="vitrine"
+                  inicial={p.imagens ?? []}
+                />
+              )}
+
+              {tipoDaPeca(p) === "imagem" && (
                 <CampoArquivo
                   name="capa"
                   pasta="vitrine"

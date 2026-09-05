@@ -51,6 +51,24 @@ export function marcado(dados: FormData, campo: string) {
  * isto, alguém poderia gravar o endereço de uma imagem de fora e fazer o site
  * servir conteúdo de terceiro.
  */
+/** A regra de origem, num lugar só: as duas versões abaixo usam esta. */
+function conferirUrl(valor: string) {
+  let host = "";
+  try {
+    const endereco = new URL(valor);
+    if (endereco.protocol !== "https:") return null;
+    host = endereco.hostname;
+  } catch {
+    return null;
+  }
+
+  const conhecido =
+    (HOST_PUBLICO && host === HOST_PUBLICO) ||
+    host.endsWith(".blob.vercel-storage.com");
+
+  return conhecido ? valor : null;
+}
+
 export function urlEnviada(dados: FormData, campo: string) {
   const valor = texto(dados, campo);
   if (!valor) return null;
@@ -59,24 +77,29 @@ export function urlEnviada(dados: FormData, campo: string) {
   // peças enviadas antes da mudança para o R2. Elas seguem válidas até serem
   // substituídas; recusar aqui impediria de salvar uma legenda numa peça
   // antiga sem reenviar o arquivo.
-  let host = "";
-  try {
-    const endereco = new URL(valor);
-    if (endereco.protocol !== "https:") throw new Error("http");
-    host = endereco.hostname;
-  } catch {
-    throw new Error("Endereço de arquivo inválido.");
-  }
+  const conferido = conferirUrl(valor);
+  if (!conferido) throw new Error("Endereço de arquivo inválido.");
+  return conferido;
+}
 
-  const conhecido =
-    (HOST_PUBLICO && host === HOST_PUBLICO) ||
-    host.endsWith(".blob.vercel-storage.com");
-
-  if (!conhecido) {
-    throw new Error("Endereço de arquivo inválido.");
-  }
-
-  return valor;
+/**
+ * Vários endereços do mesmo campo, na ordem em que chegaram.
+ *
+ * As páginas de um carrossel vão ao formulário como campos escondidos de
+ * mesmo nome, e a ordem do DOM é a ordem que chega aqui. Cada uma passa pela
+ * mesma checagem de origem da versão de um arquivo só: sem isso, alguém
+ * poderia gravar o endereço de uma imagem de fora e fazer o site servir
+ * conteúdo de terceiro.
+ */
+export function urlsEnviadas(dados: FormData, campo: string) {
+  return dados
+    .getAll(campo)
+    .filter((v): v is string => typeof v === "string" && v.trim() !== "")
+    .map((valor) => {
+      const conferido = conferirUrl(valor.trim());
+      if (!conferido) throw new Error("Endereço de arquivo inválido.");
+      return conferido;
+    });
 }
 
 /** Próxima posição no fim da lista. */

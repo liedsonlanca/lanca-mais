@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { enviarArquivo } from "@/lib/envio-arquivo";
 
 // Campo de arquivo do painel.
 //
@@ -10,8 +11,8 @@ import { useFormStatus } from "react-dom";
 // escondido. O arquivo nunca passa pela função da Vercel, que tem teto de
 // 4,5 MB por requisição — era o que derrubava a página ao salvar vídeo.
 //
-// São dois passos: o servidor assina uma URL de uso único (conferindo sessão,
-// tipo e tamanho), e o navegador manda o arquivo para lá.
+// O handshake com o armazenamento vive em lib/envio-arquivo, compartilhado
+// com o campo das páginas do carrossel.
 //
 // Efeito colateral bom: ao clicar em Salvar o arquivo já subiu, então o
 // formulário responde na hora em vez de segurar a página durante o upload.
@@ -91,47 +92,8 @@ export default function CampoArquivo({
     setProgresso(0);
 
     try {
-      // 1. Pedir autorização. O servidor decide o nome, confere o tipo e o
-      //    tamanho, e devolve uma URL que vale cinco minutos.
-      const resposta = await fetch("/api/lncadmin/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome: arquivo.name,
-          tipo: arquivo.type,
-          tamanho: arquivo.size,
-          pasta,
-          aceita,
-        }),
-      });
-
-      const dados = await resposta.json();
-      if (!resposta.ok) throw new Error(dados?.erro ?? "Envio recusado.");
-
-      // 2. Mandar o arquivo. XMLHttpRequest, e não fetch, porque só ele
-      //    informa o progresso do envio — e sem a barra um vídeo de 12 MB
-      //    parece a página travada.
-      await new Promise<void>((resolver, rejeitar) => {
-        const pedido = new XMLHttpRequest();
-        pedido.open("PUT", dados.envio);
-        pedido.setRequestHeader("Content-Type", arquivo.type);
-
-        pedido.upload.onprogress = (evento) => {
-          if (evento.lengthComputable) {
-            setProgresso((evento.loaded / evento.total) * 100);
-          }
-        };
-
-        pedido.onload = () =>
-          pedido.status >= 200 && pedido.status < 300
-            ? resolver()
-            : rejeitar(new Error("O armazenamento recusou o arquivo."));
-
-        pedido.onerror = () => rejeitar(new Error("Falha de conexão no envio."));
-        pedido.send(arquivo);
-      });
-
-      setUrl(dados.url);
+      const endereco = await enviarArquivo(arquivo, pasta, aceita, setProgresso);
+      setUrl(endereco);
       setProgresso(100);
     } catch (falha) {
       limpar();

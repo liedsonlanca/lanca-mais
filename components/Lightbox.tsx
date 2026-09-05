@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { pararRolagem, retomarRolagem } from "@/lib/scroll";
 import type { PecaVitrine } from "@/lib/showcase";
@@ -14,19 +14,56 @@ type Props = {
   aoNavegar: (novoIndice: number) => void;
 };
 
-export default function Lightbox({ pecas, indice, aoFechar, aoNavegar }: Props) {
+export default function Lightbox({
+  pecas,
+  indice,
+  aoFechar,
+  aoNavegar,
+}: Props) {
   const aberto = indice !== null;
   const peca = aberto ? pecas[indice] : null;
 
+  // Página aberta dentro de um carrossel. Nas outras peças fica em zero e
+  // não faz diferença nenhuma.
+  const [pagina, setPagina] = useState(0);
+
+  const paginas = peca?.imagens ?? [];
+  const ehCarrossel = peca?.tipo === "carrossel" && paginas.length > 1;
+
+  // Trocar de peça recomeça a leitura. Sem isto, abrir um carrossel de três
+  // páginas na terceira e passar para o próximo o abriria na terceira também
+  // — ou num índice que ele nem tem.
+  //
+  // O ajuste é feito durante a renderização, e não num efeito: reiniciar
+  // estado quando uma propriedade muda é derivação, não sincronização com o
+  // mundo de fora. No efeito, a página errada chegaria a ser desenhada antes
+  // da correção, e o leitor veria um pisca.
+  const [pecaAnterior, setPecaAnterior] = useState(indice);
+  if (indice !== pecaAnterior) {
+    setPecaAnterior(indice);
+    setPagina(0);
+  }
+
+  // As setas atravessam os dois níveis: folheiam as páginas do carrossel e,
+  // ao chegar na ponta, passam para a peça vizinha. É a leitura contínua de
+  // quem folheia uma revista, e evita o beco de uma seta que não faz nada.
   const anterior = useCallback(() => {
     if (indice === null) return;
+    if (ehCarrossel && pagina > 0) {
+      setPagina((p) => p - 1);
+      return;
+    }
     aoNavegar((indice - 1 + pecas.length) % pecas.length);
-  }, [indice, pecas.length, aoNavegar]);
+  }, [indice, pecas.length, aoNavegar, ehCarrossel, pagina]);
 
   const proxima = useCallback(() => {
     if (indice === null) return;
+    if (ehCarrossel && pagina < paginas.length - 1) {
+      setPagina((p) => p + 1);
+      return;
+    }
     aoNavegar((indice + 1) % pecas.length);
-  }, [indice, pecas.length, aoNavegar]);
+  }, [indice, pecas.length, aoNavegar, ehCarrossel, pagina, paginas.length]);
 
   // Teclado: Esc fecha, setas navegam.
   useEffect(() => {
@@ -113,26 +150,69 @@ export default function Lightbox({ pecas, indice, aoFechar, aoNavegar }: Props) 
             onClick={(e) => e.stopPropagation()}
             className="flex max-h-full w-full max-w-[min(92vw,560px)] flex-col items-center"
           >
-            <div className="relative w-full overflow-hidden rounded-3xl border border-borda bg-grafite">
-              {peca.tipo === "video" && peca.video ? (
-                <video
-                  src={peca.video}
-                  poster={peca.src}
-                  controls
-                  autoPlay
-                  playsInline
-                  className="h-auto max-h-[78vh] w-full"
-                />
-              ) : (
-                <Image
-                  src={peca.src}
-                  alt={peca.alt}
-                  width={1000}
-                  height={1250}
-                  sizes="(max-width: 640px) 92vw, 560px"
-                  className="h-auto max-h-[78vh] w-full object-contain"
-                />
-              )}
+            {/* Vizinhas espiando dos lados.
+
+                Não são navegáveis nem clicáveis: existem para dizer, num
+                relance, que há mais páginas antes e depois. Sem elas o
+                carrossel parece uma imagem só até alguém arriscar a seta.
+
+                Ficam atrás da atual e para fora da caixa dela, encolhidas e
+                apagadas, e são cortadas pela borda da tela — que é o que dá a
+                sensação de continuidade. `pointer-events-none` para o clique
+                atravessar e fechar o overlay, como em qualquer área vazia. */}
+            <div className="relative w-full">
+              {ehCarrossel &&
+                [-1, 1].map((lado) => {
+                  const vizinha = paginas[pagina + lado];
+                  if (!vizinha) return null;
+
+                  return (
+                    <span
+                      key={lado}
+                      aria-hidden
+                      className={`pointer-events-none absolute inset-y-0 w-full overflow-hidden rounded-3xl opacity-30 ${
+                        lado === -1 ? "right-[62%]" : "left-[62%]"
+                      }`}
+                    >
+                      <Image
+                        src={vizinha}
+                        alt=""
+                        width={1000}
+                        height={1250}
+                        sizes="(max-width: 640px) 60vw, 360px"
+                        className="h-full w-full scale-[0.88] object-cover"
+                      />
+                    </span>
+                  );
+                })}
+
+              <div className="relative w-full overflow-hidden rounded-3xl border border-borda bg-grafite">
+                {peca.tipo === "video" && peca.video ? (
+                  <video
+                    src={peca.video}
+                    poster={peca.src}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="h-auto max-h-[78vh] w-full"
+                  />
+                ) : (
+                  <Image
+                    key={ehCarrossel ? paginas[pagina] : peca.src}
+                    src={ehCarrossel ? paginas[pagina] : peca.src}
+                    alt={
+                      ehCarrossel
+                        ? `${peca.alt} — página ${pagina + 1} de ${paginas.length}`
+                        : peca.alt
+                    }
+                    width={1000}
+                    height={1250}
+                    sizes="(max-width: 640px) 92vw, 560px"
+                    priority
+                    className="h-auto max-h-[78vh] w-full object-contain"
+                  />
+                )}
+              </div>
             </div>
 
             {peca.legenda && (
@@ -141,7 +221,38 @@ export default function Lightbox({ pecas, indice, aoFechar, aoNavegar }: Props) 
               </p>
             )}
 
-            <p className="mt-3 text-xs uppercase tracking-widest text-bege/50">
+            {/* Pontos das páginas, no padrão que o trilho de depoimentos já
+                usa. O respiro vive no padding de cada botão, e não num gap:
+                assim a área de toque de um encosta na do vizinho, sem faixa
+                morta no meio.
+
+                shrink-0 porque a coluna que envolve isto tem altura limitada,
+                e filho de flex encolhe por padrão: sem ele os botões perdiam
+                2px e caíam abaixo do mínimo de toque. */}
+            {ehCarrossel && (
+              <div className="mt-4 flex shrink-0 items-center">
+                {paginas.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setPagina(i)}
+                    aria-label={`Ir para a página ${i + 1}`}
+                    aria-current={i === pagina}
+                    className="flex h-11 items-center justify-center px-1"
+                  >
+                    <span
+                      className={`block h-1.5 rounded-full transition-all duration-500 ${
+                        i === pagina ? "w-6 bg-salmon" : "w-1.5 bg-bege/30"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <p
+              className={`text-xs uppercase tracking-widest text-bege/50 ${ehCarrossel ? "mt-1" : "mt-3"}`}
+            >
               {(indice ?? 0) + 1} / {pecas.length}
             </p>
           </motion.div>
@@ -181,7 +292,11 @@ function BotaoNavegacao({
         strokeLinejoin="round"
         className="h-5 w-5"
       >
-        {lado === "esquerda" ? <path d="M15 5l-7 7 7 7" /> : <path d="M9 5l7 7-7 7" />}
+        {lado === "esquerda" ? (
+          <path d="M15 5l-7 7 7 7" />
+        ) : (
+          <path d="M9 5l7 7-7 7" />
+        )}
       </svg>
     </button>
   );

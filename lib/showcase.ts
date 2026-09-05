@@ -1,11 +1,31 @@
 export type PecaVitrine = {
-  /** Miniatura exibida no trilho. Formato 4:5 (feed). */
+  /**
+   * Capa exibida no trilho. Formato 4:5 (feed).
+   *
+   * No carrossel é a primeira imagem: o trilho mostra só ela, e as demais
+   * aparecem ao abrir a peça.
+   */
   src: string;
   alt: string;
-  /** Imagem abre ampliada; vídeo abre com player. */
-  tipo?: "imagem" | "video";
+  /**
+   * Estático abre ampliado; vídeo abre com player; carrossel abre
+   * folheável.
+   *
+   * O valor guardado para o estático continua sendo "imagem", e não
+   * "estatico": renomear obrigaria a migrar as peças já cadastradas, e um
+   * banco meio migrado é pior do que um nome menos bonito. Na tela do
+   * painel ele aparece como "Estático", que é como a agência fala.
+   */
+  tipo?: "imagem" | "video" | "carrossel";
   /** Arquivo do vídeo, quando `tipo` for "video". */
   video?: string;
+  /**
+   * Imagens do carrossel, em ordem, incluindo a capa na primeira posição.
+   *
+   * Fica só no carrossel. Peça estática tem uma imagem, e ela vive em
+   * `src` — duplicá-la aqui criaria duas fontes para a mesma verdade.
+   */
+  imagens?: string[];
   /** Legenda mostrada no rodapé da visualização em tela cheia. */
   legenda?: string;
 };

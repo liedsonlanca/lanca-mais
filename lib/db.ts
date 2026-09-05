@@ -135,6 +135,13 @@ const EVOLUCOES = [
   // mesma caixa, um parece enorme e o outro minúsculo, e não há cálculo que
   // resolva isso — o vazio faz parte da imagem. Quem equilibra é o olho.
   `ALTER TABLE logos ADD COLUMN IF NOT EXISTS escala INTEGER NOT NULL DEFAULT 100`,
+  // Imagens do carrossel, em ordem, com a capa na primeira posição.
+  //
+  // Vai como array na própria linha, e não numa tabela à parte: são poucas
+  // imagens por peça, sempre lidas junto com ela e nunca sozinhas. Uma
+  // tabela filha custaria uma junção em toda leitura da home para resolver
+  // um problema que não existe neste tamanho.
+  `ALTER TABLE vitrine ADD COLUMN IF NOT EXISTS imagens TEXT[]`,
 ];
 
 export async function garantirEsquema() {
