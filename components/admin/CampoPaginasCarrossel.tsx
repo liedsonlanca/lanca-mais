@@ -39,12 +39,23 @@ export default function CampoPaginasCarrossel({
   const [enviando, setEnviando] = useState<{ feitas: number; total: number } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  // Ao terminar de salvar, o campo volta ao que está guardado. Sem isso as
-  // páginas recém-enviadas ficariam na tela como se ainda estivessem pendentes,
-  // e um segundo Salvar reaplicaria tudo.
+  // Ao terminar de salvar, o campo volta ao que está guardado.
+  //
+  // `inicial` é a resposta certa nos dois formulários, e é por isso que o
+  // reinício usa ela em vez de uma lista vazia: no de acrescentar ela é vazia,
+  // então o campo limpa; no de editar ela chega com o que acabou de ser
+  // gravado, então o campo passa a refletir o salvo.
+  //
+  // O componente não é remontado ao salvar — a revalidação reaproveita esta
+  // instância —, então sem este reinício as miniaturas enviadas continuavam na
+  // tela depois de aplicadas, e um segundo Salvar reaplicaria tudo.
   const { pending } = useFormStatus();
   const salvando = useRef(false);
 
+  // `inicial` entra nas dependências mesmo trocando de identidade a cada
+  // renderização: as execuções extras não fazem nada, porque tudo aqui está
+  // atrás da bandeira, e é assim que o efeito sempre enxerga a lista salva
+  // mais recente sem escrever numa ref durante a renderização.
   useEffect(() => {
     if (pending) {
       salvando.current = true;
@@ -52,11 +63,12 @@ export default function CampoPaginasCarrossel({
     }
     if (salvando.current) {
       salvando.current = false;
+      setPaginas(inicial);
       setEnviando(null);
       setErro(null);
       if (entrada.current) entrada.current.value = "";
     }
-  }, [pending]);
+  }, [pending, inicial]);
 
   async function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
     // Ordena pelo nome do arquivo, e não pela ordem em que o sistema os
