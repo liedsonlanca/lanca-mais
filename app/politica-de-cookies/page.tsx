@@ -61,14 +61,14 @@ export default function PoliticaDeCookies() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   Acesso antecipado
                 </strong>{" "}
                 — lembra que você digitou a senha, enquanto o site ainda não
                 está aberto ao público. Dura 30 minutos parado.
               </>,
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   Sessão do painel
                 </strong>{" "}
                 — mantém a equipe da {siteConfig.name} conectada à área de
@@ -90,7 +90,7 @@ export default function PoliticaDeCookies() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   Medição de audiência
                 </strong>{" "}
                 — Google Analytics. Mostra quantas pessoas visitam, de onde vêm
@@ -98,7 +98,7 @@ export default function PoliticaDeCookies() {
                 o site.
               </>,
               <>
-                <strong className="font-medium text-preto">Marketing</strong> —
+                <strong className="font-medium text-tinta">Marketing</strong> —
                 Pixel da Meta. Mede o resultado dos nossos anúncios e permite
                 mostrar conteúdo da {siteConfig.name} para quem já demonstrou
                 interesse.
@@ -125,7 +125,7 @@ export default function PoliticaDeCookies() {
         <Secao titulo="Como mudar de ideia">
           <p>
             No rodapé de qualquer página existe o link{" "}
-            <strong className="font-medium text-preto">Gerenciar cookies</strong>
+            <strong className="font-medium text-tinta">Gerenciar cookies</strong>
             . Ele reabre a mesma escolha, com o que você marcou da última vez. Ao
             retirar uma permissão, a página recarrega para que nada continue
             rodando por inércia.
@@ -137,21 +137,21 @@ export default function PoliticaDeCookies() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">Chrome</strong> —
+                <strong className="font-medium text-tinta">Chrome</strong> —
                 Configurações, Privacidade e segurança, Cookies e outros dados
                 do site
               </>,
               <>
-                <strong className="font-medium text-preto">Safari</strong> —
+                <strong className="font-medium text-tinta">Safari</strong> —
                 Ajustes, Safari, Privacidade e segurança
               </>,
               <>
-                <strong className="font-medium text-preto">Firefox</strong> —
+                <strong className="font-medium text-tinta">Firefox</strong> —
                 Configurações, Privacidade e Segurança, Cookies e dados de
                 sites
               </>,
               <>
-                <strong className="font-medium text-preto">Edge</strong> —
+                <strong className="font-medium text-tinta">Edge</strong> —
                 Configurações, Cookies e permissões de site
               </>,
             ]}
@@ -176,7 +176,7 @@ export default function PoliticaDeCookies() {
                   href="https://policies.google.com/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+                  className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
                 >
                   Política de Privacidade do Google
                 </a>{" "}
@@ -187,7 +187,7 @@ export default function PoliticaDeCookies() {
                   href="https://www.facebook.com/privacy/policy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+                  className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
                 >
                   Política de Privacidade da Meta
                 </a>{" "}
@@ -211,7 +211,7 @@ export default function PoliticaDeCookies() {
             Escreva para{" "}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               {siteConfig.email}
             </a>
@@ -219,7 +219,7 @@ export default function PoliticaDeCookies() {
             a{" "}
             <Link
               href="/politica-de-privacidade"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Política de Privacidade
             </Link>

@@ -100,7 +100,7 @@ export default function DepoimentosCarrossel({
             // A conta desconta o vão entre eles para o terceiro não vazar.
             className="w-full shrink-0 snap-start sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
           >
-            <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco">
+            <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-cartao">
               <span
                 aria-hidden
                 className="absolute inset-x-0 top-0 h-1 w-0 bg-salmon transition-all duration-700 group-hover:w-full"
@@ -113,11 +113,11 @@ export default function DepoimentosCarrossel({
                 &ldquo;
               </span>
 
-              <p className="mt-7 flex-1 text-[17px] leading-relaxed text-preto/85">
+              <p className="mt-7 flex-1 text-[17px] leading-relaxed text-tinta/85">
                 {depoimento.citacao}
               </p>
 
-              <div className="mt-8 flex items-center gap-4 border-t border-linha pt-6">
+              <div className="mt-8 flex items-center gap-4 border-t border-contorno pt-6">
                 {depoimento.foto ? (
                   <Image
                     src={depoimento.foto}
@@ -129,7 +129,7 @@ export default function DepoimentosCarrossel({
                 ) : (
                   <span
                     aria-hidden
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-salmon-texto"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-destaque"
                   >
                     {depoimento.nome
                       .replace(/[^A-Za-zÀ-ÿ ]/g, "")
@@ -140,10 +140,10 @@ export default function DepoimentosCarrossel({
                 )}
 
                 <span>
-                  <span className="block font-semibold text-preto">
+                  <span className="block font-semibold text-tinta">
                     {depoimento.nome}
                   </span>
-                  <span className="block text-sm text-preto/60">
+                  <span className="block text-sm text-tinta/60">
                     {depoimento.cargo}
                   </span>
                 </span>
@@ -162,7 +162,7 @@ export default function DepoimentosCarrossel({
             onClick={() => irPara(Math.max(0, pagina - 1))}
             disabled={pagina === 0}
             aria-label="Depoimentos anteriores"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-preto/20 text-preto/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-preto disabled:opacity-30 disabled:hover:border-preto/20 disabled:hover:bg-transparent disabled:hover:text-preto/60"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-tinta/20 text-tinta/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-tinta disabled:opacity-30 disabled:hover:border-tinta/20 disabled:hover:bg-transparent disabled:hover:text-tinta/60"
           >
             <svg
               viewBox="0 0 24 24"
@@ -197,7 +197,7 @@ export default function DepoimentosCarrossel({
               >
                 <span
                   className={`block h-1.5 rounded-full transition-all duration-500 ${
-                    i === pagina ? "w-6 bg-salmon" : "w-1.5 bg-preto/20"
+                    i === pagina ? "w-6 bg-salmon" : "w-1.5 bg-tinta/20"
                   }`}
                 />
               </button>
@@ -209,7 +209,7 @@ export default function DepoimentosCarrossel({
             onClick={() => irPara(Math.min(paginas - 1, pagina + 1))}
             disabled={pagina >= paginas - 1}
             aria-label="Próximos depoimentos"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-preto/20 text-preto/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-preto disabled:opacity-30 disabled:hover:border-preto/20 disabled:hover:bg-transparent disabled:hover:text-preto/60"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-tinta/20 text-tinta/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-tinta disabled:opacity-30 disabled:hover:border-tinta/20 disabled:hover:bg-transparent disabled:hover:text-tinta/60"
           >
             <svg
               viewBox="0 0 24 24"

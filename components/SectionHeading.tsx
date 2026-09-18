@@ -24,20 +24,20 @@ export default function SectionHeading({
   return (
     <div className={centro ? "text-center" : "text-left"}>
       <Reveal>
-        <span className="eyebrow inline-flex items-center gap-3 rounded-full border border-preto/12 px-4 py-1.5 text-preto/68">
+        <span className="eyebrow inline-flex items-center gap-3 rounded-full border border-tinta/12 px-4 py-1.5 text-tinta/68">
           <span className="h-1 w-1 rounded-full bg-salmon" />
           {eyebrow}
         </span>
       </Reveal>
 
-      <h2 className="font-heading mt-6 text-4xl font-semibold leading-[1.06] text-preto md:text-5xl lg:text-6xl">
+      <h2 className="font-heading mt-6 text-4xl font-semibold leading-[1.06] text-tinta md:text-5xl lg:text-6xl">
         <WordReveal linhas={titulo} gatilho="scroll" delay={0.05} />
       </h2>
 
       {lead && (
         <Reveal delay={0.15}>
           <p
-            className={`mt-6 text-lg leading-relaxed text-preto/72 ${
+            className={`mt-6 text-lg leading-relaxed text-tinta/72 ${
               centro ? "mx-auto max-w-2xl" : "max-w-2xl"
             }`}
           >

@@ -45,26 +45,26 @@ export default async function AdminCases() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">Cases</h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">Cases</h1>
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         Aparecem na home, em &ldquo;Marcas que mudaram de patamar&rdquo;, e na
         página de portfólio inteira.
       </p>
 
-      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-preto/70`}>
-        <strong className="font-medium text-preto">Formato da imagem:</strong>{" "}
+      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-tinta/70`}>
+        <strong className="font-medium text-tinta">Formato da imagem:</strong>{" "}
         deitada, na proporção 16:11. Ela aparece em preto e branco e ganha cor
         ao passar o mouse, então prefira fotos com bom contraste.
       </div>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
 
       <form action={criarCase} className={`${cartao} mt-8`}>
-        <h2 className="font-medium text-preto">Adicionar case</h2>
+        <h2 className="font-medium text-tinta">Adicionar case</h2>
 
         <div className="mt-5 grid gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -148,7 +148,7 @@ export default async function AdminCases() {
 
       <div className="mt-8 space-y-4">
         {cases.length === 0 && (
-          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60">
+          <p className="rounded-2xl border border-contorno bg-cartao p-6 text-sm text-tinta/60">
             Nenhum case cadastrado.
           </p>
         )}
@@ -156,7 +156,7 @@ export default async function AdminCases() {
         {cases.map((c, i) => (
           <div key={c.id} className={cartao}>
             <div className="flex items-start gap-4">
-              <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-linha">
+              <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-contorno">
                 <Image
                   src={c.imagem}
                   alt={c.cliente}
@@ -167,8 +167,8 @@ export default async function AdminCases() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-preto">{c.cliente}</p>
-                <p className="mt-1 truncate text-sm text-preto/55">
+                <p className="truncate font-medium text-tinta">{c.cliente}</p>
+                <p className="mt-1 truncate text-sm text-tinta/55">
                   /portfolio — {c.slug}
                 </p>
 
@@ -278,7 +278,7 @@ export default async function AdminCases() {
               </button>
             </form>
 
-            <form action={apagarCase} className="mt-4 border-t border-linha pt-4">
+            <form action={apagarCase} className="mt-4 border-t border-contorno pt-4">
               <input type="hidden" name="id" value={c.id} />
               <button type="submit" className={botaoDiscreto}>
                 Apagar este case

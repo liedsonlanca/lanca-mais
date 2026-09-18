@@ -19,13 +19,13 @@ function comRealce(texto: string, realce?: string) {
   // Sem realce, ou palavra que não existe na linha: colore a linha toda, que
   // é o comportamento antigo e nunca deixa o título sem destaque nenhum.
   if (!realce || corte === -1) {
-    return <span className="text-salmon-texto">{texto}</span>;
+    return <span className="text-destaque">{texto}</span>;
   }
 
   return (
     <>
       {texto.slice(0, corte)}
-      <span className="text-salmon-texto">{realce}</span>
+      <span className="text-destaque">{realce}</span>
       {texto.slice(corte + realce.length)}
     </>
   );
@@ -40,25 +40,25 @@ export default function CtaFinal({
   rotulo = "Solicitar orçamento",
 }: Props) {
   return (
-    <section className="relative overflow-hidden bg-papel">
+    <section className="relative overflow-hidden bg-fundo">
       <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
       <div className="relative mx-auto max-w-4xl px-6 py-12 text-center lg:py-16">
-        <h2 className="font-heading text-3xl font-semibold leading-[1.08] text-preto md:text-5xl">
+        <h2 className="font-heading text-3xl font-semibold leading-[1.08] text-tinta md:text-5xl">
           {titulo}
           <span className="block">{comRealce(destaque, realce)}</span>
         </h2>
 
         {lead && (
           <Reveal delay={0.15}>
-            <p className="mx-auto mt-6 max-w-xl text-preto/72">{lead}</p>
+            <p className="mx-auto mt-6 max-w-xl text-tinta/72">{lead}</p>
           </Reveal>
         )}
 
         <Reveal delay={0.25}>
           <Link
             href="/contato"
-            className="mt-10 inline-block rounded-full bg-salmon-texto px-9 py-4 font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
+            className="mt-10 inline-block rounded-full bg-destaque px-9 py-4 font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
           >
             {rotulo}
           </Link>

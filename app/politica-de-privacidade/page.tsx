@@ -46,7 +46,7 @@ export default function PoliticaDePrivacidade() {
             desta política, incluindo pedidos sobre os seus dados, o contato é{" "}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               {siteConfig.email}
             </a>
@@ -62,21 +62,21 @@ export default function PoliticaDePrivacidade() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   O que você escreve no formulário
                 </strong>{" "}
                 — nome, e-mail, telefone e a mensagem sobre o seu negócio. São
                 enviados por você, quando decide falar com a gente.
               </>,
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   Medição de audiência
                 </strong>{" "}
                 — só se você aceitar. Páginas visitadas, origem do acesso e
                 dados aproximados de região, tratados em conjunto.
               </>,
               <>
-                <strong className="font-medium text-preto">Marketing</strong> —
+                <strong className="font-medium text-tinta">Marketing</strong> —
                 só se você aceitar. Identificadores usados pela Meta para medir
                 anúncios e formar público.
               </>,
@@ -92,7 +92,7 @@ export default function PoliticaDePrivacidade() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   Procedimentos preliminares de contrato
                 </strong>{" "}
                 (art. 7º, V) — para o que você escreve no formulário. Você pede
@@ -100,12 +100,12 @@ export default function PoliticaDePrivacidade() {
                 proposta.
               </>,
               <>
-                <strong className="font-medium text-preto">Consentimento</strong>{" "}
+                <strong className="font-medium text-tinta">Consentimento</strong>{" "}
                 (art. 7º, I) — para medição e marketing, e apenas enquanto ele
                 durar. Nada é carregado antes do seu sim.
               </>,
               <>
-                <strong className="font-medium text-preto">Obrigação legal</strong>{" "}
+                <strong className="font-medium text-tinta">Obrigação legal</strong>{" "}
                 (art. 7º, II) — para guardar o que a lei manda guardar, como
                 registros fiscais de contratos fechados.
               </>,
@@ -119,7 +119,7 @@ export default function PoliticaDePrivacidade() {
           </p>
           <p>
             Retirar o consentimento é tão simples quanto dar: o link{" "}
-            <strong className="font-medium text-preto">Gerenciar cookies</strong>{" "}
+            <strong className="font-medium text-tinta">Gerenciar cookies</strong>{" "}
             no rodapé reabre a escolha.
           </p>
         </Secao>
@@ -133,7 +133,7 @@ export default function PoliticaDePrivacidade() {
           <Lista
             itens={[
               <>
-                <strong className="font-medium text-preto">
+                <strong className="font-medium text-tinta">
                   Provedores de hospedagem e de armazenamento
                 </strong>{" "}
                 — mantêm o site no ar e guardam as imagens e os vídeos do
@@ -141,11 +141,11 @@ export default function PoliticaDePrivacidade() {
                 as nossas instruções, e não usam nada disso para fins próprios.
               </>,
               <>
-                <strong className="font-medium text-preto">Google</strong> —
+                <strong className="font-medium text-tinta">Google</strong> —
                 apenas se você aceitou medição de audiência.
               </>,
               <>
-                <strong className="font-medium text-preto">Meta</strong> —
+                <strong className="font-medium text-tinta">Meta</strong> —
                 apenas se você aceitou marketing.
               </>,
             ]}
@@ -181,7 +181,7 @@ export default function PoliticaDePrivacidade() {
             escrever para{" "}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               {siteConfig.email}
             </a>
@@ -219,7 +219,7 @@ export default function PoliticaDePrivacidade() {
             Pedidos sobre os seus dados, dúvidas e reclamações vão para{" "}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               {siteConfig.email}
             </a>
@@ -243,7 +243,7 @@ export default function PoliticaDePrivacidade() {
             Para o detalhe do que fica guardado no seu navegador, veja a{" "}
             <Link
               href="/politica-de-cookies"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Política de Cookies
             </Link>

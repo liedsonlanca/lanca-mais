@@ -53,7 +53,7 @@ export default async function SobrePage() {
       />
 
       {/* Missão */}
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-fundo-alt">
         <div className="mx-auto grid max-w-6xl gap-14 px-6 py-14 lg:px-10 lg:py-20 md:grid-cols-2">
           <Reveal distance={40} className="md:h-full">
             {/* No desktop a imagem acompanha a altura do texto; no celular
@@ -80,13 +80,13 @@ export default async function SobrePage() {
             />
 
             <Reveal delay={0.15}>
-              <p className="mt-6 leading-relaxed text-preto/72">
+              <p className="mt-6 leading-relaxed text-tinta/72">
                 Atendemos clientes de todos os nichos: saúde, estética,
                 direito, imóveis, gastronomia, moda, educação, fitness, varejo
                 e muito mais. Cada um exige uma leitura própria de mercado, mas
                 o rigor é o mesmo, e é ele que faz a marca sair do improviso.
               </p>
-              <p className="mt-4 leading-relaxed text-preto/72">
+              <p className="mt-4 leading-relaxed text-tinta/72">
                 Por trabalharmos com sete frentes complementares: gestão de
                 marketing, consultoria, audiovisual, tráfego pago, identidade
                 visual, desenvolvimento web e arquitetura, conseguimos
@@ -102,7 +102,7 @@ export default async function SobrePage() {
           das vizinhas, a única separação era o vão, e por isso ele precisava
           ser enorme para a seção começar. A troca de cor faz o corte, e o
           respiro pode ser curto. */}
-      <section className="relative overflow-hidden bg-papel text-preto">
+      <section className="relative overflow-hidden bg-fundo text-tinta">
         <div className="mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Como trabalhamos"
@@ -113,16 +113,16 @@ export default async function SobrePage() {
             ]}
           />
 
-          <Stagger className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-linha bg-linha sm:grid-cols-2">
+          <Stagger className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-contorno bg-contorno sm:grid-cols-2">
             {values.map((value) => (
               <StaggerItem
                 key={value.title}
-                className="h-full bg-branco p-8 transition-colors duration-500 hover:bg-areia"
+                className="h-full bg-cartao p-8 transition-colors duration-500 hover:bg-fundo-alt"
               >
-                <h3 className="text-lg font-semibold text-preto">
+                <h3 className="text-lg font-semibold text-tinta">
                   {value.title}
                 </h3>
-                <p className="mt-3 leading-relaxed text-preto/72">
+                <p className="mt-3 leading-relaxed text-tinta/72">
                   {value.description}
                 </p>
               </StaggerItem>
@@ -135,7 +135,7 @@ export default async function SobrePage() {
           Some inteira quando não há ninguém cadastrado: um título "Quem
           constrói a sua marca" sobre um vazio diz o contrário do que promete. */}
       {equipe.length > 0 && (
-      <section className="relative overflow-hidden bg-areia py-14 lg:py-20">
+      <section className="relative overflow-hidden bg-fundo-alt py-14 lg:py-20">
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <SectionHeading
             eyebrow="Nosso time"

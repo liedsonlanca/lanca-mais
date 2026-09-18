@@ -59,16 +59,16 @@ export default async function AdminSite() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="font-heading text-3xl font-semibold text-preto">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">
         Estado do site
       </h1>
-      <p className="mt-2 leading-relaxed text-preto/65">
+      <p className="mt-2 leading-relaxed text-tinta/65">
         Decide o que um visitante vê ao abrir o endereço. Você, com a senha do
         site, atravessa qualquer um dos estados para conferir o site fechado.
       </p>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
@@ -76,14 +76,14 @@ export default async function AdminSite() {
       {/* Situação atual, em uma frase. */}
       <div
         className={`mt-6 rounded-2xl border p-5 ${
-          aberto ? "border-salmon/50 bg-salmon/10" : "border-linha bg-branco"
+          aberto ? "border-salmon/50 bg-salmon/10" : "border-contorno bg-cartao"
         }`}
       >
-        <p className="font-medium text-preto">
+        <p className="font-medium text-tinta">
           {aberto ? "O site está aberto ao público." : "O site está fechado."}
         </p>
         {jaLancou && (
-          <p className="mt-2 text-sm leading-relaxed text-preto/70">
+          <p className="mt-2 text-sm leading-relaxed text-tinta/70">
             A contagem chegou ao fim e o site abriu sozinho. Para voltar a
             fechá-lo, mude o estado abaixo ou marque uma data nova.
           </p>
@@ -92,7 +92,7 @@ export default async function AdminSite() {
 
       {/* ---------- Estado ---------- */}
       <form action={salvarModo} className={`${cartao} mt-8`}>
-        <h2 className="font-medium text-preto">O que os visitantes veem</h2>
+        <h2 className="font-medium text-tinta">O que os visitantes veem</h2>
 
         <div className="mt-5 grid gap-3">
           {MODOS.map((m) => (
@@ -101,7 +101,7 @@ export default async function AdminSite() {
               className={`flex cursor-pointer gap-4 rounded-2xl border p-4 transition-colors duration-300 ${
                 config.modo === m.valor
                   ? "border-salmon bg-salmon/10"
-                  : "border-linha bg-branco hover:border-salmon/40"
+                  : "border-contorno bg-cartao hover:border-salmon/40"
               }`}
             >
               <input
@@ -112,8 +112,8 @@ export default async function AdminSite() {
                 className="mt-1 h-4 w-4 shrink-0 accent-[var(--color-salmon)]"
               />
               <span>
-                <span className="block font-medium text-preto">{m.titulo}</span>
-                <span className="mt-1 block text-sm leading-relaxed text-preto/62">
+                <span className="block font-medium text-tinta">{m.titulo}</span>
+                <span className="mt-1 block text-sm leading-relaxed text-tinta/62">
                   {m.descricao}
                 </span>
               </span>
@@ -133,10 +133,10 @@ export default async function AdminSite() {
 
       {/* ---------- Contagem ---------- */}
       <form action={salvarLancamento} className={`${cartao} mt-6`}>
-        <h2 className="font-medium text-preto">Contagem para o lançamento</h2>
-        <p className="mt-2 text-sm leading-relaxed text-preto/65">
+        <h2 className="font-medium text-tinta">Contagem para o lançamento</h2>
+        <p className="mt-2 text-sm leading-relaxed text-tinta/65">
           Marque o dia e a hora. A contagem aparece na página Em breve e,
-          quando chega a zero, <strong className="font-medium text-preto">o
+          quando chega a zero, <strong className="font-medium text-tinta">o
           site abre sozinho</strong> — mesmo de madrugada, sem ninguém precisar
           entrar aqui.
         </p>
@@ -180,9 +180,9 @@ export default async function AdminSite() {
           </button>
 
           {config.lancamento && (
-            <span className="text-sm text-preto/60">
+            <span className="text-sm text-tinta/60">
               Marcado para{" "}
-              <strong className="font-medium text-preto">
+              <strong className="font-medium text-tinta">
                 {new Date(config.lancamento).toLocaleString("pt-BR", {
                   dateStyle: "long",
                   timeStyle: "short",

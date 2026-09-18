@@ -22,7 +22,7 @@ async function carregar(): Promise<Linha[]> {
 }
 
 const rotuloClasse =
-  "block text-xs font-medium uppercase tracking-wider text-preto/50";
+  "block text-xs font-medium uppercase tracking-wider text-tinta/50";
 
 export default async function AdminNumeros() {
   // Portão próprio, além do layout: no App Router o layout não impede a
@@ -34,23 +34,23 @@ export default async function AdminNumeros() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">Números</h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">Números</h1>
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         Os contadores de prova social. Aparecem no topo da home e na
         apresentação da agência, animando de zero até o valor.
       </p>
 
-      <div className="mt-4 rounded-2xl border border-linha bg-branco p-5 text-sm leading-relaxed text-preto/70">
-        <strong className="font-medium text-preto">Como preencher:</strong> o
+      <div className="mt-4 rounded-2xl border border-contorno bg-cartao p-5 text-sm leading-relaxed text-tinta/70">
+        <strong className="font-medium text-tinta">Como preencher:</strong> o
         campo <em>valor</em> aceita só o número inteiro, porque é ele que a
         animação conta. Símbolos vão nos campos ao lado. Para mostrar{" "}
-        <span className="text-salmon-texto">+300 conteúdos por mês</span>, use
+        <span className="text-destaque">+300 conteúdos por mês</span>, use
         prefixo <code>+</code>, valor <code>300</code>, sufixo vazio e rótulo{" "}
         <code>conteúdos por mês</code>.
       </div>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
@@ -58,9 +58,9 @@ export default async function AdminNumeros() {
       {/* ---------- Novo ---------- */}
       <form
         action={criarNumero}
-        className="mt-8 rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)]"
+        className="mt-8 rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)]"
       >
-        <h2 className="font-medium text-preto">Adicionar número</h2>
+        <h2 className="font-medium text-tinta">Adicionar número</h2>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-[80px_120px_80px_1fr]">
           <div>
@@ -114,7 +114,7 @@ export default async function AdminNumeros() {
 
         <button
           type="submit"
-          className={`${botao} mt-5 bg-salmon text-preto hover:bg-salmon-escuro`}
+          className={`${botao} mt-5 bg-salmon text-tinta hover:bg-salmon-escuro`}
         >
           Adicionar
         </button>
@@ -123,7 +123,7 @@ export default async function AdminNumeros() {
       {/* ---------- Lista ---------- */}
       <div className="mt-8 space-y-4">
         {numeros.length === 0 && (
-          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60">
+          <p className="rounded-2xl border border-contorno bg-cartao p-6 text-sm text-tinta/60">
             Nenhum número cadastrado.
           </p>
         )}
@@ -131,15 +131,15 @@ export default async function AdminNumeros() {
         {numeros.map((n, i) => (
           <div
             key={n.id}
-            className="rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)]"
+            className="rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)]"
           >
             <div className="flex items-center justify-between gap-4">
               {/* Prévia do que a home vai mostrar. */}
-              <span className="font-heading text-xl font-semibold text-preto">
+              <span className="font-heading text-xl font-semibold text-tinta">
                 {n.prefixo}
                 {n.valor}
                 {n.sufixo}{" "}
-                <span className="text-sm font-normal text-preto/55">
+                <span className="text-sm font-normal text-tinta/55">
                   {n.rotulo}
                 </span>
               </span>
@@ -152,7 +152,7 @@ export default async function AdminNumeros() {
                     type="submit"
                     disabled={i === 0}
                     aria-label="Mover para cima"
-                    className="rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
+                    className="rounded-full border border-contorno px-3 py-1 text-sm text-tinta/60 transition-colors hover:border-salmon disabled:opacity-30"
                   >
                     ↑
                   </button>
@@ -164,7 +164,7 @@ export default async function AdminNumeros() {
                     type="submit"
                     disabled={i === numeros.length - 1}
                     aria-label="Mover para baixo"
-                    className="rounded-full border border-linha px-3 py-1 text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
+                    className="rounded-full border border-contorno px-3 py-1 text-sm text-tinta/60 transition-colors hover:border-salmon disabled:opacity-30"
                   >
                     ↓
                   </button>
@@ -226,17 +226,17 @@ export default async function AdminNumeros() {
 
               <button
                 type="submit"
-                className={`${botao} justify-self-start border border-preto/20 text-preto hover:border-preto sm:col-span-4`}
+                className={`${botao} justify-self-start border border-tinta/20 text-tinta hover:border-tinta sm:col-span-4`}
               >
                 Salvar
               </button>
             </form>
 
-            <form action={apagarNumero} className="mt-4 border-t border-linha pt-4">
+            <form action={apagarNumero} className="mt-4 border-t border-contorno pt-4">
               <input type="hidden" name="id" value={n.id} />
               <button
                 type="submit"
-                className="text-sm text-preto/45 transition-colors duration-300 hover:text-salmon-texto"
+                className="text-sm text-tinta/45 transition-colors duration-300 hover:text-destaque"
               >
                 Apagar este número
               </button>

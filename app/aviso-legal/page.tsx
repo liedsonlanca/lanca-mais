@@ -58,7 +58,7 @@ export default function AvisoLegal() {
             {siteConfig.address}, {siteConfig.city}. Contato por{" "}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               {siteConfig.email}
             </a>{" "}
@@ -94,7 +94,7 @@ export default function AvisoLegal() {
           <p>
             Trabalhamos com método, medimos o que fazemos e ajustamos a
             estratégia com base em dado. O que{" "}
-            <strong className="font-medium text-preto">não</strong> fazemos é
+            <strong className="font-medium text-tinta">não</strong> fazemos é
             garantir número: não prometemos volume de vendas, quantidade de
             seguidores, alcance de publicação nem retorno sobre investimento.
           </p>
@@ -174,21 +174,21 @@ export default function AvisoLegal() {
             foro aplicável estão nos{" "}
             <Link
               href="/termos-de-uso"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Termos de Uso
             </Link>
             . O tratamento de dados pessoais está na{" "}
             <Link
               href="/politica-de-privacidade"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Política de Privacidade
             </Link>{" "}
             e na{" "}
             <Link
               href="/politica-de-cookies"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Política de Cookies
             </Link>

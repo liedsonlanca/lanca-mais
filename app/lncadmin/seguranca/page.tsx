@@ -38,17 +38,17 @@ export default async function AdminSeguranca() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="font-heading text-3xl font-semibold text-preto">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">
         Segurança
       </h1>
-      <p className="mt-2 leading-relaxed text-preto/65">
+      <p className="mt-2 leading-relaxed text-tinta/65">
         A senha protege o painel. A verificação em duas etapas acrescenta um
         código de seis dígitos, que muda a cada trinta segundos e só existe no
         seu celular — assim, uma senha descoberta não basta para entrar.
       </p>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. A verificação em duas etapas precisa
           dele para guardar a chave.
         </p>
@@ -56,22 +56,22 @@ export default async function AdminSeguranca() {
 
       {ativo ? (
         <div className={`${cartao} mt-8`}>
-          <p className="flex items-center gap-3 font-medium text-preto">
+          <p className="flex items-center gap-3 font-medium text-tinta">
             <span
               aria-hidden
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-salmon text-xs text-preto"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-salmon text-xs text-tinta"
             >
               ✓
             </span>
             Verificação em duas etapas ativa
           </p>
 
-          <p className="mt-4 text-sm leading-relaxed text-preto/70">
+          <p className="mt-4 text-sm leading-relaxed text-tinta/70">
             Ao entrar no painel, além da senha, será pedido o código do seu
             aplicativo autenticador.
           </p>
 
-          <form action={desativarDuasEtapas} className="mt-6 border-t border-linha pt-6">
+          <form action={desativarDuasEtapas} className="mt-6 border-t border-contorno pt-6">
             <label htmlFor="codigo-desativar" className={rotulo}>
               Para desativar, digite o código atual
             </label>
@@ -97,11 +97,11 @@ export default async function AdminSeguranca() {
         </div>
       ) : (
         <form action={ativarDuasEtapas} className={`${cartao} mt-8`}>
-          <h2 className="font-medium text-preto">Ativar em três passos</h2>
+          <h2 className="font-medium text-tinta">Ativar em três passos</h2>
 
           <ol className="mt-6 space-y-6">
             <li>
-              <p className="text-sm font-medium text-preto">
+              <p className="text-sm font-medium text-tinta">
                 1. Instale um aplicativo autenticador
               </p>
               <p className={ajuda}>
@@ -111,7 +111,7 @@ export default async function AdminSeguranca() {
             </li>
 
             <li>
-              <p className="text-sm font-medium text-preto">
+              <p className="text-sm font-medium text-tinta">
                 2. Escaneie este código
               </p>
 
@@ -122,20 +122,20 @@ export default async function AdminSeguranca() {
                   alt="Código QR para configurar a verificação em duas etapas"
                   width={220}
                   height={220}
-                  className="mt-3 rounded-xl border border-linha bg-branco p-2"
+                  className="mt-3 rounded-xl border border-contorno bg-cartao p-2"
                 />
               )}
 
               <p className={ajuda}>
                 Sem câmera? Digite esta chave no aplicativo:
               </p>
-              <code className="mt-2 block break-all rounded-xl border border-linha bg-areia px-4 py-3 font-mono text-sm text-preto">
+              <code className="mt-2 block break-all rounded-xl border border-contorno bg-fundo-alt px-4 py-3 font-mono text-sm text-tinta">
                 {proposto}
               </code>
             </li>
 
             <li>
-              <p className="text-sm font-medium text-preto">
+              <p className="text-sm font-medium text-tinta">
                 3. Confirme com o código que apareceu
               </p>
               <input type="hidden" name="segredo" value={proposto ?? ""} />
@@ -160,8 +160,8 @@ export default async function AdminSeguranca() {
             Ativar verificação em duas etapas
           </button>
 
-          <p className="mt-6 rounded-2xl border border-linha bg-areia p-4 text-xs leading-relaxed text-preto/70">
-            <strong className="font-medium text-preto">Antes de ativar:</strong>{" "}
+          <p className="mt-6 rounded-2xl border border-contorno bg-fundo-alt p-4 text-xs leading-relaxed text-tinta/70">
+            <strong className="font-medium text-tinta">Antes de ativar:</strong>{" "}
             guarde a chave acima num lugar seguro, fora do celular. Se você
             perder o aparelho sem ela, a única saída é apagar a chave direto no
             banco de dados.

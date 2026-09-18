@@ -63,16 +63,16 @@ export default async function AdminVitrine() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">
         Nosso trabalho
       </h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         O trilho que desliza sozinho na home. A ordem aqui é a ordem lá, e
         clicar numa peça no site abre a versão ampliada.
       </p>
 
-      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-preto/70`}>
-        <strong className="font-medium text-preto">Formato:</strong> as peças
+      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-tinta/70`}>
+        <strong className="font-medium text-tinta">Formato:</strong> as peças
         aparecem em pé, na proporção 4:5 do feed. Uma imagem quadrada ou
         deitada vai ser cortada em cima e embaixo. O vídeo toca sozinho e sem
         som no trilho, e ganha o som ao ser aberto — por isso vale começar por
@@ -80,22 +80,22 @@ export default async function AdminVitrine() {
       </div>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
 
       {!armazenamentoConfigurado && (
-        <p className="mt-4 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm leading-relaxed text-preto/75">
+        <p className="mt-4 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm leading-relaxed text-tinta/75">
           Armazenamento de arquivos não configurado. Faltam as variáveis do
-          <span className="text-salmon-texto"> Cloudflare R2</span> no projeto
+          <span className="text-destaque"> Cloudflare R2</span> no projeto
           da Vercel, então o envio de imagem e vídeo vai falhar.
         </p>
       )}
 
       {/* ---------- Nova peça ---------- */}
       <form action={criarPeca} className={`${cartao} mt-8`}>
-        <h2 className="font-medium text-preto">Adicionar peça</h2>
+        <h2 className="font-medium text-tinta">Adicionar peça</h2>
 
         <div className="mt-5 grid gap-4">
           <SeletorTipoPeca />
@@ -138,7 +138,7 @@ export default async function AdminVitrine() {
       {/* ---------- Lista ---------- */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {pecas.length === 0 && (
-          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60 sm:col-span-2">
+          <p className="rounded-2xl border border-contorno bg-cartao p-6 text-sm text-tinta/60 sm:col-span-2">
             Nenhuma peça cadastrada.
           </p>
         )}
@@ -148,7 +148,7 @@ export default async function AdminVitrine() {
             <div className="flex items-start gap-4">
               {/* Peça de vídeo não tem imagem: a prévia é o próprio vídeo,
                   parado no primeiro quadro. */}
-              <div className="relative h-28 w-[90px] shrink-0 overflow-hidden rounded-xl border border-linha bg-areia">
+              <div className="relative h-28 w-[90px] shrink-0 overflow-hidden rounded-xl border border-contorno bg-fundo-alt">
                 {p.video ? (
                   <video
                     src={p.video}
@@ -170,7 +170,7 @@ export default async function AdminVitrine() {
 
               <div className="min-w-0 flex-1">
                 <span className="flex items-center gap-2">
-                  <span className="numeral-fantasma text-sm text-preto/35">
+                  <span className="numeral-fantasma text-sm text-tinta/35">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   {/* O tipo aparece aqui para a alternação vídeo/imagem ser
@@ -178,11 +178,11 @@ export default async function AdminVitrine() {
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       tipoDaPeca(p) === "video"
-                        ? "bg-salmon/15 text-salmon-texto"
+                        ? "bg-salmon/15 text-destaque"
                         : tipoDaPeca(p) === "carrossel" ||
                             tipoDaPeca(p) === "trinca"
-                          ? "bg-preto/8 text-preto/70"
-                          : "border border-linha text-preto/45"
+                          ? "bg-tinta/8 text-tinta/70"
+                          : "border border-contorno text-tinta/45"
                     }`}
                   >
                     {tipoDaPeca(p) === "video"
@@ -195,7 +195,7 @@ export default async function AdminVitrine() {
                   </span>
                 </span>
 
-                <p className="mt-1 truncate text-sm text-preto/70">
+                <p className="mt-1 truncate text-sm text-tinta/70">
                   {p.legenda || p.alt}
                 </p>
 
@@ -239,11 +239,11 @@ export default async function AdminVitrine() {
                       min={1}
                       max={pecas.length}
                       defaultValue={i + 1}
-                      className="min-h-11 w-16 rounded-full border border-linha bg-branco px-3 text-center text-sm text-preto outline-none focus:border-salmon"
+                      className="min-h-11 w-16 rounded-full border border-contorno bg-cartao px-3 text-center text-sm text-tinta outline-none focus:border-salmon"
                     />
                     <button
                       type="submit"
-                      className="flex min-h-11 items-center rounded-full border border-linha px-4 text-sm text-preto/60 transition-colors hover:border-salmon hover:text-salmon-texto"
+                      className="flex min-h-11 items-center rounded-full border border-contorno px-4 text-sm text-tinta/60 transition-colors hover:border-salmon hover:text-destaque"
                     >
                       Ir
                     </button>
@@ -322,7 +322,7 @@ export default async function AdminVitrine() {
               </button>
             </form>
 
-            <form action={apagarPeca} className="mt-4 border-t border-linha pt-4">
+            <form action={apagarPeca} className="mt-4 border-t border-contorno pt-4">
               <input type="hidden" name="id" value={p.id} />
               <button type="submit" className={botaoDiscreto}>
                 Apagar esta peça

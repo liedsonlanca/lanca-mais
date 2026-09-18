@@ -18,7 +18,7 @@ export default function ServiceRows() {
         <StaggerItem key={service.slug}>
           <Link
             href={`/servicos/${service.slug}`}
-            className="group relative flex items-center gap-6 overflow-hidden rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1 focus-visible:border-salmon focus-visible:outline-none sm:gap-8 sm:p-8 lg:gap-10 lg:p-10"
+            className="group relative flex items-center gap-6 overflow-hidden rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1 focus-visible:border-salmon focus-visible:outline-none sm:gap-8 sm:p-8 lg:gap-10 lg:p-10"
           >
             {/* Régua de lançamento */}
             <span
@@ -26,34 +26,34 @@ export default function ServiceRows() {
               className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full group-focus-visible:h-full"
             />
 
-            <span className="numeral-fantasma hidden shrink-0 text-5xl text-preto/20 transition-colors duration-500 group-hover:text-salmon-texto sm:block lg:text-6xl">
+            <span className="numeral-fantasma hidden shrink-0 text-5xl text-tinta/20 transition-colors duration-500 group-hover:text-destaque sm:block lg:text-6xl">
               {String(i + 1).padStart(2, "0")}
             </span>
 
             <span
               aria-hidden
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto lg:h-16 lg:w-16"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-salmon/15 text-destaque transition-colors duration-500 group-hover:bg-salmon group-hover:text-tinta lg:h-16 lg:w-16"
             >
               <ServiceIcon slug={service.slug} />
             </span>
 
             <span className="min-w-0 flex-1">
-              <span className="block text-xl font-semibold leading-tight text-preto transition-colors duration-500 group-hover:text-salmon-texto lg:text-2xl">
+              <span className="block text-xl font-semibold leading-tight text-tinta transition-colors duration-500 group-hover:text-destaque lg:text-2xl">
                 {service.name}
               </span>
-              <span className="mt-2 block leading-relaxed text-preto/70">
+              <span className="mt-2 block leading-relaxed text-tinta/70">
                 {service.shortDescription}
               </span>
             </span>
 
             {/* Entregáveis: só onde há largura sobrando. */}
-            <span className="hidden max-w-[16rem] text-sm leading-relaxed text-preto/55 xl:block">
+            <span className="hidden max-w-[16rem] text-sm leading-relaxed text-tinta/55 xl:block">
               {service.bullets.slice(0, 2).join(" · ")}
             </span>
 
             <span
               aria-hidden
-              className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-full border border-preto/15 text-preto/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto sm:flex"
+              className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-full border border-tinta/15 text-tinta/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-tinta sm:flex"
             >
               <svg
                 viewBox="0 0 24 24"

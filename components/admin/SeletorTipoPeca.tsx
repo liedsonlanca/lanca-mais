@@ -38,7 +38,7 @@ export default function SeletorTipoPeca() {
 
   return (
     <div>
-      <span className="block text-xs font-medium uppercase tracking-wider text-preto/50">
+      <span className="block text-xs font-medium uppercase tracking-wider text-tinta/50">
         Tipo da peça
       </span>
 
@@ -50,8 +50,8 @@ export default function SeletorTipoPeca() {
             key={valor}
             className={`${opcao} ${
               tipo === valor
-                ? "border-salmon bg-salmon/10 text-preto"
-                : "border-linha bg-branco text-preto/60 hover:border-salmon/40"
+                ? "border-salmon bg-salmon/10 text-tinta"
+                : "border-contorno bg-cartao text-tinta/60 hover:border-salmon/40"
             }`}
           >
             <input

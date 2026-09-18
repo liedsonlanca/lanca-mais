@@ -37,31 +37,31 @@ export default async function BlogPage() {
         lead="Reflexões e processos reais da LANÇA+ sobre marketing de conteúdo, posicionamento e crescimento digital."
       />
 
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-fundo-alt">
         <div className="mx-auto max-w-4xl px-6 py-12 lg:py-16">
-          <Stagger className="flex flex-col divide-y divide-linha">
+          <Stagger className="flex flex-col divide-y divide-contorno">
             {blogPosts.map((post) => (
               <StaggerItem key={post.slug}>
                 <Link
                   href={`/blog/${post.slug}`}
                   className="group block py-10 first:pt-0"
                 >
-                  <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-preto/55">
-                    <span className="text-salmon-texto">{post.category}</span>
+                  <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-widest text-tinta/55">
+                    <span className="text-destaque">{post.category}</span>
                     <span aria-hidden>·</span>
                     <span>{formatarData(post.date)}</span>
                     <span aria-hidden>·</span>
                     <span>{post.readingTime} de leitura</span>
                   </div>
 
-                  <h2 className="font-heading mt-4 text-2xl font-semibold leading-snug text-preto transition-colors duration-500 group-hover:text-salmon-texto md:text-3xl">
+                  <h2 className="font-heading mt-4 text-2xl font-semibold leading-snug text-tinta transition-colors duration-500 group-hover:text-destaque md:text-3xl">
                     {post.title}
                   </h2>
-                  <p className="mt-4 leading-relaxed text-preto/68">
+                  <p className="mt-4 leading-relaxed text-tinta/68">
                     {post.excerpt}
                   </p>
 
-                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-salmon-texto">
+                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-destaque">
                     Ler artigo
                     <span
                       aria-hidden

@@ -29,14 +29,14 @@ export default function ServicosPage() {
       {/* Areia, e não branco: a seção seguinte é a chamada final, que é
           branca. Duas brancas coladas não têm borda, e sem borda só o vão diz
           que uma acabou e a outra começou. */}
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-fundo-alt">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10 lg:py-16">
           <Stagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {services.map((service, i) => (
               <StaggerItem key={service.slug} className="h-full">
                 <Link
                   href={`/servicos/${service.slug}`}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-linha bg-areia p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none"
+                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none"
                 >
                   {/* Régua de lançamento, a mesma da home e do método. */}
                   <span
@@ -47,37 +47,37 @@ export default function ServicosPage() {
                   {/* Marcador numerado sobre um trilho que corre até o ícone —
                       o mesmo device dos marcadores da linha do tempo do método. */}
                   <div className="flex items-center gap-4">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-linha bg-branco transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
-                      <span className="numeral-fantasma text-base text-salmon-texto transition-colors duration-500 group-hover:text-preto">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-contorno bg-cartao transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
+                      <span className="numeral-fantasma text-base text-destaque transition-colors duration-500 group-hover:text-tinta">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </span>
 
-                    <span aria-hidden className="h-px flex-1 bg-linha" />
+                    <span aria-hidden className="h-px flex-1 bg-contorno" />
 
                     <span
                       aria-hidden
-                      className="shrink-0 text-preto/35 transition-colors duration-500 group-hover:text-salmon-texto"
+                      className="shrink-0 text-tinta/35 transition-colors duration-500 group-hover:text-destaque"
                     >
                       <ServiceIcon slug={service.slug} className="h-7 w-7" />
                     </span>
                   </div>
 
-                  <h2 className="mt-7 text-xl font-semibold leading-snug text-preto transition-colors duration-500 group-hover:text-salmon-texto">
+                  <h2 className="mt-7 text-xl font-semibold leading-snug text-tinta transition-colors duration-500 group-hover:text-destaque">
                     {service.name}
                   </h2>
-                  <p className="mt-3 leading-relaxed text-preto/70">
+                  <p className="mt-3 leading-relaxed text-tinta/70">
                     {service.shortDescription}
                   </p>
 
-                  <div className="mt-8 flex flex-1 items-end justify-between gap-4 border-t border-linha pt-6">
-                    <span className="text-sm leading-relaxed text-preto/55">
+                  <div className="mt-8 flex flex-1 items-end justify-between gap-4 border-t border-contorno pt-6">
+                    <span className="text-sm leading-relaxed text-tinta/55">
                       {service.bullets.slice(0, 2).join(" · ")}
                     </span>
 
                     <span
                       aria-hidden
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-preto/15 text-preto/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-tinta/15 text-tinta/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-tinta"
                     >
                       <svg
                         viewBox="0 0 24 24"

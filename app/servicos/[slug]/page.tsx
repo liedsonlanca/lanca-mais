@@ -95,7 +95,7 @@ export default async function ServicoPage({
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <Link
                     href="/contato"
-                    className="rounded-full bg-salmon-texto px-7 py-3.5 text-center font-medium text-branco shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
+                    className="rounded-full bg-destaque px-7 py-3.5 text-center font-medium text-preto shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
                   >
                     {page.ctaLabel}
                   </Link>
@@ -139,12 +139,12 @@ export default async function ServicoPage({
       <section className="relative overflow-hidden bg-bege">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-14 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-20">
           <Reveal>
-            <h2 className="font-heading border-l-2 border-salmon pl-7 text-3xl font-semibold leading-snug text-preto md:text-4xl">
+            <h2 className="font-heading border-l-2 border-salmon pl-7 text-3xl font-semibold leading-snug text-tinta md:text-4xl">
               {page.manifesto.statement}
             </h2>
           </Reveal>
 
-          <div className="space-y-5 leading-relaxed text-preto/72">
+          <div className="space-y-5 leading-relaxed text-tinta/72">
             {page.manifesto.body.map((paragraph, i) => (
               <Reveal key={i} delay={0.05 * i} distance={20}>
                 <p>{paragraph}</p>
@@ -164,7 +164,7 @@ export default async function ServicoPage({
       {/* ---------- Como funciona ---------- */}
       <section
         id="como-funciona"
-        className="relative scroll-mt-28 overflow-hidden bg-papel"
+        className="relative scroll-mt-28 overflow-hidden bg-fundo"
       >
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
@@ -179,14 +179,14 @@ export default async function ServicoPage({
           <Stagger className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {page.process.map((step, i) => (
               <StaggerItem key={step.title} className="h-full">
-                <div className="group h-full rounded-3xl border border-linha bg-areia p-7 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
-                  <span className="numeral-fantasma block text-4xl text-preto/28 transition-colors duration-500 group-hover:text-salmon/40">
+                <div className="group h-full rounded-3xl border border-contorno bg-fundo-alt p-7 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
+                  <span className="numeral-fantasma block text-4xl text-tinta/28 transition-colors duration-500 group-hover:text-salmon/40">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="mt-5 text-lg font-semibold text-preto">
+                  <h3 className="mt-5 text-lg font-semibold text-tinta">
                     {step.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-preto/68">
+                  <p className="mt-3 text-sm leading-relaxed text-tinta/68">
                     {step.description}
                   </p>
                 </div>
@@ -197,7 +197,7 @@ export default async function ServicoPage({
       </section>
 
       {/* ---------- O que você recebe ---------- */}
-      <section className="relative overflow-hidden bg-bege text-preto">
+      <section className="relative overflow-hidden bg-bege text-tinta">
         {/* items-center: as duas colunas têm alturas diferentes, e sem isso a
             nuvem de entregáveis ficava colada no topo com um vazio embaixo. */}
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-20">
@@ -211,7 +211,7 @@ export default async function ServicoPage({
           <Stagger className="flex flex-wrap content-start gap-3">
             {page.deliverables.map((item) => (
               <StaggerItem key={item}>
-                <span className="inline-block rounded-full border border-preto/15 bg-branco px-5 py-2.5 text-sm text-preto/82 transition-colors duration-500 hover:border-salmon hover:text-preto">
+                <span className="inline-block rounded-full border border-tinta/15 bg-cartao px-5 py-2.5 text-sm text-tinta/82 transition-colors duration-500 hover:border-salmon hover:text-tinta">
                   {item}
                 </span>
               </StaggerItem>
@@ -221,7 +221,7 @@ export default async function ServicoPage({
       </section>
 
       {/* ---------- Diferenciais ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section className="relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Por que a LANÇA+"
@@ -232,16 +232,16 @@ export default async function ServicoPage({
             ]}
           />
 
-          <Stagger className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-linha bg-linha sm:grid-cols-2">
+          <Stagger className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-contorno bg-contorno sm:grid-cols-2">
             {page.features.map((feature) => (
               <StaggerItem
                 key={feature.title}
-                className="h-full bg-areia p-8 transition-colors duration-500 hover:bg-branco"
+                className="h-full bg-fundo-alt p-8 transition-colors duration-500 hover:bg-cartao"
               >
-                <h3 className="text-lg font-semibold text-preto">
+                <h3 className="text-lg font-semibold text-tinta">
                   {feature.title}
                 </h3>
-                <p className="mt-3 leading-relaxed text-preto/72">
+                <p className="mt-3 leading-relaxed text-tinta/72">
                   {feature.description}
                 </p>
               </StaggerItem>
@@ -276,12 +276,12 @@ export default async function ServicoPage({
               <StaggerItem key={outro.slug} className="h-full">
                 <Link
                   href={`/servicos/${outro.slug}`}
-                  className="group flex h-full flex-col rounded-3xl border border-linha bg-branco shadow-[var(--sombra-cartao)] p-8 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/50 hover:bg-salmon/[0.07]"
+                  className="group flex h-full flex-col rounded-3xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] p-8 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/50 hover:bg-salmon/[0.07]"
                 >
-                  <h3 className="text-lg font-semibold text-preto transition-colors duration-500 group-hover:text-salmon">
+                  <h3 className="text-lg font-semibold text-tinta transition-colors duration-500 group-hover:text-salmon">
                     {outro.name}
                   </h3>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-preto/68">
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-tinta/68">
                     {outro.shortDescription}
                   </p>
                   <span className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-salmon">

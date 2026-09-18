@@ -1,40 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  /* Marca */
+  /* Marca. Cores literais, que não mudam com o tema. */
   --color-preto: #0a0a08;
   --color-bege: #ede5d2;
   --color-branco: #ffffff;
   --color-musgo: #3c3a20;
   --color-salmon: #dd8a55;
+  --color-salmon-claro: #eaa87c;
+  --color-salmon-escuro: #b96a3a;
 
-  /* Camadas do claro — a base é branca; estas são as superfícies do corpo.
-     A banda alternada e as bordas são de baixa saturação de propósito: o bege
-     da marca (#ede5d2) fica amarelado demais encostado no branco puro. */
-  --color-papel: #ffffff;
-  --color-areia: #f7f5f0;
-  --color-linha: #e9e5dd;
+  /* Tema. O site é escuro desde 18/09/2026; a abertura da home é clara.
 
-  /* Salmão escurecido para texto pequeno sobre claro. O salmão puro sobre
-     branco dá ~2.6:1 de contraste; este passa de 4.5:1. */
-  --color-salmon-texto: #a85c2c;
+     Os nomes dizem o papel, não a cor: tinta é a cor do primeiro plano,
+     seja ela clara ou escura, e é por isso que text-tinta/60 continua sendo
+     "texto secundário" nos dois temas. Um bloco claro redefine estes mesmos
+     nomes em .tema-claro, logo abaixo, e nada dentro dele precisa saber disso.
 
-  /* Camadas do escuro — reservadas ao hero, à faixa do slogan e ao rodapé */
+     Valores escolhidos por contraste medido, e não a olho: a versão escura de
+     setembro caiu por ser "escura demais". Sobre o fundo, a tinta dá 16,5:1,
+     a tinta a 50% ainda dá 4,8:1 e o salmão dá 7:1. O preto é clareado de
+     propósito, para o site não parecer um buraco. */
+  --color-fundo: #131211;
+  --color-fundo-alt: #1a1917;
+  --color-cartao: #23211d;
+  --color-contorno: #2f2d29;
+  --color-tinta: #f4f0e8;
+  --color-destaque: #dd8a55;
+
+  /* Superfícies herdadas do tempo em que só o hero e o rodapé eram escuros.
+     Continuam em uso nesses componentes. */
   --color-abismo: #050504;
   --color-carvao: #101010;
   --color-grafite: #171714;
   --color-borda: #2a2a24;
 
-  /* Acento em variações */
-  --color-salmon-claro: #eaa87c;
-  --color-salmon-escuro: #b96a3a;
-
-  /* Elevação dos cards: no branco puro a borda sozinha não separa o card do fundo. */
-  --sombra-cartao: 0 1px 2px rgba(10, 10, 8, 0.04), 0 14px 36px -28px rgba(10, 10, 8, 0.3);
+  /* No escuro a sombra quase não aparece: quem separa o card do fundo é o
+     degrau de cor e a borda. A sombra fica só como profundidade. */
+  --sombra-cartao: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 40px -28px rgba(0, 0, 0, 0.7);
 
   /* Curvas de easing — a mesma linguagem de movimento em todo o site */
   --ease-suave: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-saida: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Trecho claro dentro do site escuro. Hoje é a abertura da home.
+
+   Redefine os mesmos nomes do tema, então todo componente dentro dele se
+   acerta sozinho. O destaque escurece aqui porque salmão puro sobre claro dá
+   2,4:1 e reprova para texto; o escurecido passa de 4,5:1. */
+.tema-claro {
+  --color-fundo: #eeeeeb;
+  --color-fundo-alt: #e5e5e1;
+  --color-cartao: #ffffff;
+  --color-contorno: #dcdcd7;
+  --color-tinta: #121211;
+  --color-destaque: #a85c2c;
+  --sombra-cartao: 0 1px 2px rgba(10, 10, 8, 0.05), 0 16px 40px -26px rgba(10, 10, 8, 0.35);
+  color-scheme: light;
+  color: var(--color-tinta);
 }
 
 @theme inline {
@@ -43,30 +67,34 @@
   --color-branco: var(--color-branco);
   --color-musgo: var(--color-musgo);
   --color-salmon: var(--color-salmon);
-  --color-papel: var(--color-papel);
-  --color-areia: var(--color-areia);
-  --color-linha: var(--color-linha);
-  --color-salmon-texto: var(--color-salmon-texto);
+  --color-salmon-claro: var(--color-salmon-claro);
+  --color-salmon-escuro: var(--color-salmon-escuro);
+  --color-fundo: var(--color-fundo);
+  --color-fundo-alt: var(--color-fundo-alt);
+  --color-cartao: var(--color-cartao);
+  --color-contorno: var(--color-contorno);
+  --color-tinta: var(--color-tinta);
+  --color-destaque: var(--color-destaque);
   --color-abismo: var(--color-abismo);
   --color-carvao: var(--color-carvao);
   --color-grafite: var(--color-grafite);
   --color-borda: var(--color-borda);
-  --color-salmon-claro: var(--color-salmon-claro);
-  --color-salmon-escuro: var(--color-salmon-escuro);
 
-  --font-heading: var(--font-palmore);
+  /* Títulos na mesma sans do corpo, em peso médio. A Palmore, serifada de
+     display, saiu com a mudança de linguagem de 18/09/2026. */
+  --font-heading: var(--font-google-sans);
   --font-sans: var(--font-google-sans);
 }
 
 html {
-  background: var(--color-papel);
-  /* Controles nativos (select, scrollbar, autofill) acompanham o tema claro. */
-  color-scheme: light;
+  background: var(--color-fundo);
+  /* Controles nativos (rolagem, preenchimento automático) acompanham o escuro. */
+  color-scheme: dark;
 }
 
 body {
-  background: var(--color-papel);
-  color: var(--color-preto);
+  background: var(--color-fundo);
+  color: var(--color-tinta);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -90,15 +118,10 @@ html.lenis body {
 
 /* ---------- Utilitários de composição ---------- */
 
-/* Acento tipográfico do WordReveal. O mesmo componente serve seções claras e
-   escuras, então a cor vem da superfície: escurecida no branco (contraste),
-   salmão puro no escuro. */
+/* Acento tipográfico do WordReveal. A cor vem do tema: salmão no escuro,
+   salmão escurecido dentro de .tema-claro, onde o puro reprovaria. */
 .acento {
-  color: var(--color-salmon-texto);
-}
-
-.superficie-escura .acento {
-  color: var(--color-salmon);
+  color: var(--color-destaque);
 }
 
 /* Rótulo de seção em caixa alta espaçada, como nas três referências. */

@@ -23,10 +23,10 @@ export default async function ClientLogos() {
   const trilha = [...volta, ...volta];
 
   return (
-    <section className="relative overflow-hidden border-y border-linha bg-papel">
+    <section className="relative overflow-hidden border-y border-contorno bg-fundo">
       <div className="py-10 lg:py-14">
         <Reveal>
-          <p className="eyebrow text-center text-preto/58">
+          <p className="eyebrow text-center text-tinta/58">
             Marcas que confiam na LANÇA+
           </p>
         </Reveal>
@@ -34,8 +34,8 @@ export default async function ClientLogos() {
         <div className="relative mt-12 overflow-hidden">
           {/* Máscaras laterais: os logos surgem e somem em vez de cortar seco,
               como na faixa de nichos logo abaixo do hero. */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-papel to-transparent lg:w-32" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-papel to-transparent lg:w-32" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-fundo to-transparent lg:w-32" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-fundo to-transparent lg:w-32" />
 
           {/* animate-marquee corre sozinho e para quando o ponteiro encosta. */}
           <div className="animate-marquee flex w-max items-center gap-12 lg:gap-16">

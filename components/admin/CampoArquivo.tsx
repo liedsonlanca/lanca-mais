@@ -159,7 +159,7 @@ export default function CampoArquivo({
     <div>
       <label
         htmlFor={idCampo}
-        className="block text-xs font-medium uppercase tracking-wider text-preto/50"
+        className="block text-xs font-medium uppercase tracking-wider text-tinta/50"
       >
         {label}
       </label>
@@ -191,26 +191,26 @@ export default function CampoArquivo({
 
       {enviando && (
         <div className="mt-3">
-          <div className="h-1 w-full overflow-hidden rounded-full bg-linha">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-contorno">
             <div
               className="h-full bg-salmon transition-all duration-200"
               style={{ width: `${progresso}%` }}
             />
           </div>
-          <p className="mt-2 text-xs text-preto/55">
+          <p className="mt-2 text-xs text-tinta/55">
             Enviando {nome} — {Math.round(progresso ?? 0)}%
           </p>
         </div>
       )}
 
       {url && (
-        <p className="mt-2 text-xs font-medium text-salmon-texto">
+        <p className="mt-2 text-xs font-medium text-destaque">
           {nome} enviado. Clique em Salvar para aplicar.
         </p>
       )}
 
       {erro && (
-        <p role="alert" className="mt-2 text-xs text-salmon-texto">
+        <p role="alert" className="mt-2 text-xs text-destaque">
           {erro}
         </p>
       )}
@@ -221,14 +221,14 @@ export default function CampoArquivo({
       {aviso && (
         <p
           role="status"
-          className="mt-2 rounded-xl border border-linha bg-areia px-3 py-2 text-xs leading-relaxed text-preto/70"
+          className="mt-2 rounded-xl border border-contorno bg-fundo-alt px-3 py-2 text-xs leading-relaxed text-tinta/70"
         >
           {aviso}
         </p>
       )}
 
       {ajuda && !enviando && !erro && !aviso && (
-        <p className="mt-2 text-xs leading-relaxed text-preto/50">{ajuda}</p>
+        <p className="mt-2 text-xs leading-relaxed text-tinta/50">{ajuda}</p>
       )}
     </div>
   );

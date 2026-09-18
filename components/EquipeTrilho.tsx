@@ -82,7 +82,7 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
   }
 
   const seta =
-    "flex h-11 w-11 items-center justify-center rounded-full border border-linha text-preto/55 transition-colors duration-300 hover:border-salmon hover:text-salmon-texto disabled:opacity-25 disabled:hover:border-linha disabled:hover:text-preto/55";
+    "flex h-11 w-11 items-center justify-center rounded-full border border-contorno text-tinta/55 transition-colors duration-300 hover:border-salmon hover:text-destaque disabled:opacity-25 disabled:hover:border-contorno disabled:hover:text-tinta/55";
 
   return (
     <>
@@ -135,10 +135,10 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
         {/* Véus laterais, cada um só quando há conteúdo escondido daquele
             lado. Fixos, escureceriam um card inteiramente visível. */}
         {transborda && !noInicio && (
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-areia to-transparent lg:w-16" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-fundo-alt to-transparent lg:w-16" />
         )}
         {transborda && !noFim && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-areia to-transparent lg:w-16" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-fundo-alt to-transparent lg:w-16" />
         )}
 
         {/* tabIndex torna o trilho alcançável pelo teclado: os cards não são
@@ -175,7 +175,7 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
               {/* A foto ocupa o card inteiro e o nome vem sobre ela, num véu
                   que sobe no hover. A função fica numa etiqueta salmão, o
                   mesmo selo de acento usado nas etiquetas do blog. */}
-              <div className="group relative aspect-[3/4] overflow-hidden rounded-3xl border border-linha bg-areia shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:shadow-[0_30px_60px_-36px_rgba(10,10,8,0.55)]">
+              <div className="group relative aspect-[3/4] overflow-hidden rounded-3xl border border-contorno bg-fundo-alt shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:shadow-[0_30px_60px_-36px_rgba(10,10,8,0.55)]">
                 <Image
                   src={pessoa.foto}
                   alt={pessoa.nome}

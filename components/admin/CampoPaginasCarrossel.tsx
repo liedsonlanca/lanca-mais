@@ -141,7 +141,7 @@ export default function CampoPaginasCarrossel({
 
   return (
     <div>
-      <span className="block text-xs font-medium uppercase tracking-wider text-preto/50">
+      <span className="block text-xs font-medium uppercase tracking-wider text-tinta/50">
         Páginas do carrossel ({paginas.length})
       </span>
 
@@ -154,7 +154,7 @@ export default function CampoPaginasCarrossel({
         {paginas.map((endereco, i) => (
           <div
             key={endereco}
-            className="group relative h-32 w-[104px] overflow-hidden rounded-xl border border-linha bg-areia"
+            className="group relative h-32 w-[104px] overflow-hidden rounded-xl border border-contorno bg-fundo-alt"
           >
             <Image
               src={endereco}
@@ -172,7 +172,7 @@ export default function CampoPaginasCarrossel({
               type="button"
               onClick={() => remover(i)}
               aria-label={`Remover a página ${i + 1}`}
-              className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-abismo/80 text-bege transition-colors duration-300 hover:bg-salmon-texto"
+              className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-abismo/80 text-bege transition-colors duration-300 hover:bg-destaque"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -215,7 +215,7 @@ export default function CampoPaginasCarrossel({
             arquivos sem uma linha de JavaScript. */}
         <label
           htmlFor={idCampo}
-          className="flex h-32 w-[104px] cursor-pointer items-center justify-center rounded-xl border border-dashed border-linha text-2xl text-preto/35 transition-colors duration-300 hover:border-salmon hover:text-salmon-texto"
+          className="flex h-32 w-[104px] cursor-pointer items-center justify-center rounded-xl border border-dashed border-contorno text-2xl text-tinta/35 transition-colors duration-300 hover:border-salmon hover:text-destaque"
         >
           +
           <span className="sr-only">Acrescentar páginas</span>
@@ -246,19 +246,19 @@ export default function CampoPaginasCarrossel({
       )}
 
       {enviando && (
-        <p className="mt-3 text-xs text-preto/55">
+        <p className="mt-3 text-xs text-tinta/55">
           Enviando {enviando.feitas} de {enviando.total}
         </p>
       )}
 
       {erro && (
-        <p role="alert" className="mt-3 text-xs text-salmon-texto">
+        <p role="alert" className="mt-3 text-xs text-destaque">
           {erro}
         </p>
       )}
 
       {!enviando && !erro && (
-        <p className="mt-3 text-xs leading-relaxed text-preto/50">
+        <p className="mt-3 text-xs leading-relaxed text-tinta/50">
           {faltam > 0
             ? `Escolha pelo menos ${MINIMO} imagens. Um carrossel de uma página só é uma peça estática.`
             : "As páginas entram na ordem do nome do arquivo, então exportar como 01, 02, 03 já resolve. A primeira é a capa, e é ela que aparece no trilho da home. JPG, PNG ou WEBP, até 8 MB cada, em pé (4:5)."}

@@ -18,7 +18,7 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
   if (itens.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden bg-areia">
+    <section className="relative overflow-hidden bg-fundo-alt">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-10 lg:py-20">
         <div className="lg:sticky lg:top-32 lg:self-start">
           <SectionHeading
@@ -31,11 +31,11 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
           />
 
           <Reveal delay={0.2}>
-            <p className="mt-6 leading-relaxed text-preto/70">
+            <p className="mt-6 leading-relaxed text-tinta/70">
               Se a sua não estiver aqui,{" "}
               <Link
                 href="/contato"
-                className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4 transition-colors duration-500 hover:decoration-salmon"
+                className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4 transition-colors duration-500 hover:decoration-salmon"
               >
                 fale com a gente
               </Link>
@@ -57,19 +57,19 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
                   atributo, as perguntas apenas continuam abrindo juntas. */}
               <details
                 name="faq-servico"
-                className="faq-suave group border-t border-linha transition-colors duration-500 open:border-salmon"
+                className="faq-suave group border-t border-contorno transition-colors duration-500 open:border-salmon"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-medium text-preto transition-colors duration-500 hover:text-salmon-texto [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-medium text-tinta transition-colors duration-500 hover:text-destaque [&::-webkit-details-marker]:hidden">
                   {item.question}
                   <span
                     aria-hidden
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-linha text-xl text-salmon-texto transition-all duration-500 group-hover:border-salmon/60 group-open:rotate-45 group-open:border-salmon group-open:bg-salmon group-open:text-preto"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-contorno text-xl text-destaque transition-all duration-500 group-hover:border-salmon/60 group-open:rotate-45 group-open:border-salmon group-open:bg-salmon group-open:text-tinta"
                   >
                     +
                   </span>
                 </summary>
 
-                <p className="max-w-2xl pb-7 pr-16 leading-relaxed text-preto/72">
+                <p className="max-w-2xl pb-7 pr-16 leading-relaxed text-tinta/72">
                   {item.answer}
                 </p>
               </details>
@@ -77,7 +77,7 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
           ))}
 
           {/* Fecha a lista: sem isto a última pergunta fica sem base. */}
-          <span aria-hidden className="block border-t border-linha" />
+          <span aria-hidden className="block border-t border-contorno" />
         </Stagger>
       </div>
     </section>

@@ -36,23 +36,23 @@ export default async function AdminLogos() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">
         Logos de clientes
       </h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         A faixa &ldquo;Marcas que confiam na LANÇA+&rdquo;, na home. Enquanto
         não houver nenhum logo aqui, a faixa inteira não aparece no site.
       </p>
 
-      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-preto/70`}>
-        <strong className="font-medium text-preto">Formato:</strong> PNG ou
+      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-tinta/70`}>
+        <strong className="font-medium text-tinta">Formato:</strong> PNG ou
         WEBP com fundo transparente. Os logos são exibidos em tom único, e a
         cor volta ao passar o mouse — logo com fundo branco quadrado vai
         aparecer como um retângulo no meio da faixa.
       </div>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
@@ -64,7 +64,7 @@ export default async function AdminLogos() {
       {logos.length > 0 && (
         <div className="mt-8">
           <p className={rotulo}>Como está no site</p>
-          <div className="sem-barra mt-3 flex items-center gap-10 overflow-x-auto rounded-3xl border border-linha bg-branco px-8 py-7">
+          <div className="sem-barra mt-3 flex items-center gap-10 overflow-x-auto rounded-3xl border border-contorno bg-cartao px-8 py-7">
             {logos.map((l) => (
               <div
                 key={`previa-${l.id}`}
@@ -90,7 +90,7 @@ export default async function AdminLogos() {
       )}
 
       <form action={criarLogo} className={`${cartao} mt-8`}>
-        <h2 className="font-medium text-preto">Adicionar logo</h2>
+        <h2 className="font-medium text-tinta">Adicionar logo</h2>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
@@ -115,7 +115,7 @@ export default async function AdminLogos() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {logos.length === 0 && (
-          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60 sm:col-span-2">
+          <p className="rounded-2xl border border-contorno bg-cartao p-6 text-sm text-tinta/60 sm:col-span-2">
             Nenhum logo cadastrado, então a faixa não aparece no site.
           </p>
         )}
@@ -126,7 +126,7 @@ export default async function AdminLogos() {
               {/* Prévia no tamanho real da faixa, com a escala aplicada: é
                   assim que ela vai aparecer no site. Fundo areia porque logo
                   transparente some no branco do card. */}
-              <div className="relative h-14 w-44 shrink-0 overflow-hidden rounded-xl border border-linha bg-areia">
+              <div className="relative h-14 w-44 shrink-0 overflow-hidden rounded-xl border border-contorno bg-fundo-alt">
                 <Image
                   src={l.logo}
                   alt={l.nome}
@@ -138,7 +138,7 @@ export default async function AdminLogos() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-preto">{l.nome}</p>
+                <p className="truncate font-medium text-tinta">{l.nome}</p>
                 <div className="mt-2 flex items-center gap-2">
                   <form action={moverLogo}>
                     <input type="hidden" name="id" value={l.id} />
@@ -198,7 +198,7 @@ export default async function AdminLogos() {
                     defaultValue={l.escala ?? 100}
                     className={`${campo} w-28`}
                   />
-                  <span className="text-sm text-preto/50">%</span>
+                  <span className="text-sm text-tinta/50">%</span>
                 </div>
                 <p className={ajuda}>
                   100% é o padrão. Aumente o logo que ficou pequeno na faixa,
@@ -218,7 +218,7 @@ export default async function AdminLogos() {
               </button>
             </form>
 
-            <form action={apagarLogo} className="mt-4 border-t border-linha pt-4">
+            <form action={apagarLogo} className="mt-4 border-t border-contorno pt-4">
               <input type="hidden" name="id" value={l.id} />
               <button type="submit" className={botaoDiscreto}>
                 Apagar este logo

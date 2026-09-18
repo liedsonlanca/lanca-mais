@@ -196,8 +196,8 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
     <>
       <div className="relative">
         {/* Máscaras laterais: as peças surgem e somem em vez de cortar seco. */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-areia to-transparent lg:w-24" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-areia to-transparent lg:w-24" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-fundo-alt to-transparent lg:w-24" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-fundo-alt to-transparent lg:w-24" />
 
         <div
           ref={trilho}
@@ -232,7 +232,7 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                       ? `Abrir trinca por inteiro: ${peca.legenda ?? peca.alt}`
                       : `Ampliar: ${peca.legenda ?? peca.alt}`
                 }
-                className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 hover:border-salmon/60 hover:shadow-[0_28px_60px_-30px_rgba(10,10,8,0.6)] focus-visible:border-salmon focus-visible:outline-none sm:w-[240px] lg:w-[280px]"
+                className="group relative aspect-[4/5] w-[200px] shrink-0 overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] transition-all duration-500 hover:border-salmon/60 hover:shadow-[0_28px_60px_-30px_rgba(10,10,8,0.6)] focus-visible:border-salmon focus-visible:outline-none sm:w-[240px] lg:w-[280px]"
               >
                 {peca.tipo === "video" && peca.video ? (
                   // O vídeo toca no próprio trilho, sem esperar clique. Clicar
@@ -358,7 +358,7 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
 
         <div className="mt-6 flex items-center justify-center gap-3 px-6 lg:px-10">
           <BotaoTrilho direcao="anterior" aoClicar={() => deslocar(-1)} />
-          <span className="eyebrow text-preto/45">Arraste para ver mais</span>
+          <span className="eyebrow text-tinta/45">Arraste para ver mais</span>
           <BotaoTrilho direcao="proxima" aoClicar={() => deslocar(1)} />
         </div>
       </div>
@@ -385,7 +385,7 @@ function BotaoTrilho({
       type="button"
       onClick={aoClicar}
       aria-label={direcao === "anterior" ? "Peças anteriores" : "Próximas peças"}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-preto/15 text-preto/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-preto"
+      className="flex h-11 w-11 items-center justify-center rounded-full border border-tinta/15 text-tinta/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-tinta"
     >
       <svg
         viewBox="0 0 24 24"

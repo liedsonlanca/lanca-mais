@@ -111,8 +111,8 @@ export default function VitrineVideo({
   // um buraco, e quem olha entende que ali havia uma peça.
   if (falhou) {
     return (
-      <div className="absolute inset-0 flex items-end bg-areia p-4">
-        <span className="font-heading text-sm leading-snug text-preto/45">
+      <div className="absolute inset-0 flex items-end bg-fundo-alt p-4">
+        <span className="font-heading text-sm leading-snug text-tinta/45">
           {legenda || alt}
         </span>
       </div>
@@ -134,7 +134,7 @@ export default function VitrineVideo({
       draggable={false}
       // Fundo neutro por baixo: enquanto o quadro não chega, o ladrilho aparece
       // como espaço reservado, e não como um buraco branco num card branco.
-      className={`bg-linha ${className ?? ""}`}
+      className={`bg-contorno ${className ?? ""}`}
     />
   );
 }

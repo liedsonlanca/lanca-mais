@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { palmore, googleSans } from "./fonts";
+import { googleSans } from "./fonts";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -48,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${palmore.variable} ${googleSans.variable} h-full antialiased`}
+      className={`${googleSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <JsonLd />

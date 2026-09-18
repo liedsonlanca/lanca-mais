@@ -80,14 +80,14 @@ export default function LoginAdmin() {
   }
 
   const campo =
-    "mt-3 w-full rounded-2xl border border-linha bg-branco px-5 py-3.5 text-preto shadow-[var(--sombra-cartao)] outline-none transition-colors duration-300 focus:border-salmon";
+    "mt-3 w-full rounded-2xl border border-contorno bg-cartao px-5 py-3.5 text-tinta shadow-[var(--sombra-cartao)] outline-none transition-colors duration-300 focus:border-salmon";
 
   const naSegunda = etapa === "codigo";
 
   return (
     <form onSubmit={aoEnviar} className="w-full max-w-sm text-left">
       <div className="flex items-center justify-between gap-3">
-        <label htmlFor="senha-admin" className="eyebrow block text-preto/55">
+        <label htmlFor="senha-admin" className="eyebrow block text-tinta/55">
           Senha do painel
         </label>
 
@@ -95,7 +95,7 @@ export default function LoginAdmin() {
           <button
             type="button"
             onClick={voltarParaSenha}
-            className="text-xs text-preto/45 underline underline-offset-4 transition-colors duration-300 hover:text-salmon-texto"
+            className="text-xs text-tinta/45 underline underline-offset-4 transition-colors duration-300 hover:text-destaque"
           >
             trocar
           </button>
@@ -115,7 +115,7 @@ export default function LoginAdmin() {
           onChange={(e) => setSenha(e.target.value)}
           className={`${campo} pr-12 ${
             naSegunda
-              ? "cursor-default border-salmon/40 bg-areia text-preto/50"
+              ? "cursor-default border-salmon/40 bg-fundo-alt text-tinta/50"
               : ""
           }`}
         />
@@ -128,7 +128,7 @@ export default function LoginAdmin() {
             onClick={() => setMostrarSenha((v) => !v)}
             aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
             aria-pressed={mostrarSenha}
-            className="absolute right-2 top-1/2 mt-1.5 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-preto/40 transition-colors duration-300 hover:text-salmon-texto"
+            className="absolute right-2 top-1/2 mt-1.5 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-tinta/40 transition-colors duration-300 hover:text-destaque"
           >
             <svg
               aria-hidden
@@ -157,7 +157,7 @@ export default function LoginAdmin() {
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="absolute right-5 top-1/2 mt-1.5 h-4 w-4 -translate-y-1/2 text-salmon-texto"
+            className="absolute right-5 top-1/2 mt-1.5 h-4 w-4 -translate-y-1/2 text-destaque"
           >
             <path d="M20 6 9 17l-5-5" />
           </svg>
@@ -166,7 +166,7 @@ export default function LoginAdmin() {
 
       {naSegunda && (
         <div className="mt-6">
-          <label htmlFor="codigo-admin" className="eyebrow block text-preto/55">
+          <label htmlFor="codigo-admin" className="eyebrow block text-tinta/55">
             Código do aplicativo
           </label>
           <input
@@ -185,7 +185,7 @@ export default function LoginAdmin() {
             }
             className={`${campo} text-center text-lg tracking-[0.4em]`}
           />
-          <p className="mt-3 text-xs leading-relaxed text-preto/50">
+          <p className="mt-3 text-xs leading-relaxed text-tinta/50">
             Os seis dígitos do aplicativo autenticador. Eles mudam a cada 30
             segundos.
           </p>
@@ -197,13 +197,13 @@ export default function LoginAdmin() {
         disabled={
           enviando || (naSegunda ? codigo.length < 6 : senha.length === 0)
         }
-        className="mt-6 w-full rounded-full bg-salmon-texto px-7 py-3.5 font-medium text-branco transition-opacity duration-300 disabled:opacity-50"
+        className="mt-6 w-full rounded-full bg-destaque px-7 py-3.5 font-medium text-preto transition-opacity duration-300 disabled:opacity-50"
       >
         {enviando ? "Conferindo" : naSegunda ? "Entrar" : "Continuar"}
       </button>
 
       {erro && (
-        <p role="alert" className="mt-4 text-sm text-salmon-texto">
+        <p role="alert" className="mt-4 text-sm text-destaque">
           {erro}
         </p>
       )}

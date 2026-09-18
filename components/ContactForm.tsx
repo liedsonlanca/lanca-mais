@@ -37,7 +37,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label htmlFor="name" className="eyebrow text-preto/75">
+        <label htmlFor="name" className="eyebrow text-tinta/75">
           Seu nome *
         </label>
         <input
@@ -45,32 +45,32 @@ export default function ContactForm() {
           name="name"
           type="text"
           required
-          className="mt-2.5 w-full rounded-xl border border-preto/12 bg-preto/[0.04] px-4 py-3.5 text-preto outline-none transition-colors duration-300 placeholder:text-preto/55 hover:border-preto/20 focus:border-salmon focus:bg-preto/[0.06]"
+          className="mt-2.5 w-full rounded-xl border border-tinta/12 bg-tinta/[0.04] px-4 py-3.5 text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/55 hover:border-tinta/20 focus:border-salmon focus:bg-tinta/[0.06]"
           placeholder="Como podemos te chamar?"
         />
       </div>
 
       <div>
-        <label htmlFor="business" className="eyebrow text-preto/75">
+        <label htmlFor="business" className="eyebrow text-tinta/75">
           Marca ou empresa
         </label>
         <input
           id="business"
           name="business"
           type="text"
-          className="mt-2.5 w-full rounded-xl border border-preto/12 bg-preto/[0.04] px-4 py-3.5 text-preto outline-none transition-colors duration-300 placeholder:text-preto/55 hover:border-preto/20 focus:border-salmon focus:bg-preto/[0.06]"
+          className="mt-2.5 w-full rounded-xl border border-tinta/12 bg-tinta/[0.04] px-4 py-3.5 text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/55 hover:border-tinta/20 focus:border-salmon focus:bg-tinta/[0.06]"
           placeholder="Nome do seu negócio"
         />
       </div>
 
       <div>
-        <label htmlFor="service" className="eyebrow text-preto/75">
+        <label htmlFor="service" className="eyebrow text-tinta/75">
           Serviço de interesse
         </label>
         <select
           id="service"
           name="service"
-          className="mt-2.5 w-full rounded-xl border border-preto/12 bg-preto/[0.04] px-4 py-3.5 text-preto outline-none transition-colors duration-300 placeholder:text-preto/55 hover:border-preto/20 focus:border-salmon focus:bg-preto/[0.06]"
+          className="mt-2.5 w-full rounded-xl border border-tinta/12 bg-tinta/[0.04] px-4 py-3.5 text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/55 hover:border-tinta/20 focus:border-salmon focus:bg-tinta/[0.06]"
           defaultValue=""
         >
           <option value="" disabled>
@@ -86,14 +86,14 @@ export default function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="message" className="eyebrow text-preto/75">
+        <label htmlFor="message" className="eyebrow text-tinta/75">
           Conte um pouco sobre seu momento atual
         </label>
         <textarea
           id="message"
           name="message"
           rows={4}
-          className="mt-2.5 w-full rounded-xl border border-preto/12 bg-preto/[0.04] px-4 py-3.5 text-preto outline-none transition-colors duration-300 placeholder:text-preto/55 hover:border-preto/20 focus:border-salmon focus:bg-preto/[0.06]"
+          className="mt-2.5 w-full rounded-xl border border-tinta/12 bg-tinta/[0.04] px-4 py-3.5 text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/55 hover:border-tinta/20 focus:border-salmon focus:bg-tinta/[0.06]"
           placeholder="Ex: já tenho presença digital mas quero reposicionar a marca..."
         />
       </div>
@@ -101,11 +101,11 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-full bg-salmon-texto px-7 py-4 font-medium text-branco shadow-[0_0_32px_-10px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)] disabled:opacity-60"
+        className="w-full rounded-full bg-destaque px-7 py-4 font-medium text-preto shadow-[0_0_32px_-10px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)] disabled:opacity-60"
       >
         Enviar pelo WhatsApp
       </button>
-      <p className="text-center text-xs text-preto/50">
+      <p className="text-center text-xs text-tinta/50">
         Ao enviar, você será redirecionado ao WhatsApp da LANÇA+ com a
         mensagem já preenchida.
       </p>

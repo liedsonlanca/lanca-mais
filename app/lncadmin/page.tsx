@@ -85,18 +85,18 @@ export default async function AdminInicio() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">
         O que você pode editar
       </h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         Cada bloco abaixo é uma parte do site. O que você salvar aqui aparece
         no site em segundos, sem precisar publicar nada.
       </p>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm leading-relaxed text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm leading-relaxed text-tinta/75">
           O banco de dados não está conectado, então nada será salvo. Confira em{" "}
-          <span className="text-salmon-texto">/api/status-conteudo</span> o que
+          <span className="text-destaque">/api/status-conteudo</span> o que
           está faltando.
         </p>
       )}
@@ -108,20 +108,20 @@ export default async function AdminInicio() {
           const cartao = (
             <>
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="text-lg font-semibold text-preto">
+                <h2 className="text-lg font-semibold text-tinta">
                   {secao.rotulo}
                 </h2>
                 {typeof total === "number" && (
-                  <span className="numeral-fantasma text-sm text-preto/35">
+                  <span className="numeral-fantasma text-sm text-tinta/35">
                     {total}
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-preto/62">
+              <p className="mt-2 text-sm leading-relaxed text-tinta/62">
                 {secao.descricao}
               </p>
               {!secao.pronto && (
-                <p className="mt-3 text-xs uppercase tracking-wider text-salmon-texto">
+                <p className="mt-3 text-xs uppercase tracking-wider text-destaque">
                   Em construção
                 </p>
               )}
@@ -132,14 +132,14 @@ export default async function AdminInicio() {
             <Link
               key={secao.href}
               href={secao.href}
-              className="rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)] transition-all duration-300 hover:-translate-y-0.5 hover:border-salmon/50"
+              className="rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)] transition-all duration-300 hover:-translate-y-0.5 hover:border-salmon/50"
             >
               {cartao}
             </Link>
           ) : (
             <div
               key={secao.href}
-              className="rounded-3xl border border-linha bg-branco/60 p-6 opacity-70"
+              className="rounded-3xl border border-contorno bg-cartao/60 p-6 opacity-70"
             >
               {cartao}
             </div>

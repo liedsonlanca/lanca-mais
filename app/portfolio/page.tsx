@@ -25,12 +25,12 @@ export default async function PortfolioPage() {
         lead="Uma amostra de como a estratégia da LANÇA+ se adapta a nichos diferentes sem perder consistência de método."
       />
 
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-fundo-alt">
         <div className="mx-auto max-w-6xl px-6 py-12 lg:px-10 lg:py-16">
           <Stagger className="grid gap-6 sm:grid-cols-2">
             {caseStudies.map((item) => (
               <StaggerItem key={item.slug}>
-                <article className="group h-full overflow-hidden rounded-3xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-colors duration-500 hover:border-salmon/40">
+                <article className="group h-full overflow-hidden rounded-3xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] transition-colors duration-500 hover:border-salmon/40">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image
                       src={item.image}
@@ -43,11 +43,11 @@ export default async function PortfolioPage() {
                   </div>
 
                   <div className="p-8">
-                    <span className="eyebrow text-salmon-texto">{item.niche}</span>
-                    <h2 className="mt-3 text-xl font-semibold text-preto">
+                    <span className="eyebrow text-destaque">{item.niche}</span>
+                    <h2 className="mt-3 text-xl font-semibold text-tinta">
                       {item.client}
                     </h2>
-                    <p className="mt-3 leading-relaxed text-preto/68">
+                    <p className="mt-3 leading-relaxed text-tinta/68">
                       {item.summary}
                     </p>
 
@@ -55,14 +55,14 @@ export default async function PortfolioPage() {
                       {item.services.map((s) => (
                         <span
                           key={s}
-                          className="rounded-full border border-linha px-3 py-1 text-xs text-preto/72"
+                          className="rounded-full border border-contorno px-3 py-1 text-xs text-tinta/72"
                         >
                           {s}
                         </span>
                       ))}
                     </div>
 
-                    <p className="mt-6 border-t border-linha pt-5 text-sm font-medium text-salmon-texto">
+                    <p className="mt-6 border-t border-contorno pt-5 text-sm font-medium text-destaque">
                       {item.result}
                     </p>
                   </div>
@@ -71,7 +71,7 @@ export default async function PortfolioPage() {
             ))}
           </Stagger>
 
-          <p className="mt-10 text-center text-sm text-preto/50">
+          <p className="mt-10 text-center text-sm text-tinta/50">
             Cases ilustrativos. Substitua pelos resultados reais de clientes
             antes de publicar o site.
           </p>

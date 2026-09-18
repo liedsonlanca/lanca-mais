@@ -1,15 +1,8 @@
 import localFont from "next/font/local";
 
-export const palmore = localFont({
-  variable: "--font-palmore",
-  display: "swap",
-  src: [
-    { path: "../public/fonts/palmore/PalmoreLight.ttf", weight: "300", style: "normal" },
-    { path: "../public/fonts/palmore/PalmoreRegular.ttf", weight: "400", style: "normal" },
-    { path: "../public/fonts/palmore/PalmoreSemibold.ttf", weight: "600", style: "normal" },
-    { path: "../public/fonts/palmore/PalmoreBold.ttf", weight: "700", style: "normal" },
-  ],
-});
+// A Palmore saiu da web em 18/09/2026, quando os títulos passaram para a sans.
+// Os arquivos continuam em public/fonts/palmore porque a imagem de
+// compartilhamento (opengraph-image.tsx) ainda os lê direto do disco.
 
 export const googleSans = localFont({
   variable: "--font-google-sans",
@@ -19,3 +12,4 @@ export const googleSans = localFont({
     { path: "../public/fonts/google-sans/GoogleSans-Italic-Variable.ttf", weight: "300 700", style: "italic" },
   ],
 });
+

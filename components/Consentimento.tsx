@@ -136,17 +136,17 @@ export default function Consentimento() {
           aria-labelledby="consentimento-titulo"
           className="fixed inset-x-0 bottom-0 z-[110] p-3 sm:p-5"
         >
-          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-linha bg-branco shadow-[0_30px_70px_-30px_rgba(10,10,8,0.45)]">
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.45)]">
             <div className="p-6 sm:p-8">
               <p
                 id="consentimento-titulo"
-                className="font-heading text-xl font-semibold text-preto sm:text-2xl"
+                className="font-heading text-xl font-semibold text-tinta sm:text-2xl"
               >
                 Um minuto sobre{" "}
-                <span className="text-salmon-texto">cookies</span>
+                <span className="text-destaque">cookies</span>
               </p>
 
-              <p className="mt-3 text-sm leading-relaxed text-preto/70">
+              <p className="mt-3 text-sm leading-relaxed text-tinta/70">
                 O site funciona sem guardar nada sobre você. Se permitir, usamos
                 duas ferramentas para entender o que traz visitantes até aqui e
                 para medir nossos anúncios. Você escolhe, e pode mudar de ideia
@@ -160,10 +160,10 @@ export default function Consentimento() {
 
                     const descricao = (
                       <span>
-                        <span className="block text-sm font-medium text-preto">
+                        <span className="block text-sm font-medium text-tinta">
                           {linha.titulo}
                         </span>
-                        <span className="mt-1 block text-sm leading-relaxed text-preto/62">
+                        <span className="mt-1 block text-sm leading-relaxed text-tinta/62">
                           {linha.texto}
                         </span>
                       </span>
@@ -175,10 +175,10 @@ export default function Consentimento() {
                       return (
                         <div
                           key={linha.titulo}
-                          className="flex items-start justify-between gap-4 rounded-2xl border border-linha bg-areia/60 p-4"
+                          className="flex items-start justify-between gap-4 rounded-2xl border border-contorno bg-fundo-alt/60 p-4"
                         >
                           {descricao}
-                          <span className="eyebrow shrink-0 pt-1 text-salmon-texto">
+                          <span className="eyebrow shrink-0 pt-1 text-destaque">
                             Sempre ativo
                           </span>
                         </div>
@@ -193,7 +193,7 @@ export default function Consentimento() {
                         className={`flex cursor-pointer items-start justify-between gap-4 rounded-2xl border p-4 transition-colors duration-300 ${
                           ligada
                             ? "border-salmon bg-salmon/10"
-                            : "border-linha bg-areia hover:border-salmon/40"
+                            : "border-contorno bg-fundo-alt hover:border-salmon/40"
                         }`}
                       >
                         {descricao}
@@ -213,11 +213,11 @@ export default function Consentimento() {
                         <span
                           aria-hidden
                           className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors duration-300 peer-focus-visible:ring-2 peer-focus-visible:ring-salmon peer-focus-visible:ring-offset-2 ${
-                            ligada ? "bg-salmon-texto" : "bg-preto/20"
+                            ligada ? "bg-destaque" : "bg-tinta/20"
                           }`}
                         >
                           <span
-                            className={`absolute top-1 h-4 w-4 rounded-full bg-branco transition-all duration-300 ${
+                            className={`absolute top-1 h-4 w-4 rounded-full bg-cartao transition-all duration-300 ${
                               ligada ? "left-6" : "left-1"
                             }`}
                           />
@@ -232,7 +232,7 @@ export default function Consentimento() {
                 <button
                   type="button"
                   onClick={() => decidir(detalhando ? escolha : TUDO)}
-                  className="flex min-h-11 flex-1 items-center justify-center rounded-full bg-salmon-texto px-6 font-medium text-branco transition-opacity duration-300 hover:opacity-90"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-full bg-destaque px-6 font-medium text-preto transition-opacity duration-300 hover:opacity-90"
                 >
                   {detalhando ? "Salvar escolha" : "Aceitar"}
                 </button>
@@ -240,7 +240,7 @@ export default function Consentimento() {
                 <button
                   type="button"
                   onClick={() => decidir(NADA)}
-                  className="flex min-h-11 flex-1 items-center justify-center rounded-full border border-preto/25 px-6 font-medium text-preto transition-colors duration-300 hover:border-salmon hover:text-salmon-texto"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-full border border-tinta/25 px-6 font-medium text-tinta transition-colors duration-300 hover:border-salmon hover:text-destaque"
                 >
                   Recusar
                 </button>
@@ -249,31 +249,31 @@ export default function Consentimento() {
                   <button
                     type="button"
                     onClick={() => setDetalhando(true)}
-                    className="flex min-h-11 items-center justify-center rounded-full px-6 text-sm text-preto/60 transition-colors duration-300 hover:text-salmon-texto"
+                    className="flex min-h-11 items-center justify-center rounded-full px-6 text-sm text-tinta/60 transition-colors duration-300 hover:text-destaque"
                   >
                     Escolher
                   </button>
                 )}
               </div>
 
-              <p className="mt-2 flex flex-wrap items-center text-xs text-preto/50">
+              <p className="mt-2 flex flex-wrap items-center text-xs text-tinta/50">
                 <Link
                   href="/politica-de-cookies"
-                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-salmon-texto"
+                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-destaque"
                 >
                   Política de Cookies
                 </Link>
                 <span className="mx-2">·</span>
                 <Link
                   href="/politica-de-privacidade"
-                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-salmon-texto"
+                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-destaque"
                 >
                   Política de Privacidade
                 </Link>
                 <span className="mx-2">·</span>
                 <Link
                   href="/aviso-legal"
-                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-salmon-texto"
+                  className="flex min-h-11 items-center underline underline-offset-4 hover:text-destaque"
                 >
                   Aviso Legal
                 </Link>

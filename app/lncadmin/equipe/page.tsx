@@ -43,14 +43,14 @@ export default async function AdminEquipe() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">Equipe</h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">Equipe</h1>
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         Aparecem na página Sobre, na seção &ldquo;Quem constrói a sua
         marca&rdquo;. Toda alteração vale no site em segundos.
       </p>
 
-      <div className="mt-4 rounded-2xl border border-linha bg-branco p-5 text-sm leading-relaxed text-preto/70">
-        <strong className="font-medium text-preto">
+      <div className="mt-4 rounded-2xl border border-contorno bg-cartao p-5 text-sm leading-relaxed text-tinta/70">
+        <strong className="font-medium text-tinta">
           Cabe quanta gente for preciso.
         </strong>{" "}
         Os retratos ficam num trilho que desliza para o lado. Quando houver
@@ -60,7 +60,7 @@ export default async function AdminEquipe() {
       </div>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
@@ -68,9 +68,9 @@ export default async function AdminEquipe() {
       {/* ---------- Nova pessoa ---------- */}
       <form
         action={criarPessoa}
-        className="mt-8 rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)]"
+        className="mt-8 rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)]"
       >
-        <h2 className="font-medium text-preto">Acrescentar pessoa</h2>
+        <h2 className="font-medium text-tinta">Acrescentar pessoa</h2>
 
         <div className="mt-5 grid gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -110,7 +110,7 @@ export default async function AdminEquipe() {
 
         <button
           type="submit"
-          className={`${botao} mt-5 bg-salmon-texto text-branco hover:bg-salmon-escuro`}
+          className={`${botao} mt-5 bg-destaque text-preto hover:bg-salmon-escuro`}
         >
           Acrescentar
         </button>
@@ -119,7 +119,7 @@ export default async function AdminEquipe() {
       {/* ---------- Lista ---------- */}
       <div className="mt-8 space-y-4">
         {equipe.length === 0 && (
-          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60">
+          <p className="rounded-2xl border border-contorno bg-cartao p-6 text-sm text-tinta/60">
             Ninguém cadastrado. A seção não aparece na página Sobre enquanto
             estiver vazia.
           </p>
@@ -128,10 +128,10 @@ export default async function AdminEquipe() {
         {equipe.map((p, i) => (
           <div
             key={p.id}
-            className="rounded-3xl border border-linha bg-branco p-6 shadow-[var(--sombra-cartao)]"
+            className="rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)]"
           >
             <div className="flex items-center justify-between gap-4">
-              <span className="numeral-fantasma text-sm text-preto/35">
+              <span className="numeral-fantasma text-sm text-tinta/35">
                 {String(i + 1).padStart(2, "0")}
               </span>
 
@@ -145,7 +145,7 @@ export default async function AdminEquipe() {
                     type="submit"
                     disabled={i === 0}
                     aria-label={`Mover ${p.nome} para trás`}
-                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-linha text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-contorno text-sm text-tinta/60 transition-colors hover:border-salmon disabled:opacity-30"
                   >
                     ↑
                   </button>
@@ -158,7 +158,7 @@ export default async function AdminEquipe() {
                     type="submit"
                     disabled={i === equipe.length - 1}
                     aria-label={`Mover ${p.nome} para frente`}
-                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-linha text-sm text-preto/60 transition-colors hover:border-salmon disabled:opacity-30"
+                    className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-contorno text-sm text-tinta/60 transition-colors hover:border-salmon disabled:opacity-30"
                   >
                     ↓
                   </button>
@@ -178,7 +178,7 @@ export default async function AdminEquipe() {
                   alt={`Foto de ${p.nome}`}
                   width={96}
                   height={128}
-                  className="h-32 w-24 shrink-0 rounded-xl border border-linha object-cover object-top grayscale"
+                  className="h-32 w-24 shrink-0 rounded-xl border border-contorno object-cover object-top grayscale"
                 />
 
                 <div className="grid min-w-[240px] flex-1 gap-4">
@@ -217,18 +217,18 @@ export default async function AdminEquipe() {
 
               <button
                 type="submit"
-                className={`${botao} justify-self-start border border-preto/20 text-preto hover:border-preto`}
+                className={`${botao} justify-self-start border border-tinta/20 text-tinta hover:border-tinta`}
               >
                 Salvar
               </button>
             </form>
 
             {/* Fora do formulário acima: um formulário não pode conter outro. */}
-            <form action={apagarPessoa} className="mt-4 border-t border-linha pt-4">
+            <form action={apagarPessoa} className="mt-4 border-t border-contorno pt-4">
               <input type="hidden" name="id" value={p.id} />
               <button
                 type="submit"
-                className="text-sm text-preto/45 transition-colors duration-300 hover:text-salmon-texto"
+                className="text-sm text-tinta/45 transition-colors duration-300 hover:text-destaque"
               >
                 Tirar {p.nome} da equipe
               </button>

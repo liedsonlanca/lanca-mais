@@ -43,28 +43,28 @@ export default async function AdminBlog() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-semibold text-preto">Blog</h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-preto/65">
+      <h1 className="font-heading text-3xl font-semibold text-tinta">Blog</h1>
+      <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
         Os três posts mais recentes aparecem na home e no rodapé. A lista
         completa fica na página do blog, com uma página própria para cada texto.
       </p>
 
-      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-preto/70`}>
-        <strong className="font-medium text-preto">Como escrever:</strong>{" "}
+      <div className={`${cartao} mt-4 !p-5 text-sm leading-relaxed text-tinta/70`}>
+        <strong className="font-medium text-tinta">Como escrever:</strong>{" "}
         separe os parágrafos com uma linha em branco, como num e-mail. O tempo
         de leitura é calculado sozinho. Desmarque{" "}
         <em>publicado</em> para guardar um rascunho sem que ele apareça no site.
       </div>
 
       {!sql && (
-        <p className="mt-6 rounded-2xl border border-salmon/40 bg-branco p-5 text-sm text-preto/75">
+        <p className="mt-6 rounded-2xl border border-salmon/40 bg-cartao p-5 text-sm text-tinta/75">
           Banco de dados não configurado. Nada aqui será salvo.
         </p>
       )}
 
       {/* ---------- Novo post ---------- */}
       <form action={criarPost} className={`${cartao} mt-8`}>
-        <h2 className="font-medium text-preto">Escrever post</h2>
+        <h2 className="font-medium text-tinta">Escrever post</h2>
 
         <div className="mt-5 grid gap-4">
           <div>
@@ -133,7 +133,7 @@ export default async function AdminBlog() {
             />
           </div>
 
-          <label className="flex min-h-11 items-center gap-3 text-sm text-preto/70">
+          <label className="flex min-h-11 items-center gap-3 text-sm text-tinta/70">
             <input
               type="checkbox"
               name="publicado"
@@ -152,7 +152,7 @@ export default async function AdminBlog() {
       {/* ---------- Lista ---------- */}
       <div className="mt-8 space-y-4">
         {posts.length === 0 && (
-          <p className="rounded-2xl border border-linha bg-branco p-6 text-sm text-preto/60">
+          <p className="rounded-2xl border border-contorno bg-cartao p-6 text-sm text-tinta/60">
             Nenhum post cadastrado.
           </p>
         )}
@@ -161,13 +161,13 @@ export default async function AdminBlog() {
           <details key={p.id} className={`${cartao} group`}>
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
               <span className="min-w-0">
-                <span className="block truncate font-medium text-preto">
+                <span className="block truncate font-medium text-tinta">
                   {p.titulo}
                 </span>
-                <span className="mt-1 block text-sm text-preto/55">
+                <span className="mt-1 block text-sm text-tinta/55">
                   {p.data} · {p.tempo_leitura}
                   {!p.publicado && (
-                    <span className="ml-2 rounded-full bg-salmon/15 px-2 py-0.5 text-xs text-salmon-texto">
+                    <span className="ml-2 rounded-full bg-salmon/15 px-2 py-0.5 text-xs text-destaque">
                       rascunho
                     </span>
                   )}
@@ -175,7 +175,7 @@ export default async function AdminBlog() {
               </span>
               <span
                 aria-hidden
-                className="shrink-0 text-xl text-salmon-texto transition-transform duration-300 group-open:rotate-45"
+                className="shrink-0 text-xl text-destaque transition-transform duration-300 group-open:rotate-45"
               >
                 +
               </span>
@@ -252,7 +252,7 @@ export default async function AdminBlog() {
                 />
               </div>
 
-              <label className="flex min-h-11 items-center gap-3 text-sm text-preto/70">
+              <label className="flex min-h-11 items-center gap-3 text-sm text-tinta/70">
                 <input
                   type="checkbox"
                   name="publicado"
@@ -267,7 +267,7 @@ export default async function AdminBlog() {
               </button>
             </form>
 
-            <form action={apagarPost} className="mt-4 border-t border-linha pt-4">
+            <form action={apagarPost} className="mt-4 border-t border-contorno pt-4">
               <input type="hidden" name="id" value={p.id} />
               <button type="submit" className={botaoDiscreto}>
                 Apagar este post

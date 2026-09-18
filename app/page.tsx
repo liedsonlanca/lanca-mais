@@ -9,7 +9,6 @@ import {
   lerPosts,
 } from "@/lib/conteudo";
 import Hero from "@/components/Hero";
-import NicheMarquee from "@/components/NicheMarquee";
 import ServiceRows from "@/components/ServiceRows";
 import MethodSteps from "@/components/MethodSteps";
 import WorkShowcase from "@/components/WorkShowcase";
@@ -130,11 +129,10 @@ export default async function Home() {
     <>
       <FaqJsonLd />
 
-      <Hero numeros={numeros} />
-      <NicheMarquee />
+      <Hero numeros={numeros} vitrine={vitrine} depoimentos={depoimentos} />
 
       {/* ---------- 1. Serviços ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-fundo-alt">
         <div className="glow-salmon pointer-events-none absolute -left-32 bottom-0 h-[480px] w-[480px] opacity-25 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
@@ -151,11 +149,11 @@ export default async function Home() {
           <ServiceRows />
 
           <Reveal delay={0.2}>
-            <div className="mt-10 flex flex-col items-start gap-4 border-t border-linha pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-preto/62">Precisa de algo específico?</p>
+            <div className="mt-10 flex flex-col items-start gap-4 border-t border-contorno pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-tinta/62">Precisa de algo específico?</p>
               <Link
                 href="/contato"
-                className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-salmon-texto"
+                className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-destaque"
               >
                 Solicitar orçamento
                 <span
@@ -171,7 +169,7 @@ export default async function Home() {
       </section>
 
       {/* ---------- 2. O problema ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section className="relative overflow-hidden bg-fundo">
         <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
@@ -188,7 +186,7 @@ export default async function Home() {
             {sintomas.map((sintoma, i) => (
               <StaggerItem
                 key={sintoma.titulo}
-                className="group relative h-full overflow-hidden rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
+                className="group relative h-full overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
               >
                 {/* Régua de lançamento, como nas abas de serviço e no método. */}
                 <span
@@ -198,7 +196,7 @@ export default async function Home() {
 
                 <span
                   aria-hidden
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-destaque transition-colors duration-500 group-hover:bg-salmon group-hover:text-tinta"
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -213,10 +211,10 @@ export default async function Home() {
                   </svg>
                 </span>
 
-                <h3 className="mt-6 text-xl font-semibold leading-snug text-preto">
+                <h3 className="mt-6 text-xl font-semibold leading-snug text-tinta">
                   {sintoma.titulo}
                 </h3>
-                <p className="mt-3 leading-relaxed text-preto/70">
+                <p className="mt-3 leading-relaxed text-tinta/70">
                   {sintoma.descricao}
                 </p>
               </StaggerItem>
@@ -225,8 +223,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ---------- 3. Vitrine de trabalhos ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      {/* ---------- 3. Vitrine de trabalhos ----------
+          O id é o destino do "Ver todo o trabalho" da abertura. scroll-mt
+          desconta o menu fixo, que senão cobriria o título ao chegar. */}
+      <section id="nosso-trabalho" className="relative scroll-mt-20 overflow-hidden bg-fundo-alt">
         <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-10 lg:pt-36">
           <SectionHeading
             eyebrow="Nosso trabalho"
@@ -244,7 +244,7 @@ export default async function Home() {
       </section>
 
       {/* ---------- 4. Método ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section className="relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Nosso método"
@@ -261,7 +261,7 @@ export default async function Home() {
       </section>
 
       {/* ---------- 5. Cases ---------- */}
-      <section className="relative overflow-hidden bg-areia">
+      <section className="relative overflow-hidden bg-fundo-alt">
         <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Cases"
@@ -277,7 +277,7 @@ export default async function Home() {
               <StaggerItem key={caso.slug}>
                 {/* No claro o texto sai de cima da foto e vai para o card:
                     sobre a imagem ele exigiria um véu escuro em toda peça. */}
-                <article className="group h-full overflow-hidden rounded-3xl border border-linha bg-branco shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
+                <article className="group h-full overflow-hidden rounded-3xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
                   <div className="relative aspect-[16/11] overflow-hidden">
                     <Image
                       src={caso.image}
@@ -289,14 +289,14 @@ export default async function Home() {
                   </div>
 
                   <div className="p-8">
-                    <span className="eyebrow text-salmon-texto">{caso.niche}</span>
-                    <h3 className="mt-3 text-xl font-semibold text-preto">
+                    <span className="eyebrow text-destaque">{caso.niche}</span>
+                    <h3 className="mt-3 text-xl font-semibold text-tinta">
                       {caso.client}
                     </h3>
-                    <p className="mt-3 leading-relaxed text-preto/72">
+                    <p className="mt-3 leading-relaxed text-tinta/72">
                       {caso.summary}
                     </p>
-                    <p className="mt-6 border-t border-linha pt-5 text-sm font-medium text-salmon-texto">
+                    <p className="mt-6 border-t border-contorno pt-5 text-sm font-medium text-destaque">
                       {caso.result}
                     </p>
                   </div>
@@ -309,7 +309,7 @@ export default async function Home() {
             <div className="mt-12 text-center">
               <Link
                 href="/portfolio"
-                className="group inline-flex items-center gap-2 rounded-full border border-preto/20 px-7 py-3.5 font-medium text-preto transition-colors duration-500 hover:border-salmon hover:text-salmon-texto"
+                className="group inline-flex items-center gap-2 rounded-full border border-tinta/20 px-7 py-3.5 font-medium text-tinta transition-colors duration-500 hover:border-salmon hover:text-destaque"
               >
                 Ver todos os cases
                 <span
@@ -325,7 +325,7 @@ export default async function Home() {
       </section>
 
       {/* ---------- 6. Depoimentos ---------- */}
-      <section className="relative overflow-hidden bg-papel">
+      <section className="relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Depoimentos"
@@ -345,7 +345,7 @@ export default async function Home() {
 
       {/* ---------- 7. Blog ---------- */}
       {BLOG_ATIVO && (
-        <section className="relative overflow-hidden bg-areia">
+        <section className="relative overflow-hidden bg-fundo-alt">
           <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
             <SectionHeading
               eyebrow="Insights"
@@ -361,29 +361,29 @@ export default async function Home() {
                 <StaggerItem key={post.slug} className="h-full">
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="group flex h-full flex-col rounded-3xl border border-linha bg-areia p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-branco hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
+                    className="group flex h-full flex-col rounded-3xl border border-contorno bg-fundo-alt p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
                   >
                     {/* Categoria vira etiqueta: dá um ponto de cor ao card e
                         separa a leitura do tempo estimado. */}
                     <div className="flex items-center gap-3">
-                      <span className="eyebrow rounded-full bg-salmon/15 px-3 py-1.5 text-salmon-texto">
+                      <span className="eyebrow rounded-full bg-salmon/15 px-3 py-1.5 text-destaque">
                         {post.category}
                       </span>
-                      <span className="text-xs text-preto/55">{post.readingTime}</span>
+                      <span className="text-xs text-tinta/55">{post.readingTime}</span>
                     </div>
 
-                    <h3 className="mt-6 text-xl font-semibold leading-snug text-preto transition-colors duration-500 group-hover:text-salmon-texto">
+                    <h3 className="mt-6 text-xl font-semibold leading-snug text-tinta transition-colors duration-500 group-hover:text-destaque">
                       {post.title}
                     </h3>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-preto/70">
+                    <p className="mt-3 flex-1 text-sm leading-relaxed text-tinta/70">
                       {post.excerpt}
                     </p>
 
-                    <span className="mt-7 flex items-center justify-between border-t border-linha pt-5">
-                      <span className="text-xs uppercase tracking-widest text-preto/50">
+                    <span className="mt-7 flex items-center justify-between border-t border-contorno pt-5">
+                      <span className="text-xs uppercase tracking-widest text-tinta/50">
                         {formatarData(post.date)}
                       </span>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-linha text-preto/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-contorno text-tinta/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-tinta">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                           <path d="M5 12h14M13 6l6 6-6 6" />
                         </svg>
@@ -400,7 +400,7 @@ export default async function Home() {
       {/* ---------- 8. FAQ ---------- */}
       <section
         className={`relative overflow-hidden ${
-          BLOG_ATIVO ? "bg-papel" : "bg-areia"
+          BLOG_ATIVO ? "bg-fundo" : "bg-fundo-alt"
         }`}
       >
         <div className="mx-auto max-w-3xl px-6 py-14 lg:py-20">
@@ -419,21 +419,21 @@ export default async function Home() {
                     abrir uma pergunta fecha a anterior. */}
                 <details
                   name="faq-home"
-                  className="faq-suave group rounded-2xl border border-linha bg-branco shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
+                  className="faq-suave group rounded-2xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
                 >
                   {/* min-h-11 no summary, e nao no details: o padding do details nao
                       abre nada ao ser tocado, so o summary abre. Sem isto o
                       alvo real era a linha de texto, com 28px de altura. */}
-                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-medium text-preto [&::-webkit-details-marker]:hidden">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-medium text-tinta [&::-webkit-details-marker]:hidden">
                     {item.question}
                     <span
                       aria-hidden
-                      className="shrink-0 text-xl text-salmon-texto transition-transform duration-500 group-open:rotate-45"
+                      className="shrink-0 text-xl text-destaque transition-transform duration-500 group-open:rotate-45"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mt-4 text-sm leading-relaxed text-preto/72">
+                  <p className="mt-4 text-sm leading-relaxed text-tinta/72">
                     {item.answer}
                   </p>
                 </details>
@@ -446,7 +446,7 @@ export default async function Home() {
       {/* ---------- 9. Quem somos ---------- */}
       <section
         className={`relative overflow-hidden ${
-          BLOG_ATIVO ? "bg-areia" : "bg-papel"
+          BLOG_ATIVO ? "bg-fundo-alt" : "bg-fundo"
         }`}
       >
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
@@ -463,17 +463,17 @@ export default async function Home() {
               />
 
               <Reveal delay={0.2}>
-                <div className="mt-10 grid grid-cols-2 gap-8 border-t border-preto/10 pt-10">
+                <div className="mt-10 grid grid-cols-2 gap-8 border-t border-tinta/10 pt-10">
                   {numeros.map((stat) => (
                     <div key={stat.rotulo}>
-                      <span className="font-heading block text-4xl font-semibold text-preto">
+                      <span className="font-heading block text-4xl font-semibold text-tinta">
                         <Counter
                           valor={stat.valor}
                           prefixo={stat.prefixo}
                           sufixo={stat.sufixo}
                         />
                       </span>
-                      <span className="mt-1 block text-sm text-preto/68">
+                      <span className="mt-1 block text-sm text-tinta/68">
                         {stat.rotulo}
                       </span>
                     </div>
@@ -484,7 +484,7 @@ export default async function Home() {
               <Reveal delay={0.3}>
                 <Link
                   href="/sobre"
-                  className="group mt-10 inline-flex items-center gap-2 rounded-full border border-preto/20 px-7 py-3.5 font-medium text-preto transition-colors duration-500 hover:border-preto"
+                  className="group mt-10 inline-flex items-center gap-2 rounded-full border border-tinta/20 px-7 py-3.5 font-medium text-tinta transition-colors duration-500 hover:border-tinta"
                 >
                   Conhecer a equipe
                   <span
@@ -544,20 +544,20 @@ export default async function Home() {
           acompanha: vira areia, porque "Quem somos" passa a ser papel. */}
       <section
         className={`relative overflow-hidden ${
-          BLOG_ATIVO ? "bg-papel" : "bg-areia"
+          BLOG_ATIVO ? "bg-fundo" : "bg-fundo-alt"
         }`}
       >
         <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
         <div className="relative mx-auto max-w-4xl px-6 py-12 text-center lg:py-16">
-          <h2 className="font-heading text-4xl font-semibold leading-[1.06] text-preto md:text-6xl">
+          <h2 className="font-heading text-4xl font-semibold leading-[1.06] text-tinta md:text-6xl">
             Pronto para lançar sua marca
             <span className="block">
-              para o próximo <span className="text-salmon-texto">nível?</span>
+              para o próximo <span className="text-destaque">nível?</span>
             </span>
           </h2>
           <Reveal delay={0.15}>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-preto/72">
+            <p className="mx-auto mt-6 max-w-xl text-lg text-tinta/72">
               Fale com a equipe da {siteConfig.name} e receba um diagnóstico
               inicial da sua presença digital, sem compromisso.
             </p>
@@ -565,7 +565,7 @@ export default async function Home() {
           <Reveal delay={0.25}>
             <Link
               href="/contato"
-              className="mt-10 inline-block rounded-full bg-salmon-texto px-9 py-4 font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
+              className="mt-10 inline-block rounded-full bg-destaque px-9 py-4 font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
             >
               Solicitar diagnóstico
             </Link>

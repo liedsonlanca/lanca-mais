@@ -92,7 +92,7 @@ export default function TermosDeUso() {
             Encontrou uma falha de segurança e quer relatar? Escreva para{" "}
             <a
               href={`mailto:${siteConfig.email}`}
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               {siteConfig.email}
             </a>
@@ -122,7 +122,7 @@ export default function TermosDeUso() {
             O que fazemos com esses dados está na{" "}
             <Link
               href="/politica-de-privacidade"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Política de Privacidade
             </Link>
@@ -162,14 +162,14 @@ export default function TermosDeUso() {
             O que o conteúdo publicado aqui é, e o que ele não promete, está no{" "}
             <Link
               href="/aviso-legal"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Aviso Legal
             </Link>
             . O que fica guardado no seu navegador está na{" "}
             <Link
               href="/politica-de-cookies"
-              className="font-medium text-salmon-texto underline decoration-salmon/40 underline-offset-4"
+              className="font-medium text-destaque underline decoration-salmon/40 underline-offset-4"
             >
               Política de Cookies
             </Link>

@@ -93,9 +93,9 @@ export default async function BlogPostPage({
         </div>
       </header>
 
-      <article className="relative overflow-hidden bg-papel">
+      <article className="relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-3xl px-6 py-12 lg:py-16">
-          <div className="space-y-6 text-lg leading-relaxed text-preto/75">
+          <div className="space-y-6 text-lg leading-relaxed text-tinta/75">
             {post.content.map((paragraph, i) => (
               <Reveal key={i} delay={0.03 * i} distance={20}>
                 <p>{paragraph}</p>

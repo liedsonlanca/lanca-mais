@@ -54,7 +54,7 @@ export default function MethodSteps({ etapas }: { etapas: Etapa[] }) {
       {/* Trilho: vertical no celular, horizontal a partir do desktop. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-8 top-8 h-[calc(100%-4rem)] w-px bg-linha lg:left-0 lg:top-8 lg:h-px lg:w-full"
+        className="pointer-events-none absolute left-8 top-8 h-[calc(100%-4rem)] w-px bg-contorno lg:left-0 lg:top-8 lg:h-px lg:w-full"
       >
         <motion.div
           style={{ scaleY: avanco }}
@@ -81,13 +81,13 @@ export default function MethodSteps({ etapas }: { etapas: Etapa[] }) {
             className="group relative flex gap-6 lg:block"
           >
             {/* Marcador que cruza o trilho */}
-            <span className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-linha bg-areia shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
-              <span className="numeral-fantasma text-xl text-salmon-texto transition-colors duration-500 group-hover:text-preto">
+            <span className="relative z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-contorno bg-fundo-alt shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
+              <span className="numeral-fantasma text-xl text-destaque transition-colors duration-500 group-hover:text-tinta">
                 {etapa.step}
               </span>
             </span>
 
-            <div className="relative flex-1 overflow-hidden rounded-3xl border border-linha bg-areia p-7 shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:-translate-y-1 group-hover:border-salmon/45 group-hover:bg-branco group-hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:mt-8 lg:p-8">
+            <div className="relative flex-1 overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-7 shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:-translate-y-1 group-hover:border-salmon/45 group-hover:bg-cartao group-hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:mt-8 lg:p-8">
               {/* A mesma régua de lançamento das abas de serviço. */}
               <span
                 aria-hidden
@@ -96,7 +96,7 @@ export default function MethodSteps({ etapas }: { etapas: Etapa[] }) {
 
               <span
                 aria-hidden
-                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-salmon-texto transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-destaque transition-colors duration-500 group-hover:bg-salmon group-hover:text-tinta"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -111,10 +111,10 @@ export default function MethodSteps({ etapas }: { etapas: Etapa[] }) {
                 </svg>
               </span>
 
-              <h3 className="mt-6 text-xl font-semibold text-preto">
+              <h3 className="mt-6 text-xl font-semibold text-tinta">
                 {etapa.title}
               </h3>
-              <p className="mt-3 leading-relaxed text-preto/70">
+              <p className="mt-3 leading-relaxed text-tinta/70">
                 {etapa.description}
               </p>
             </div>

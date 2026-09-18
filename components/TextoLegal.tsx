@@ -27,26 +27,26 @@ export async function PaginaLegal({
 
   return (
     <section
-      className={`relative overflow-hidden bg-papel ${
+      className={`relative overflow-hidden bg-fundo ${
         aberto ? "" : "pagina-legal-fechada"
       }`}
     >
       <div className="mx-auto max-w-2xl px-6 py-12 lg:py-16">
-        <p className="eyebrow text-preto/45">
+        <p className="eyebrow text-tinta/45">
           Atualizada em {atualizadoEm}
         </p>
         <div className="mt-10 space-y-10">{children}</div>
 
         {!aberto && (
-          <div className="mt-16 border-t border-linha pt-8">
-            <p className="text-sm text-preto/60">
+          <div className="mt-16 border-t border-contorno pt-8">
+            <p className="text-sm text-tinta/60">
               O site ainda não abriu ao público. Enquanto isso, a equipe da{" "}
               {siteConfig.name} continua atendendo normalmente.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <Link
                 href="/"
-                className="flex min-h-11 items-center rounded-full border border-linha px-5 text-sm text-preto/75 transition-colors duration-300 hover:border-salmon hover:text-salmon-texto"
+                className="flex min-h-11 items-center rounded-full border border-contorno px-5 text-sm text-tinta/75 transition-colors duration-300 hover:border-salmon hover:text-destaque"
               >
                 Voltar
               </Link>
@@ -54,7 +54,7 @@ export async function PaginaLegal({
                 href={`https://wa.me/${siteConfig.whatsappNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-11 items-center rounded-full bg-salmon-texto px-5 text-sm font-medium text-branco transition-opacity duration-300 hover:opacity-90"
+                className="flex min-h-11 items-center rounded-full bg-destaque px-5 text-sm font-medium text-preto transition-opacity duration-300 hover:opacity-90"
               >
                 Falar no WhatsApp
               </a>
@@ -75,10 +75,10 @@ export function Secao({
 }) {
   return (
     <div>
-      <h2 className="font-heading text-2xl font-semibold text-preto">
+      <h2 className="font-heading text-2xl font-semibold text-tinta">
         {titulo}
       </h2>
-      <div className="mt-4 space-y-4 leading-relaxed text-preto/72">
+      <div className="mt-4 space-y-4 leading-relaxed text-tinta/72">
         {children}
       </div>
     </div>

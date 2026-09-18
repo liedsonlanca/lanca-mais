@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { navLinks, siteConfig } from "@/lib/site-config";
 import { pararRolagem, retomarRolagem } from "@/lib/scroll";
@@ -12,15 +12,40 @@ export default function Header() {
   const pathname = usePathname();
   const [aberto, setAberto] = useState(false);
   const [rolou, setRolou] = useState(false);
+  const [sobreClaro, setSobreClaro] = useState(false);
   const { scrollY } = useScroll();
 
-  // Toda página abre com um hero escuro, então no topo o header é transparente
-  // com texto claro. Depois da dobra ele entra no claro do corpo do site.
+  // A cor do header segue o que está embaixo dele.
+  //
+  // Antes a regra era "no topo, texto claro; depois de rolar, escuro", que só
+  // valia porque toda página abria com um hero escuro. Desde 18/09/2026 a home
+  // abre com um painel claro e as outras continuam abrindo escuras, então
+  // nenhuma regra de posição acerta as duas. Olhar o que está de fato sob o
+  // header acerta qualquer página, inclusive uma que ainda não exista.
+  //
+  // Sobre um trecho claro, o header ganha a própria classe tema-claro, e as
+  // cores dele se redefinem sozinhas, do mesmo jeito que as do painel.
+  const medirFundo = useCallback(() => {
+    const debaixo = document
+      .elementsFromPoint(window.innerWidth / 2, 38)
+      .find((el) => !el.closest("header"));
+    setSobreClaro(Boolean(debaixo?.closest(".tema-claro")));
+  }, []);
+
   useMotionValueEvent(scrollY, "change", (valor) => {
     setRolou(valor > 24);
+    medirFundo();
   });
 
-  const claro = rolou || aberto;
+  // Ao chegar numa página, antes de qualquer rolagem. No quadro seguinte, e
+  // não na hora: a página nova ainda está sendo desenhada quando o efeito roda.
+  useEffect(() => {
+    const quadro = requestAnimationFrame(medirFundo);
+    return () => cancelAnimationFrame(quadro);
+  }, [pathname, medirFundo]);
+
+  // Com o menu cheio aberto, o que está embaixo é o menu, que é escuro.
+  const claroEmCima = sobreClaro && !aberto;
 
   // Fecha o menu ao trocar de página.
   useEffect(() => {
@@ -67,8 +92,10 @@ export default function Header() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
-          claro
-            ? "border-b border-linha bg-papel/85 backdrop-blur-xl"
+          claroEmCima ? "tema-claro" : ""
+        } ${
+          rolou || aberto
+            ? "border-b border-contorno bg-fundo/85 backdrop-blur-xl"
             : "border-b border-transparent bg-transparent"
         }`}
       >
@@ -83,8 +110,8 @@ export default function Header() {
             className="flex h-11 shrink-0 items-center"
           >
             <span className="relative block h-7 w-[110px]">
-              {/* Duas versões do logo em cross-fade: a clara vale sobre o hero
-                  escuro, a escura vale sobre o corpo claro. */}
+              {/* Duas versões do logo em cross-fade: a clara vale sobre fundo
+                  escuro, a escura sobre fundo claro. */}
               <Image
                 src="/images/logo-1.png"
                 alt="LANÇA+"
@@ -92,7 +119,7 @@ export default function Header() {
                 priority
                 sizes="110px"
                 className={`object-contain object-left transition-opacity duration-500 ${
-                  claro ? "opacity-0" : "opacity-100"
+                  claroEmCima ? "opacity-0" : "opacity-100"
                 }`}
               />
               <Image
@@ -102,7 +129,7 @@ export default function Header() {
                 fill
                 sizes="110px"
                 className={`object-contain object-left transition-opacity duration-500 ${
-                  claro ? "opacity-100" : "opacity-0"
+                  claroEmCima ? "opacity-100" : "opacity-0"
                 }`}
               />
             </span>
@@ -118,11 +145,9 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`group relative text-sm transition-colors duration-500 ${
-                    claro
-                      ? "text-preto/65 hover:text-preto"
-                      : "text-bege/85 hover:text-bege"
-                  }`}
+                  // A tinta já muda sozinha com o tema-claro: uma cor só serve
+                  // sobre o claro e sobre o escuro.
+                  className="group relative text-sm text-tinta/70 transition-colors duration-500 hover:text-tinta"
                 >
                   {link.label}
                   <span
@@ -138,9 +163,25 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <Link
               href="/contato"
-              className="hidden rounded-full bg-salmon-texto px-5 py-2.5 text-sm font-medium text-branco shadow-[0_0_24px_-8px_var(--color-salmon)] transition-all duration-300 hover:shadow-[0_0_36px_-6px_var(--color-salmon)] sm:inline-block"
+              // Tinta sobre fundo, como o botão preto da referência. Como o
+              // header troca de tema sozinho, o mesmo botão sai preto sobre o
+              // painel claro da home e claro sobre as seções escuras, sempre
+              // com o contraste máximo do tema.
+              className="group hidden min-h-11 items-center gap-2 rounded-full bg-tinta px-5 text-sm font-medium text-fundo transition-transform duration-300 hover:-translate-y-0.5 sm:inline-flex"
             >
               Pedir orçamento
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
             </Link>
 
             <button
@@ -152,12 +193,12 @@ export default function Header() {
             >
               <span
                 className={`h-px w-6 transition-all duration-300 ${
-                  claro ? "bg-preto" : "bg-bege"
+                  "bg-tinta"
                 } ${aberto ? "translate-y-[3px] rotate-45" : ""}`}
               />
               <span
                 className={`h-px w-6 transition-all duration-300 ${
-                  claro ? "bg-preto" : "bg-bege"
+                  "bg-tinta"
                 } ${aberto ? "-translate-y-[3px] -rotate-45" : ""}`}
               />
             </button>
@@ -181,7 +222,7 @@ export default function Header() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             data-lenis-prevent
-            className="menu-aberto noise fixed inset-0 z-40 overflow-y-auto bg-papel lg:hidden"
+            className="menu-aberto noise fixed inset-0 z-40 overflow-y-auto bg-fundo lg:hidden"
           >
             {/* Brilho de marca ao fundo: tira o chapado do branco puro. */}
             <div
@@ -196,7 +237,7 @@ export default function Header() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="eyebrow text-preto/45"
+                className="eyebrow text-tinta/45"
               >
                 Navegação
               </motion.p>
@@ -224,13 +265,13 @@ export default function Header() {
                         aria-current={ativo ? "page" : undefined}
                         onClick={() => setAberto(false)}
                         className={`group flex items-center gap-4 border-t py-4 transition-colors duration-500 ${
-                          ativo ? "border-salmon" : "border-linha"
+                          ativo ? "border-salmon" : "border-contorno"
                         }`}
                       >
                         <span
                           aria-hidden
                           className={`numeral-fantasma w-7 shrink-0 text-xs transition-colors duration-500 ${
-                            ativo ? "text-salmon-texto" : "text-preto/30"
+                            ativo ? "text-destaque" : "text-tinta/30"
                           }`}
                         >
                           {String(i + 1).padStart(2, "0")}
@@ -238,7 +279,7 @@ export default function Header() {
 
                         <span
                           className={`font-heading flex-1 text-3xl font-semibold leading-none transition-colors duration-500 ${
-                            ativo ? "text-salmon-texto" : "text-preto"
+                            ativo ? "text-destaque" : "text-tinta"
                           }`}
                         >
                           {link.label}
@@ -249,7 +290,7 @@ export default function Header() {
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-500 ${
                             ativo
                               ? "border-salmon bg-salmon text-preto"
-                              : "border-linha text-preto/40"
+                              : "border-contorno text-tinta/40"
                           }`}
                         >
                           <svg
@@ -270,7 +311,7 @@ export default function Header() {
                 })}
 
                 {/* Fecha a lista: sem isto o último item fica sem base. */}
-                <span aria-hidden className="block border-t border-linha" />
+                <span aria-hidden className="block border-t border-contorno" />
               </nav>
 
               {/* mt-auto empurra o rodapé do menu para baixo em tela alta, sem
@@ -284,28 +325,28 @@ export default function Header() {
                 <Link
                   href="/contato"
                   onClick={() => setAberto(false)}
-                  className="block rounded-full bg-salmon-texto px-7 py-4 text-center font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)]"
+                  className="block rounded-full bg-destaque px-7 py-4 text-center font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)]"
                 >
                   Pedir orçamento
                 </Link>
 
-                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-preto/55">
+                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-tinta/55">
                   <a
                     href={`https://wa.me/${siteConfig.whatsappNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="transition-colors duration-500 hover:text-salmon-texto"
+                    className="transition-colors duration-500 hover:text-destaque"
                   >
                     WhatsApp
                   </a>
-                  <span aria-hidden className="text-preto/25">
+                  <span aria-hidden className="text-tinta/25">
                     /
                   </span>
                   <a
                     href={`https://instagram.com/${siteConfig.instagram.replace("@", "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="transition-colors duration-500 hover:text-salmon-texto"
+                    className="transition-colors duration-500 hover:text-destaque"
                   >
                     {siteConfig.instagram}
                   </a>

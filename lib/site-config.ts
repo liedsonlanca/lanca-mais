@@ -205,3 +205,21 @@ export const services: Service[] = [
     ],
   },
 ];
+
+// Nichos atendidos. Aparecem na fileira de baixo da abertura da home, no lugar
+// em que a referência põe logos de clientes: logos a LANÇA+ ainda não pode
+// mostrar (ver lib/clients.ts), e nicho é afirmação que ela pode fazer.
+export const nichos = [
+  "Saúde",
+  "Estética",
+  "Direito",
+  "Imóveis",
+  "Gastronomia",
+  "Moda",
+  "Educação",
+  "Fitness",
+  "Varejo",
+  "Arquitetura",
+  "Pet",
+  "Tecnologia",
+];
