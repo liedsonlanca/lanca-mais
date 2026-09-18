@@ -58,7 +58,7 @@ export default function TermosDeUso() {
 
         <Secao titulo="Para que o site serve">
           <p>
-            Apresentar as sete frentes de trabalho da {siteConfig.name}, mostrar
+            Apresentar as frentes de trabalho da {siteConfig.name}, mostrar
             o portfólio e os cases, e abrir um canal para quem quiser conversar
             sobre a própria marca. Nada aqui é loja: não há venda, pagamento nem
             cadastro de conta neste site.

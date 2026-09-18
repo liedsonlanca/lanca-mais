@@ -17,7 +17,7 @@ export const caseStudies: CaseStudy[] = [
     image: "/images/team/LFF_0691_resized.jpg",
     summary:
       "Reposicionamento de perfil e estruturação de linha editorial para clínica de estética que não tinha consistência de conteúdo.",
-    services: ["Gestão de Marketing", "Audiovisual"],
+    services: ["Marketing Empresarial", "Audiovisual"],
     result: "[+X% em seguidores / leads em Y meses]",
   },
   {
@@ -37,7 +37,7 @@ export const caseStudies: CaseStudy[] = [
     image: "/images/team/LFF_0655_resized.jpg",
     summary:
       "Estratégia de conteúdo e tráfego pago para consultório médico com foco em geração de agendamentos qualificados.",
-    services: ["Tráfego Pago", "Gestão de Marketing"],
+    services: ["Tráfego Pago", "Marketing Empresarial"],
     result: "[CPL de R$ X / Y agendamentos por mês]",
   },
   {

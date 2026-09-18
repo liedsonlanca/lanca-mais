@@ -100,7 +100,9 @@ export default function DepoimentosCarrossel({
             // A conta desconta o vão entre eles para o terceiro não vazar.
             className="w-full shrink-0 snap-start sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
           >
-            <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-cartao">
+            {/* Cartão, e não a cor da seção: a home alterna os fundos conforme
+                as seções que aparecem, e o card precisa se destacar das duas. */}
+            <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-cartao p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50">
               <span
                 aria-hidden
                 className="absolute inset-x-0 top-0 h-1 w-0 bg-salmon transition-all duration-700 group-hover:w-full"

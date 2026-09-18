@@ -183,6 +183,20 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // A Gestão de Marketing virou Marketing Pessoal e Marketing Empresarial em
+  // 18/09/2026. O endereço antigo leva ao Empresarial, que herdou o conteúdo
+  // dela, em vez de cair na página de erro. Permanente, para o Google trocar o
+  // endereço guardado.
+  async redirects() {
+    return [
+      {
+        source: "/servicos/gestao-de-marketing",
+        destination: "/servicos/marketing-empresarial",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       { source: "/:path*", headers: CABECALHOS },

@@ -87,9 +87,9 @@ export default async function SobrePage() {
                 o rigor é o mesmo, e é ele que faz a marca sair do improviso.
               </p>
               <p className="mt-4 leading-relaxed text-tinta/72">
-                Por trabalharmos com sete frentes complementares: gestão de
-                marketing, consultoria, audiovisual, tráfego pago, identidade
-                visual, desenvolvimento web e arquitetura, conseguimos
+                Por trabalharmos com oito frentes complementares: marketing
+                pessoal, marketing empresarial, audiovisual, consultoria, tráfego
+                pago, identidade visual, desenvolvimento web e arquitetura, conseguimos
                 garantir que a marca do cliente seja a mesma em qualquer ponto
                 de contato.
               </p>

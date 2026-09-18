@@ -10,7 +10,7 @@ export const siteConfig = {
   slogan: ["Somos movimento.", "Somos ideia em ação.", "Somos LANÇA+"],
   tagline: "Marketing que lança marcas para o próximo nível.",
   description:
-    "Agência completa de marketing: gestão de marketing, consultoria, audiovisual, tráfego pago, identidade visual, desenvolvimento web e arquitetura.",
+    "Agência completa de marketing: marketing pessoal, marketing empresarial, audiovisual, consultoria, tráfego pago, identidade visual, desenvolvimento web e arquitetura.",
   whatsappNumber: "5583991060691", // (83) 99106-0691
   email: "contato@lancamais.com",
   instagram: "@lanca.mais",
@@ -47,7 +47,9 @@ export const stats = [
   { prefixo: "+", valor: 40, sufixo: "", label: "marcas atendidas" }, // [AJUSTAR]
   { prefixo: "+", valor: 10, sufixo: "", label: "nichos diferentes" }, // [AJUSTAR]
   { prefixo: "+", valor: 300, sufixo: "", label: "conteúdos por mês" }, // [AJUSTAR]
-  { prefixo: "", valor: 7, sufixo: "", label: "frentes integradas" },
+  // Oito desde 18/09/2026, quando a Gestão de Marketing virou duas. Este é só o
+  // valor de reserva: o que aparece no site é o do painel, em Números.
+  { prefixo: "", valor: 8, sufixo: "", label: "frentes integradas" },
 ];
 
 // Depoimentos — substitua por depoimentos reais de clientes (com autorização).
@@ -108,33 +110,47 @@ export type Service = {
   bullets: string[];
 };
 
+// Os três serviços em evidência na home, na ordem em que aparecem. Os outros
+// ficam atrás do botão "Conhecer outros serviços", na página de serviços.
+export const SERVICOS_EM_DESTAQUE = [
+  "marketing-pessoal",
+  "marketing-empresarial",
+  "audiovisual",
+];
+
+// A ordem daqui é a ordem em todo lugar que lista os serviços (página de
+// serviços, rodapé, formulário de contato): os três em destaque vêm primeiro.
+//
+// Marketing Pessoal e Marketing Empresarial substituíram a Gestão de Marketing
+// em 18/09/2026. Os textos dos dois foram escritos pela equipe do site a partir
+// do que a Gestão dizia, e esperam a revisão da agência antes do lançamento.
 export const services: Service[] = [
   {
-    slug: "gestao-de-marketing",
-    name: "Gestão de Marketing",
+    slug: "marketing-pessoal",
+    name: "Marketing Pessoal",
     shortDescription:
-      "Estratégia e execução contínua da presença digital da sua marca.",
+      "Para profissionais que querem ser a referência da própria área.",
     description:
-      "Cuidamos do planejamento, produção e publicação do conteúdo da sua marca de ponta a ponta, com linha editorial definida, calendário mensal e acompanhamento constante de resultados. Sua marca não posta por postar: cada conteúdo tem um objetivo dentro de uma estratégia maior.",
+      "Para médicos, advogados, dentistas, arquitetos e todo profissional em que a pessoa é a marca. Construímos a sua autoridade no digital com estratégia, conteúdo e imagem à altura do seu trabalho, para que o paciente ou cliente já chegue confiando em você.",
     bullets: [
-      "Perfil estratégico completo da marca",
-      "Calendário editorial mensal",
-      "Produção de conteúdo para Instagram, TikTok e demais canais",
-      "Monitoramento de métricas e reajuste contínuo de estratégia",
+      "Posicionamento da sua marca pessoal",
+      "Linha editorial e calendário mensal",
+      "Produção de conteúdo com você no centro",
+      "Monitoramento de métricas e reajuste contínuo",
     ],
   },
   {
-    slug: "consultoria",
-    name: "Assessoria e Consultoria em Marketing",
+    slug: "marketing-empresarial",
+    name: "Marketing Empresarial",
     shortDescription:
-      "Diagnóstico e direcionamento estratégico para times internos.",
+      "Para empresas que querem ser escolhidas antes do primeiro contato.",
     description:
-      "Para marcas que já têm equipe própria mas precisam de direção estratégica, auditoria de presença digital e um olhar externo especializado para destravar resultados.",
+      "Cuidamos do planejamento, da produção e da publicação do conteúdo da sua empresa de ponta a ponta, com linha editorial definida, calendário mensal e acompanhamento constante de resultados. Sua empresa não posta por postar: cada conteúdo tem um objetivo dentro de uma estratégia maior.",
     bullets: [
-      "Auditoria completa de perfil e concorrência",
-      "Diagnóstico de posicionamento e oportunidades",
-      "Mentoria e direcionamento para equipes internas",
-      "Planos de ação priorizados por impacto",
+      "Perfil estratégico completo da empresa",
+      "Calendário editorial mensal",
+      "Produção de conteúdo para Instagram, TikTok e demais canais",
+      "Monitoramento de métricas e reajuste contínuo de estratégia",
     ],
   },
   {
@@ -149,6 +165,20 @@ export const services: Service[] = [
       "Captação em estúdio ou externa",
       "Edição, motion graphics e trilha sonora",
       "Formatos otimizados para cada plataforma",
+    ],
+  },
+  {
+    slug: "consultoria",
+    name: "Assessoria e Consultoria em Marketing",
+    shortDescription:
+      "Diagnóstico e direcionamento estratégico para times internos.",
+    description:
+      "Para marcas que já têm equipe própria mas precisam de direção estratégica, auditoria de presença digital e um olhar externo especializado para destravar resultados.",
+    bullets: [
+      "Auditoria completa de perfil e concorrência",
+      "Diagnóstico de posicionamento e oportunidades",
+      "Mentoria e direcionamento para equipes internas",
+      "Planos de ação priorizados por impacto",
     ],
   },
   {

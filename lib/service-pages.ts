@@ -22,11 +22,116 @@ export type ServicePage = {
 };
 
 export const servicePages: Record<string, ServicePage> = {
-  "gestao-de-marketing": {
-    slug: "gestao-de-marketing",
-    heroKicker: "O carro-chefe da agência",
+  // Marketing Pessoal e Marketing Empresarial substituíram a Gestão de
+  // Marketing em 18/09/2026. Textos escritos pela equipe do site a partir do
+  // que a Gestão dizia, à espera da revisão da agência antes do lançamento.
+  "marketing-pessoal": {
+    slug: "marketing-pessoal",
+    heroKicker: "Para quem é a própria marca",
     heroSubtitle:
-      "Onde a marca deixa de postar por postar e passa a se posicionar. No digital, ninguém escolhe o mais barato, escolhe-se quem parece mais preparado.",
+      "Quando o profissional é a marca, o que as pessoas encontram de você no digital decide se elas marcam a consulta, fecham o contrato ou procuram outro.",
+    deliverables: [
+      "Posicionamento pessoal",
+      "Linha editorial definida",
+      "Calendário mensal",
+      "Produção com você no centro",
+      "Monitoramento de métricas",
+      "Reajuste estratégico",
+    ],
+    manifesto: {
+      statement: "Ninguém contrata um especialista que não conhece.",
+      body: [
+        "O seu trabalho pode ser excelente e ainda assim perder para quem aparece melhor. Antes de marcar, o paciente ou cliente pesquisa você, e decide pelo que encontra.",
+        "O Marketing Pessoal da LANÇA+ existe para que o que aparece de você no digital esteja à altura do que você entrega: com estratégia, com constância e com a sua voz.",
+      ],
+    },
+    features: [
+      {
+        title: "Você no centro, sem perder o dia",
+        description:
+          "Gravações e aprovações organizadas para caber na sua agenda. Você aparece, e o resto do trabalho é nosso.",
+      },
+      {
+        title: "Autoridade, e não exposição",
+        description:
+          "O conteúdo mostra o que você sabe e como trabalha. A ideia é ser lembrado como referência, e não virar mais um perfil falando de tudo.",
+      },
+      {
+        title: "Produção integrada",
+        description:
+          "Roteiro, gravação, edição, design e texto no mesmo time. A sua imagem fica coerente em todos os formatos.",
+      },
+      {
+        title: "Dados, não achismo",
+        description:
+          "Relatórios com as métricas que importam para o seu objetivo, e reajuste mensal da estratégia com base neles.",
+      },
+    ],
+    process: [
+      {
+        title: "Entrada e briefing",
+        description:
+          "Entendemos a sua trajetória, o seu público e como você quer ser visto.",
+      },
+      {
+        title: "Estratégia",
+        description:
+          "Sua marca pessoal ganha uma direção definida e registrada, validada com você antes de qualquer publicação.",
+      },
+      {
+        title: "Produção e publicação",
+        description:
+          "Gravamos, editamos e publicamos com constância, semana após semana.",
+      },
+      {
+        title: "Leitura e ajuste",
+        description:
+          "Acompanhamos o desempenho e corrigimos a rota ciclo a ciclo: o que funciona ganha espaço.",
+      },
+    ],
+    results: [
+      "Ser reconhecido como referência na sua área",
+      "Pacientes e clientes que chegam já confiando em você",
+      "Um perfil que mostra o nível real do seu trabalho",
+      "Presença constante sem tomar o seu dia",
+      "Estratégia que evolui com dados, não com achismos",
+      "Um time completo cuidando da sua imagem",
+    ],
+    faq: [
+      {
+        question: "Marketing Pessoal ou Empresarial: qual é o meu?",
+        answer:
+          "Se as pessoas contratam você, pelo seu nome, é o Pessoal. Se contratam a empresa, com uma equipe e uma marca que não dependem de uma pessoa só, é o Empresarial. Dá para ter os dois, e a primeira conversa serve para decidir isso.",
+      },
+      {
+        question: "Preciso aparecer nos vídeos?",
+        answer:
+          "Aparecer faz diferença, porque quem contrata um profissional quer ver quem vai atender. Mas a quantidade é combinada com você, e há formatos em que você não precisa estar na tela.",
+      },
+      {
+        question: "Minha profissão tem regras de publicidade. Como fica?",
+        answer:
+          "O conteúdo é planejado dentro das regras do seu conselho profissional, como CFM, CRO e OAB. O que não pode ser dito não entra, e isso é conferido antes de publicar.",
+      },
+      {
+        question: "Quanto do meu tempo isso vai tomar?",
+        answer:
+          "Pouco, e de forma previsível. Você participa da estratégia no começo, das gravações combinadas e das aprovações. O resto é nosso.",
+      },
+      {
+        question: "Vocês atendem fora de Cajazeiras?",
+        answer:
+          "Atendemos. A estratégia e a edição acontecem à distância sem perda nenhuma, e quando é preciso gravar com você a equipe se desloca. Isso entra combinado na proposta, sem custo surpresa depois.",
+      },
+    ],
+    ctaLabel: "Quero ser referência na minha área",
+  },
+
+  "marketing-empresarial": {
+    slug: "marketing-empresarial",
+    heroKicker: "Para a sua empresa",
+    heroSubtitle:
+      "Onde a empresa deixa de postar por postar e passa a se posicionar. No digital, ninguém escolhe o mais barato, escolhe-se quem parece mais preparado.",
     deliverables: [
       "Posicionamento de marca",
       "Linha editorial definida",
@@ -39,15 +144,15 @@ export const servicePages: Record<string, ServicePage> = {
       statement:
         "Ser 'só mais um' no feed é o caminho mais rápido para ficar invisível.",
       body: [
-        "O maior risco para o seu negócio no digital não é a concorrência, é a indiferença. Marcas que comunicam bem o que fazem não competem por preço: elas são escolhidas antes mesmo do primeiro contato.",
-        "A Gestão de Marketing da LANÇA+ existe para transformar a presença digital da sua marca em um ativo de autoridade, consistente, estratégico e orientado a resultado.",
+        "O maior risco para a sua empresa no digital não é a concorrência, é a indiferença. Empresas que comunicam bem o que fazem não competem por preço: elas são escolhidas antes mesmo do primeiro contato.",
+        "O Marketing Empresarial da LANÇA+ existe para transformar a presença digital da sua empresa em um ativo de autoridade, consistente, estratégico e orientado a resultado.",
       ],
     },
     features: [
       {
         title: "Estratégia documentada",
         description:
-          "Sua marca passa a ter uma direção registrada, e não improvisada. É esse documento que guia cada decisão de conteúdo.",
+          "Sua empresa passa a ter uma direção registrada, e não improvisada. É esse documento que guia cada decisão de conteúdo.",
       },
       {
         title: "Linha editorial definida",
@@ -57,7 +162,7 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Produção integrada",
         description:
-          "Design, audiovisual e copywriting no mesmo time, a marca fala com uma voz só em todos os formatos e canais.",
+          "Design, audiovisual e copywriting no mesmo time: a marca fala com uma voz só em todos os formatos e canais.",
       },
       {
         title: "Dados, não achismo",
@@ -74,7 +179,7 @@ export const servicePages: Record<string, ServicePage> = {
       {
         title: "Estratégia",
         description:
-          "Sua marca ganha uma direção definida e registrada, validada com você antes de qualquer publicação.",
+          "Sua empresa ganha uma direção definida e registrada, validada com você antes de qualquer publicação.",
       },
       {
         title: "Produção e publicação",
@@ -88,7 +193,7 @@ export const servicePages: Record<string, ServicePage> = {
       },
     ],
     results: [
-      "Marca reconhecida como referência no seu segmento",
+      "Empresa reconhecida como referência no seu segmento",
       "Feed que constrói percepção de valor antes do primeiro contato",
       "Presença digital consistente que trabalha por você todos os dias",
       "Conteúdo que converte seguidores em oportunidades reais",
@@ -97,12 +202,12 @@ export const servicePages: Record<string, ServicePage> = {
     ],
     faq: [
       {
-        question: "Vocês atendem marcas de fora de Cajazeiras?",
+        question: "Vocês atendem empresas de fora de Cajazeiras?",
         answer:
-          "Atendemos. A gestão acontece à distância sem perda nenhuma, e quando a marca precisa de produção presencial a equipe se desloca. Isso entra combinado na proposta, sem custo surpresa depois.",
+          "Atendemos. A gestão acontece à distância sem perda nenhuma, e quando a empresa precisa de produção presencial a equipe se desloca. Isso entra combinado na proposta, sem custo surpresa depois.",
       },
       {
-        question: "Quem vai cuidar da minha marca no dia a dia?",
+        question: "Quem vai cuidar da minha empresa no dia a dia?",
         answer:
           "Um time da casa, e não freelancers rotativos. Estratégia, design, audiovisual e texto ficam sob o mesmo teto, então a sua marca não muda de voz quando muda de formato.",
       },
@@ -122,7 +227,7 @@ export const servicePages: Record<string, ServicePage> = {
           "Não precisa, são frentes separadas. Mas vale saber: com conteúdo consistente sustentando o anúncio, o custo por resultado costuma cair, então a conta muda quando as duas andam juntas.",
       },
     ],
-    ctaLabel: "Quero minha marca como referência",
+    ctaLabel: "Quero minha empresa como referência",
   },
 
   consultoria: {

@@ -290,3 +290,4 @@ export async function lerPosts(): Promise<BlogPost[]> {
 
 /** Usada pelo painel: garante que as tabelas existem antes de qualquer escrita. */
 export { garantirEsquema };
+

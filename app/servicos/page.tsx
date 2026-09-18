@@ -9,7 +9,7 @@ import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 export const metadata: Metadata = {
   title: "Serviços",
   description:
-    "Gestão de marketing, consultoria, audiovisual, tráfego pago, identidade visual, desenvolvimento web e arquitetura: tudo em uma única agência.",
+    "Marketing pessoal, marketing empresarial, audiovisual, consultoria, tráfego pago, identidade visual, desenvolvimento web e arquitetura: tudo em uma única agência.",
 };
 
 export default function ServicosPage() {
@@ -18,13 +18,13 @@ export default function ServicosPage() {
       <PageHero
         eyebrow="Serviços"
         titulo={[
-          { texto: "Sete frentes que constroem" },
+          { texto: "Oito frentes que constroem" },
           { texto: "uma marca por inteiro.", acento: "inteiro." },
         ]}
         lead="Cada serviço pode ser contratado isoladamente ou combinado, o que não muda é o padrão de qualidade e o alinhamento estratégico entre eles."
       />
 
-      {/* Grade de serviços. Em lista longa as sete frentes viravam rolagem;
+      {/* Grade de serviços. Em lista longa as oito frentes viravam rolagem;
           em grade elas se comparam de relance, que é o que a página precisa. */}
       {/* Areia, e não branco: a seção seguinte é a chamada final, que é
           branca. Duas brancas coladas não têm borda, e sem borda só o vão diz
@@ -36,7 +36,7 @@ export default function ServicosPage() {
               <StaggerItem key={service.slug} className="h-full">
                 <Link
                   href={`/servicos/${service.slug}`}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none"
+                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-cartao p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none"
                 >
                   {/* Régua de lançamento, a mesma da home e do método. */}
                   <span

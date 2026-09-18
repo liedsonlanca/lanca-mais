@@ -125,7 +125,7 @@ export default async function AdminCases() {
               <input
                 id="novo-servicos"
                 name="servicos"
-                placeholder="Gestão de Marketing, Audiovisual"
+                placeholder="Marketing Empresarial, Audiovisual"
                 className={`${campo} mt-2`}
               />
               <p className={ajuda}>Separe por vírgula.</p>

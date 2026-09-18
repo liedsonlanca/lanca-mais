@@ -1,268 +1,203 @@
 import Image from "next/image";
 import Link from "next/link";
-import { siteConfig, faq, BLOG_ATIVO } from "@/lib/site-config";
-import {
-  lerVitrine,
-  lerDepoimentos,
-  lerCases,
-  lerNumeros,
-  lerPosts,
-} from "@/lib/conteudo";
+import { siteConfig, services, SERVICOS_EM_DESTAQUE } from "@/lib/site-config";
+import { lerVitrine, lerDepoimentos, lerCases, lerNumeros } from "@/lib/conteudo";
+import { ehProvisorio } from "@/lib/provisorio";
 import Hero from "@/components/Hero";
-import ServiceRows from "@/components/ServiceRows";
-import MethodSteps from "@/components/MethodSteps";
 import WorkShowcase from "@/components/WorkShowcase";
 import ClientLogos from "@/components/ClientLogos";
 import SectionHeading from "@/components/SectionHeading";
-import FaqJsonLd from "@/components/FaqJsonLd";
+import ServiceIcon from "@/components/ServiceIcon";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
-import Counter from "@/components/motion/Counter";
 import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
 
-// Um ícone por sintoma: preço que não bate com a percepção, publicação em
-// piloto automático e ausência de medição.
-const iconesSintoma: React.ReactNode[] = [
-  <>
-    <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-7.2-7.2A2 2 0 0 1 2.8 12V4.8A2 2 0 0 1 4.8 2.8H12a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.8Z" key="a" />
-    <circle cx="7.5" cy="7.5" r="1.2" key="b" />
-  </>,
-  <>
-    <path d="M3 12a9 9 0 0 1 15.3-6.4M21 12a9 9 0 0 1-15.3 6.4" key="a" />
-    <path d="M18 2.5v4h-4M6 21.5v-4h4" key="b" />
-  </>,
-  <>
-    <path d="M4 20V12M10 20v-5M16 20v-9" key="a" />
-    <path d="M2 20h20" key="b" />
-    <path d="M19.5 3.2a2 2 0 0 1 2.3 3c-.4.5-1 .7-1.3 1.1-.3.4-.3.8-.3 1.2" key="c" />
-    <circle cx="20.2" cy="10.6" r="0.6" fill="currentColor" key="d" />
-  </>,
-];
-
-const sintomas = [
-  {
-    titulo: "O feed não parece o preço",
-    descricao:
-      "A entrega é excelente, mas a comunicação mostra um negócio menor. E o público precifica pelo que vê.",
-  },
-  {
-    titulo: "Publicar virou tarefa, não estratégia",
-    descricao:
-      "Sem linha editorial, cada post nasce solto e nenhum responde à pergunta básica: o que ele deveria vender?",
-  },
-  {
-    titulo: "Ninguém sabe dizer o que funcionou",
-    descricao:
-      "Sem métrica acompanhada, a decisão do mês seguinte vira achismo e o investimento se repete sem aprendizado.",
-  },
-];
-
-// As quatro etapas dizem a forma do trabalho, não a receita dele.
+// A home, desde 18/09/2026.
 //
-// A versão anterior listava os artefatos internos de cada fase, o que
-// entregava o método pronto para quem quisesse copiar. O cliente precisa
-// saber que existe um caminho e que ele funciona; o passo a passo é da casa.
-const metodo = [
-  {
-    step: "01",
-    title: "Estruturação",
-    description:
-      "Antes de qualquer publicação, sua marca ganha uma direção definida e registrada. Nada sai no improviso.",
-  },
-  {
-    step: "02",
-    title: "Implementação",
-    description:
-      "O conteúdo entra no ar com consistência, e cada peça nasce com um objetivo dentro dessa direção.",
-  },
-  {
-    step: "03",
-    title: "Monitoramento",
-    description:
-      "Acompanhamos de perto o que o desempenho mostra sobre o objetivo da sua marca.",
-  },
-  {
-    step: "04",
-    title: "Reajuste",
-    description:
-      "A rota é corrigida pelo que os números mostram. O que funciona ganha espaço, o que não funciona sai.",
-  },
-];
+// Enxuta de propósito. Quem chega para contratar marketing não fica lendo: quer
+// ver o que a agência faz, uma prova de que faz bem, e o botão de falar. A home
+// tinha onze seções e as sete frentes uma embaixo da outra; agora são estas,
+// nesta ordem:
+//
+//   1. Abertura: proposta, números, vídeos e nichos, tudo na primeira tela;
+//   2. Os três serviços em evidência, e os outros atrás de um botão;
+//   3. Nosso trabalho: as peças e os vídeos, que se veem sem ler;
+//   4. Cases e 5. Depoimentos, só quando forem reais;
+//   6. Logos de clientes, só quando houver;
+//   7. A chamada final.
+//
+// O problema, o método, as perguntas e o "quem somos" saíram. O que eles
+// diziam continua no site: a frase-problema abre a abertura, cada página de
+// serviço tem as suas etapas e perguntas, e a equipe está em /sobre.
+//
+// Os fundos alternam sozinhos. Cases e depoimentos podem estar escondidos, e
+// uma ordem fixa de fundos deixaria duas seções vizinhas da mesma cor quando
+// um deles some. Por isso cada seção recebe o fundo pela posição em que de
+// fato aparece.
 
-function formatarData(data: string) {
-  return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+const FUNDOS = ["bg-fundo", "bg-fundo-alt"] as const;
+
+function Seta() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
 }
 
-// Ordem da home, e o porquê dela.
-//
-// O hero faz o gancho e a home alterna oferta e argumento, aos pares: o que
-// vendemos (serviços) e por que isso importa (o problema); como é o trabalho
-// (vitrine) e como ele acontece (método). Só então vem a prova — deu certo com
-// quem (cases) e quem confirma (depoimentos).
-//
-// A apresentação da agência e a faixa de logos fecham a página, encostadas no
-// CTA: quem chegou até ali já quer saber com quem vai falar, e a última coisa
-// antes do convite é quem já confiou.
-//
-// Atenção ao mexer nesta ordem: os fundos alternam papel/areia e duas seções
-// vizinhas nunca repetem. Inserir ou remover uma seção inverte a paridade de
-// tudo que vem abaixo, e o fundo dos cards precisa acompanhar — seção branca
-// pede card areia, seção areia pede card branco (ver README). Quando der,
-// prefira ajustar as pontas (a faixa de nichos e o CTA, que não têm cards) a
-// virar as seções do meio.
 export default async function Home() {
   // Conteúdo editável pelo painel. Sem banco configurado cada leitura devolve
   // o conteúdo estático de lib/, então a home nunca fica vazia.
-  const [vitrine, depoimentos, cases, numeros, posts] = await Promise.all([
+  const [vitrine, depoimentos, cases, numeros] = await Promise.all([
     lerVitrine(),
     lerDepoimentos(),
     lerCases(),
     lerNumeros(),
-    lerPosts(),
   ]);
 
-  return (
-    <>
-      <FaqJsonLd />
+  const destaques = SERVICOS_EM_DESTAQUE.map((slug) =>
+    services.find((s) => s.slug === slug)
+  ).filter((s): s is (typeof services)[number] => Boolean(s));
+  const outros = services.filter((s) => !SERVICOS_EM_DESTAQUE.includes(s.slug));
 
-      <Hero numeros={numeros} vitrine={vitrine} depoimentos={depoimentos} />
+  // Prova social só entra verdadeira. Os provisórios têm colchetes.
+  const casosReais = cases.filter(
+    (c) => !ehProvisorio(c.client, c.niche, c.summary, c.result)
+  );
+  const depoimentosReais = depoimentos.filter(
+    (d) => !ehProvisorio(d.citacao, d.nome, d.cargo)
+  );
 
-      {/* ---------- 1. Serviços ---------- */}
-      <section className="relative overflow-hidden bg-fundo-alt">
-        <div className="glow-salmon pointer-events-none absolute -left-32 bottom-0 h-[480px] w-[480px] opacity-25 blur-3xl" />
+  // ---------- As seções depois da abertura ----------
+  // Cada uma recebe o fundo pela posição em que aparece (ver o topo).
+  const secoes: Array<(fundo: string) => React.ReactNode> = [];
 
-        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-          <SectionHeading
-            eyebrow="O que fazemos"
-            alinhamento="esquerda"
-            titulo={[
-              { texto: "Sete frentes que" },
-              { texto: "conversam entre si.", acento: "conversam" },
-            ]}
-            lead="Contrate uma frente ou todas. Juntas, mantêm estratégia, conteúdo, tráfego e identidade na mesma direção."
-          />
+  // 2. Serviços em evidência
+  secoes.push((fundo) => (
+    <section key="servicos" className={`relative overflow-hidden ${fundo}`}>
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
+        <SectionHeading
+          eyebrow="Serviços"
+          alinhamento="esquerda"
+          titulo={[
+            { texto: "Três formas de" },
+            { texto: "lançar a sua marca.", acento: "lançar" },
+          ]}
+        />
 
-          <ServiceRows />
-
-          <Reveal delay={0.2}>
-            <div className="mt-10 flex flex-col items-start gap-4 border-t border-contorno pt-8 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-tinta/62">Precisa de algo específico?</p>
+        {/* Cards numerados, como os da referência escura: o número em salmão
+            diz a ordem de leitura sem precisar de texto. */}
+        <Stagger className="mt-12 grid gap-5 md:grid-cols-3">
+          {destaques.map((s, i) => (
+            <StaggerItem key={s.slug} className="h-full">
               <Link
-                href="/contato"
-                className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-destaque"
+                href={`/servicos/${s.slug}`}
+                className="group relative flex h-full min-h-[300px] flex-col rounded-3xl border border-contorno bg-cartao p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:p-8 lg:min-h-[340px]"
               >
-                Solicitar orçamento
-                <span
-                  aria-hidden
-                  className="transition-transform duration-500 group-hover:translate-x-1.5"
-                >
-                  →
-                </span>
+                <div className="flex items-start justify-between gap-4">
+                  <span className="numeral-fantasma text-5xl leading-none text-salmon">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/12 text-salmon"
+                  >
+                    <ServiceIcon slug={s.slug} className="h-6 w-6" />
+                  </span>
+                </div>
+
+                <div className="mt-auto pt-12">
+                  <h3 className="text-2xl font-semibold tracking-[-0.02em] text-tinta">
+                    {s.name}
+                  </h3>
+                  <p className="mt-3 leading-relaxed text-tinta/65">
+                    {s.shortDescription}
+                  </p>
+                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-destaque">
+                    Conhecer
+                    <Seta />
+                  </span>
+                </div>
+              </Link>
+            </StaggerItem>
+          ))}
+        </Stagger>
+
+        {/* Os outros serviços: nomes à vista, para quem procura um deles
+            achar sem clicar às cegas, e o botão para a página com todos. */}
+        {outros.length > 0 && (
+          <Reveal delay={0.15}>
+            <div className="mt-6 flex flex-col gap-5 rounded-3xl border border-contorno p-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-7">
+              <div className="min-w-0">
+                <p className="text-sm text-tinta/55">Também fazemos</p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {outros.map((s) => (
+                    <li key={s.slug}>
+                      <Link
+                        href={`/servicos/${s.slug}`}
+                        className="inline-flex min-h-11 items-center rounded-full border border-contorno px-4 text-sm text-tinta/80 transition-colors duration-500 hover:border-salmon hover:text-tinta"
+                      >
+                        {s.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Link
+                href="/servicos"
+                className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-tinta px-6 font-medium text-fundo transition-transform duration-500 hover:-translate-y-0.5"
+              >
+                Conhecer outros serviços
+                <Seta />
               </Link>
             </div>
           </Reveal>
-        </div>
-      </section>
+        )}
+      </div>
+    </section>
+  ));
 
-      {/* ---------- 2. O problema ---------- */}
-      <section className="relative overflow-hidden bg-fundo">
-        <div className="glow-salmon pointer-events-none absolute right-0 top-0 h-[420px] w-[420px] opacity-30 blur-3xl" />
+  // 3. Nosso trabalho
+  // O id é o destino do "Ver todo o trabalho" da abertura; scroll-mt desconta
+  // o menu fixo, que senão cobriria o título ao chegar.
+  secoes.push((fundo) => (
+    <section
+      key="trabalho"
+      id="nosso-trabalho"
+      className={`relative scroll-mt-20 overflow-hidden ${fundo}`}
+    >
+      <div className="mx-auto max-w-7xl px-6 pt-14 lg:px-10 lg:pt-20">
+        <SectionHeading
+          eyebrow="Nosso trabalho"
+          titulo={[
+            { texto: "Cada peça que sai daqui" },
+            { texto: "tem um porquê.", acento: "porquê." },
+          ]}
+        />
+      </div>
 
-        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-          <SectionHeading
-            eyebrow="O problema que resolvemos"
-            titulo={[
-              { texto: "Negócios muito bons" },
-              { texto: "que parecem medianos no digital.", acento: "medianos" },
-            ]}
-            lead="Não é falta de qualidade. É falta de tradução: a marca entrega um nível que a comunicação ainda não mostra."
-          />
+      <div className="pb-14 pt-10 lg:pb-20 lg:pt-12">
+        <WorkShowcase vitrine={vitrine} />
+      </div>
+    </section>
+  ));
 
-          <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-            {sintomas.map((sintoma, i) => (
-              <StaggerItem
-                key={sintoma.titulo}
-                className="group relative h-full overflow-hidden rounded-3xl border border-contorno bg-fundo-alt p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)] lg:p-9"
-              >
-                {/* Régua de lançamento, como nas abas de serviço e no método. */}
-                <span
-                  aria-hidden
-                  className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full"
-                />
-
-                <span
-                  aria-hidden
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/15 text-destaque transition-colors duration-500 group-hover:bg-salmon group-hover:text-tinta"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-6 w-6"
-                  >
-                    {iconesSintoma[i]}
-                  </svg>
-                </span>
-
-                <h3 className="mt-6 text-xl font-semibold leading-snug text-tinta">
-                  {sintoma.titulo}
-                </h3>
-                <p className="mt-3 leading-relaxed text-tinta/70">
-                  {sintoma.descricao}
-                </p>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
-
-      {/* ---------- 3. Vitrine de trabalhos ----------
-          O id é o destino do "Ver todo o trabalho" da abertura. scroll-mt
-          desconta o menu fixo, que senão cobriria o título ao chegar. */}
-      <section id="nosso-trabalho" className="relative scroll-mt-20 overflow-hidden bg-fundo-alt">
-        <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-10 lg:pt-36">
-          <SectionHeading
-            eyebrow="Nosso trabalho"
-            titulo={[
-              { texto: "Cada peça que sai daqui" },
-              { texto: "tem um porquê.", acento: "porquê." },
-            ]}
-            lead="Nada sobe por subir. Todo conteúdo responde a um objetivo da estratégia."
-          />
-        </div>
-
-        <div className="pb-28 pt-16 lg:pb-36">
-          <WorkShowcase vitrine={vitrine} />
-        </div>
-      </section>
-
-      {/* ---------- 4. Método ---------- */}
-      <section className="relative overflow-hidden bg-fundo">
+  // 4. Cases, só os reais, e só dois: a home mostra a prova, o portfólio conta
+  // a história inteira.
+  if (casosReais.length > 0) {
+    secoes.push((fundo) => (
+      <section key="cases" className={`relative overflow-hidden ${fundo}`}>
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-          <SectionHeading
-            eyebrow="Nosso método"
-            alinhamento="esquerda"
-            titulo={[
-              { texto: "Quatro etapas que tiram" },
-              { texto: "a marca do improviso.", acento: "improviso." },
-            ]}
-            lead="Um ciclo que não termina na publicação: ele recomeça, com dado na mesa."
-          />
-
-          <MethodSteps etapas={metodo} />
-        </div>
-      </section>
-
-      {/* ---------- 5. Cases ---------- */}
-      <section className="relative overflow-hidden bg-fundo-alt">
-        <div className="relative mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Cases"
             alinhamento="esquerda"
@@ -272,12 +207,10 @@ export default async function Home() {
             ]}
           />
 
-          <Stagger className="mt-16 grid gap-5 md:grid-cols-2">
-            {cases.map((caso) => (
+          <Stagger className="mt-12 grid gap-5 md:grid-cols-2">
+            {casosReais.slice(0, 2).map((caso) => (
               <StaggerItem key={caso.slug}>
-                {/* No claro o texto sai de cima da foto e vai para o card:
-                    sobre a imagem ele exigiria um véu escuro em toda peça. */}
-                <article className="group h-full overflow-hidden rounded-3xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
+                <article className="group h-full overflow-hidden rounded-3xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45">
                   <div className="relative aspect-[16/11] overflow-hidden">
                     <Image
                       src={caso.image}
@@ -287,16 +220,12 @@ export default async function Home() {
                       className="object-cover grayscale transition-all duration-[1.2s] group-hover:scale-105 group-hover:grayscale-0"
                     />
                   </div>
-
-                  <div className="p-8">
+                  <div className="p-7 sm:p-8">
                     <span className="eyebrow text-destaque">{caso.niche}</span>
                     <h3 className="mt-3 text-xl font-semibold text-tinta">
                       {caso.client}
                     </h3>
-                    <p className="mt-3 leading-relaxed text-tinta/72">
-                      {caso.summary}
-                    </p>
-                    <p className="mt-6 border-t border-contorno pt-5 text-sm font-medium text-destaque">
+                    <p className="mt-4 border-t border-contorno pt-4 text-sm font-medium text-destaque">
                       {caso.result}
                     </p>
                   </div>
@@ -305,27 +234,26 @@ export default async function Home() {
             ))}
           </Stagger>
 
-          <Reveal delay={0.2}>
-            <div className="mt-12 text-center">
+          <Reveal delay={0.15}>
+            <div className="mt-10">
               <Link
                 href="/portfolio"
-                className="group inline-flex items-center gap-2 rounded-full border border-tinta/20 px-7 py-3.5 font-medium text-tinta transition-colors duration-500 hover:border-salmon hover:text-destaque"
+                className="group inline-flex min-h-11 items-center gap-2 font-medium text-tinta"
               >
                 Ver todos os cases
-                <span
-                  aria-hidden
-                  className="transition-transform duration-500 group-hover:translate-x-1.5"
-                >
-                  →
-                </span>
+                <Seta />
               </Link>
             </div>
           </Reveal>
         </div>
       </section>
+    ));
+  }
 
-      {/* ---------- 6. Depoimentos ---------- */}
-      <section className="relative overflow-hidden bg-fundo">
+  // 5. Depoimentos, só os reais
+  if (depoimentosReais.length > 0) {
+    secoes.push((fundo) => (
+      <section key="depoimentos" className={`relative overflow-hidden ${fundo}`}>
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Depoimentos"
@@ -334,244 +262,57 @@ export default async function Home() {
               { texto: "trabalha com a gente.", acento: "gente." },
             ]}
           />
-
-          {/* Todos os depoimentos, navegáveis por página.
-              A grade fixa de três deixava card sozinho na última fila e
-              obrigava a esconder o resto; aqui cabem quantos existirem, e
-              quem quiser ver mais avança pelas setas. */}
-          <DepoimentosCarrossel itens={depoimentos} />
+          <DepoimentosCarrossel itens={depoimentosReais} />
         </div>
       </section>
+    ));
+  }
 
-      {/* ---------- 7. Blog ---------- */}
-      {BLOG_ATIVO && (
-        <section className="relative overflow-hidden bg-fundo-alt">
-          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-            <SectionHeading
-              eyebrow="Insights"
-              alinhamento="esquerda"
-              titulo={[
-                { texto: "O que a gente" },
-                { texto: "pensa sobre marca.", acento: "marca." },
-              ]}
-            />
+  // 7. Chamada final
+  secoes.push((fundo) => (
+    <section key="chamada" className={`relative overflow-hidden ${fundo}`}>
+      <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 opacity-35 blur-3xl" />
 
-            <Stagger className="mt-16 grid gap-5 md:grid-cols-3">
-              {posts.slice(0, 3).map((post) => (
-                <StaggerItem key={post.slug} className="h-full">
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="group flex h-full flex-col rounded-3xl border border-contorno bg-fundo-alt p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]"
-                  >
-                    {/* Categoria vira etiqueta: dá um ponto de cor ao card e
-                        separa a leitura do tempo estimado. */}
-                    <div className="flex items-center gap-3">
-                      <span className="eyebrow rounded-full bg-salmon/15 px-3 py-1.5 text-destaque">
-                        {post.category}
-                      </span>
-                      <span className="text-xs text-tinta/55">{post.readingTime}</span>
-                    </div>
+      <div className="relative mx-auto max-w-3xl px-6 py-14 text-center lg:py-20">
+        <h2 className="font-heading text-4xl font-semibold leading-[1.06] tracking-[-0.03em] text-tinta md:text-6xl">
+          Pronto para lançar
+          <span className="block">
+            a sua <span className="text-destaque">marca?</span>
+          </span>
+        </h2>
+        <Reveal delay={0.15}>
+          <p className="mx-auto mt-5 max-w-md text-lg text-tinta/70">
+            Fale com a equipe da {siteConfig.name} e receba uma proposta para a
+            sua marca.
+          </p>
+        </Reveal>
+        <Reveal delay={0.25}>
+          <Link
+            href="/contato"
+            className="group mt-9 inline-flex min-h-12 items-center gap-2 rounded-full bg-salmon px-8 font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
+          >
+            Pedir orçamento
+            <Seta />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  ));
 
-                    <h3 className="mt-6 text-xl font-semibold leading-snug text-tinta transition-colors duration-500 group-hover:text-destaque">
-                      {post.title}
-                    </h3>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-tinta/70">
-                      {post.excerpt}
-                    </p>
+  // A chamada final é a última; os logos entram logo antes dela, e trazem
+  // fundo e fios próprios, então ficam fora da alternância.
+  const antesDaChamada = secoes.slice(0, -1);
+  const chamada = secoes[secoes.length - 1];
 
-                    <span className="mt-7 flex items-center justify-between border-t border-contorno pt-5">
-                      <span className="text-xs uppercase tracking-widest text-tinta/50">
-                        {formatarData(post.date)}
-                      </span>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border border-contorno text-tinta/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-tinta">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                          <path d="M5 12h14M13 6l6 6-6 6" />
-                        </svg>
-                      </span>
-                    </span>
-                  </Link>
-                </StaggerItem>
-              ))}
-            </Stagger>
-          </div>
-        </section>
-      )}
+  return (
+    <>
+      <Hero numeros={numeros} vitrine={vitrine} depoimentos={depoimentos} />
 
-      {/* ---------- 8. FAQ ---------- */}
-      <section
-        className={`relative overflow-hidden ${
-          BLOG_ATIVO ? "bg-fundo" : "bg-fundo-alt"
-        }`}
-      >
-        <div className="mx-auto max-w-3xl px-6 py-14 lg:py-20">
-          <SectionHeading
-            eyebrow="Dúvidas frequentes"
-            titulo={[
-              { texto: "O que você precisa saber" },
-              { texto: "antes de começar.", acento: "começar." },
-            ]}
-          />
+      {antesDaChamada.map((secao, i) => secao(FUNDOS[i % 2]))}
 
-          <Stagger className="mt-14 space-y-3">
-            {faq.map((item) => (
-              <StaggerItem key={item.question}>
-                {/* Mesmo acordeão nativo do FAQ das páginas de serviço:
-                    abrir uma pergunta fecha a anterior. */}
-                <details
-                  name="faq-home"
-                  className="faq-suave group rounded-2xl border border-contorno bg-cartao shadow-[var(--sombra-cartao)] px-6 py-5 transition-colors duration-500 open:border-salmon/40"
-                >
-                  {/* min-h-11 no summary, e nao no details: o padding do details nao
-                      abre nada ao ser tocado, so o summary abre. Sem isto o
-                      alvo real era a linha de texto, com 28px de altura. */}
-                  <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-medium text-tinta [&::-webkit-details-marker]:hidden">
-                    {item.question}
-                    <span
-                      aria-hidden
-                      className="shrink-0 text-xl text-destaque transition-transform duration-500 group-open:rotate-45"
-                    >
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-4 text-sm leading-relaxed text-tinta/72">
-                    {item.answer}
-                  </p>
-                </details>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
-
-      {/* ---------- 9. Quem somos ---------- */}
-      <section
-        className={`relative overflow-hidden ${
-          BLOG_ATIVO ? "bg-fundo-alt" : "bg-fundo"
-        }`}
-      >
-        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-          <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            <div>
-              <SectionHeading
-                eyebrow="Sobre a LANÇA+"
-                alinhamento="esquerda"
-                titulo={[
-                  { texto: "Uma agência inteira" },
-                  { texto: "debaixo do mesmo teto.", acento: "teto." },
-                ]}
-                lead="Estratégia, audiovisual, tráfego, identidade visual, web e arquitetura. Sem terceirização, sem ruído entre quem pensa e quem executa."
-              />
-
-              <Reveal delay={0.2}>
-                <div className="mt-10 grid grid-cols-2 gap-8 border-t border-tinta/10 pt-10">
-                  {numeros.map((stat) => (
-                    <div key={stat.rotulo}>
-                      <span className="font-heading block text-4xl font-semibold text-tinta">
-                        <Counter
-                          valor={stat.valor}
-                          prefixo={stat.prefixo}
-                          sufixo={stat.sufixo}
-                        />
-                      </span>
-                      <span className="mt-1 block text-sm text-tinta/68">
-                        {stat.rotulo}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.3}>
-                <Link
-                  href="/sobre"
-                  className="group mt-10 inline-flex items-center gap-2 rounded-full border border-tinta/20 px-7 py-3.5 font-medium text-tinta transition-colors duration-500 hover:border-tinta"
-                >
-                  Conhecer a equipe
-                  <span
-                    aria-hidden
-                    className="transition-transform duration-500 group-hover:translate-x-1.5"
-                  >
-                    →
-                  </span>
-                </Link>
-              </Reveal>
-            </div>
-
-            <Reveal distance={40}>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-3xl">
-                  <Image
-                    src="/images/team/equipe-1.jpg"
-                    alt="Equipe da LANÇA+"
-                    fill
-                    sizes="(max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-[1.2s] hover:scale-105"
-                  />
-                </div>
-                <div className="relative mt-10 aspect-[3/4] overflow-hidden rounded-3xl">
-                  <Image
-                    src="/images/team/equipe-2.jpg"
-                    alt="Equipe da LANÇA+ nos bastidores"
-                    fill
-                    sizes="(max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-[1.2s] hover:scale-105"
-                  />
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* Prova social visual, encostada no convite final: a última coisa antes
-          de pedir o contato é quem já confiou.
-
-          Ela é papel entre duas seções areia, com fio em cima e embaixo. Se
-          não houver logo cadastrado a faixa não renderiza nada, e as duas
-          seções areia encostam — por isso o fio, e não a cor, é o que separa
-          a faixa das vizinhas. */}
       <ClientLogos />
 
-      {/* ---------- CTA final ----------
-          Papel, e não areia, para o caso de a faixa de logos não renderizar:
-          sem logos cadastrados ela não desenha nada, e com areia aqui o
-          convite encostaria em "Quem somos" sem nenhuma mudança de fundo,
-          virando uma seção só. Com papel, a alternância se sustenta com ou
-          sem a faixa — e quando ela existe, o fio dela é que faz a divisão.
-          É também o mesmo fundo do convite das outras páginas.
-
-          Com o blog fora, a alternância inverte daqui para cima, e o convite
-          acompanha: vira areia, porque "Quem somos" passa a ser papel. */}
-      <section
-        className={`relative overflow-hidden ${
-          BLOG_ATIVO ? "bg-fundo" : "bg-fundo-alt"
-        }`}
-      >
-        <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
-
-        <div className="relative mx-auto max-w-4xl px-6 py-12 text-center lg:py-16">
-          <h2 className="font-heading text-4xl font-semibold leading-[1.06] text-tinta md:text-6xl">
-            Pronto para lançar sua marca
-            <span className="block">
-              para o próximo <span className="text-destaque">nível?</span>
-            </span>
-          </h2>
-          <Reveal delay={0.15}>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-tinta/72">
-              Fale com a equipe da {siteConfig.name} e receba um diagnóstico
-              inicial da sua presença digital, sem compromisso.
-            </p>
-          </Reveal>
-          <Reveal delay={0.25}>
-            <Link
-              href="/contato"
-              className="mt-10 inline-block rounded-full bg-destaque px-9 py-4 font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
-            >
-              Solicitar diagnóstico
-            </Link>
-          </Reveal>
-        </div>
-      </section>
+      {chamada(FUNDOS[antesDaChamada.length % 2])}
     </>
   );
 }

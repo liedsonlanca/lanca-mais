@@ -8,6 +8,7 @@ import Counter from "@/components/motion/Counter";
 import HeroVideos from "@/components/HeroVideos";
 import { type Depoimento, type Numero } from "@/lib/conteudo";
 import { type PecaVitrine } from "@/lib/showcase";
+import { ehProvisorio } from "@/lib/provisorio";
 import { nichos, services } from "@/lib/site-config";
 
 // Abertura da home, desde 18/09/2026.
@@ -48,7 +49,7 @@ const COLUNAS_NUMEROS: Record<number, string> = {
 
 /** Depoimento só entra se for real: os provisórios têm colchetes. */
 function depoimentoReal(lista: Depoimento[]) {
-  return lista.find((d) => !/[[\]]/.test(`${d.citacao}${d.nome}${d.cargo}`));
+  return lista.find((d) => !ehProvisorio(d.citacao, d.nome, d.cargo));
 }
 
 function Seta({ className = "h-4 w-4" }: { className?: string }) {
@@ -103,7 +104,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
 
   // Duas frentes nas bolhas, como as duas mensagens da referência, e a
   // terceira bolha, a de "digitando", vira o atalho para todas as outras.
-  const frentes = ["gestao-de-marketing", "trafego-pago"]
+  const frentes = ["marketing-pessoal", "marketing-empresarial"]
     .map((slug) => services.find((s) => s.slug === slug))
     .filter((s): s is (typeof services)[number] => Boolean(s));
 

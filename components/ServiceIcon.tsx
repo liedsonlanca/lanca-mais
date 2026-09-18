@@ -2,11 +2,20 @@
 // serviços precisam do mesmo desenho. Traço de 1.5px, para acompanhar a leveza
 // das réguas e bordas do site.
 const desenhos: Record<string, React.ReactNode> = {
-  "gestao-de-marketing": (
+  // A pessoa, com um brilho ao lado: a marca é ela.
+  "marketing-pessoal": (
     <>
-      <circle cx="12" cy="12" r="8" />
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+      <circle cx="10" cy="8" r="3.5" />
+      <path d="M3.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2" />
+      <path d="M19 3v4M17 5h4" />
+    </>
+  ),
+  // A pasta de trabalho: a marca é a empresa.
+  "marketing-empresarial": (
+    <>
+      <rect x="3" y="7" width="18" height="13" rx="2.5" />
+      <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" />
+      <path d="M3 13h18M11 13v2h2v-2" />
     </>
   ),
   consultoria: (
