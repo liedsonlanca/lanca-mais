@@ -480,16 +480,25 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
           <div className="relative min-w-0 flex-1 overflow-hidden">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-fundo to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-fundo to-transparent" />
-            <div className="animate-marquee flex w-max items-center gap-12">
+            {/* O mesmo espaço dentro e fora de cada item: é o que deixa a
+                estrela no meio exato entre dois nichos, e a emenda do laço
+                igual às outras. */}
+            <div className="animate-marquee flex w-max items-center gap-10">
               {[...nichos, ...nichos].map((nicho, i) => (
                 <span
                   key={i}
                   // A segunda volta é cópia para o laço não ter emenda: quem
                   // usa leitor de tela ouve a lista uma vez só.
                   aria-hidden={i >= nichos.length}
-                  className="whitespace-nowrap text-lg font-bold tracking-[-0.02em] text-tinta/70"
+                  className="flex items-center gap-10 whitespace-nowrap text-lg font-bold tracking-[-0.02em] text-tinta/70"
                 >
                   {nicho}
+                  {/* A estrela da faixa antiga, a pedido do cliente. Salmão da
+                      marca, e não o destaque do tema: é enfeite, e o destaque
+                      escurece dentro do painel claro. */}
+                  <span aria-hidden className="text-sm text-salmon">
+                    ✦
+                  </span>
                 </span>
               ))}
             </div>
