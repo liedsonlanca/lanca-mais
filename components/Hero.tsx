@@ -293,7 +293,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.25, ease: FACIL }}
-              className="absolute bottom-[2%] left-[9%] right-[12%] top-[9%] rounded-[26px] bg-salmon sm:right-[27%]"
+              className="absolute bottom-[2%] left-[6%] right-[6%] top-[9%] rounded-[26px] bg-salmon sm:left-[9%] sm:right-[27%]"
             >
               {pecas.length === 0 && (
                 <span
@@ -305,12 +305,19 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
               )}
             </motion.div>
 
+            {/* Moldura em 9:16 exato, que é como a agência exporta os vídeos.
+                A altura manda e a largura sai da proporção: antes a largura era
+                uma fatia da coluna, a proporção variava com a tela, e no celular
+                ela ficava em 0,41, cortando 27% das laterais de cada vídeo.
+
+                No celular fica centralizada e um pouco mais baixa, para o bloco
+                salmão aparecer dos lados, como na referência. */}
             {pecas.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4, ease: FACIL }}
-                className="absolute bottom-[4%] left-[17%] top-0 w-[60%] overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:w-[48%]"
+                className="absolute left-1/2 top-0 aspect-[9/16] h-[86%] -translate-x-1/2 overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:h-[96%] sm:translate-x-0"
               >
                 <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
               </motion.div>
@@ -345,9 +352,15 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                       <SetaDiagonal />
                     </Link>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-tinta">
-                    {atual.legenda ?? atual.alt}
-                  </p>
+                  {/* O título do vídeo que está passando é a Legenda da peça no
+                      painel. Sem legenda, a descrição; sem nenhuma das duas, a
+                      linha some, em vez de deixar um vão no card. Legenda vazia
+                      chega como texto vazio, e não como ausente, por isso o ||. */}
+                  {(atual.legenda?.trim() || atual.alt?.trim()) && (
+                    <p className="mt-2 line-clamp-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-tinta">
+                      {atual.legenda?.trim() || atual.alt?.trim()}
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-tinta/60">
                     {atual.tipo === "video" ? "Agora passando" : "Do nosso trabalho"}
                   </p>
