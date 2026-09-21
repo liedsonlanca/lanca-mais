@@ -136,7 +136,7 @@ export default async function ServicoPage({
       </section>
 
       {/* ---------- Manifesto ---------- */}
-      <section className="relative overflow-hidden bg-bege">
+      <section className="tema-claro relative overflow-hidden bg-fundo">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-14 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-20">
           <Reveal>
             <h2 className="font-heading border-l-2 border-salmon pl-7 text-3xl font-semibold leading-snug text-tinta md:text-4xl">
@@ -197,7 +197,7 @@ export default async function ServicoPage({
       </section>
 
       {/* ---------- O que você recebe ---------- */}
-      <section className="relative overflow-hidden bg-bege text-tinta">
+      <section className="tema-claro relative overflow-hidden bg-fundo">
         {/* items-center: as duas colunas têm alturas diferentes, e sem isso a
             nuvem de entregáveis ficava colada no topo com um vazio embaixo. */}
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-20">
@@ -260,7 +260,7 @@ export default async function ServicoPage({
       <ServiceFaq itens={page.faq} />
 
       {/* ---------- Serviços relacionados ---------- */}
-      <section className="relative overflow-hidden bg-bege">
+      <section className="tema-claro relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
             eyebrow="Continue explorando"

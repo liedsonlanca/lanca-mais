@@ -18,6 +18,7 @@ import ClientLogos from "@/components/ClientLogos";
 import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
 import ServicosDestaque from "@/components/ServicosDestaque";
 import FaqServicos, { type AbaFaq } from "@/components/home/FaqServicos";
+import Sintomas from "@/components/home/Sintomas";
 import { Rotulo, Titulo, Botao, LinkSeta } from "@/components/home/Pecas";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -176,26 +177,7 @@ export default async function Home() {
               ]}
             />
 
-            <Stagger className={`mt-9 border-t ${FIO}`}>
-              {sintomas.map((sintoma, i) => (
-                <StaggerItem key={sintoma.titulo}>
-                  <div
-                    className={`group relative flex items-baseline gap-5 border-b ${FIO} py-5`}
-                  >
-                    <span
-                      aria-hidden
-                      className="absolute -bottom-px left-0 h-px w-0 bg-salmon transition-all duration-[900ms] ease-out group-hover:w-full"
-                    />
-                    <span className="numeral-fantasma text-sm text-tinta/30 transition-colors duration-500 group-hover:text-destaque">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h3 className="font-heading text-xl font-semibold leading-[1.2] tracking-[-0.025em] text-tinta lg:text-[1.45rem]">
-                      {sintoma.titulo}
-                    </h3>
-                  </div>
-                </StaggerItem>
-              ))}
-            </Stagger>
+            <Sintomas itens={sintomas} />
           </div>
 
           {/* O retrato. Figura andando, que é o que a marca diz de si na
@@ -216,21 +198,27 @@ export default async function Home() {
         </div>
       </Miolo>
 
-      {/* A virada, de ponta a ponta do painel, numa linha só. */}
+      {/* A virada.
+
+          Já foi uma faixa de salmão ocupando o painel inteiro de ponta a
+          ponta, e era demais: aquele tom em área grande domina tudo em volta
+          e briga com as fotos. Agora o salmão é só a régua à esquerda e o
+          botão, que é onde ele trabalha. A frase fica na cor do texto. */}
       <Reveal delay={0.1}>
-        <div className="relative mt-12 bg-salmon text-preto lg:mt-16">
-          <div className="mx-auto flex max-w-7xl flex-col gap-7 px-6 py-9 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:px-12 lg:py-10">
-            <p className="font-heading max-w-2xl text-[1.6rem] font-semibold leading-[1.12] tracking-[-0.03em] lg:text-[2.1rem]">
-              Uma agência inteira, num teto só, resolvendo isso.
+        <Miolo className="pb-12 pt-12 lg:pb-16 lg:pt-14">
+          <div
+            className={`flex flex-col gap-7 border-t ${FIO} pt-10 lg:flex-row lg:items-center lg:justify-between lg:gap-14`}
+          >
+            <p className="font-heading max-w-2xl border-l-2 border-salmon pl-6 text-[1.55rem] font-semibold leading-[1.14] tracking-[-0.03em] text-tinta lg:text-[2rem]">
+              Uma agência inteira, num teto só,{" "}
+              <span className="text-destaque">resolvendo isso.</span>
             </p>
 
             <div className="shrink-0">
-              <Botao href="/contato" variante="contraste">
-                Receber um diagnóstico
-              </Botao>
+              <Botao href="/contato">Receber um diagnóstico</Botao>
             </div>
           </div>
-        </div>
+        </Miolo>
       </Reveal>
     </Painel>
   ));
@@ -257,8 +245,8 @@ export default async function Home() {
             <div
               className={`mt-10 flex flex-col gap-5 border-t ${FIO} pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10`}
             >
-              <p className="text-tinta/50">
-                <span className="text-tinta/35">Também fazemos </span>
+              <p className="text-tinta/65">
+                <span className="text-tinta/55">Também fazemos </span>
                 {outros.map((s, i) => (
                   <span key={s.slug}>
                     <Link
@@ -268,7 +256,7 @@ export default async function Home() {
                       {s.name}
                     </Link>
                     {i < outros.length - 1 && (
-                      <span aria-hidden className="px-2 text-salmon/50">
+                      <span aria-hidden className="px-2 text-destaque/70">
                         ·
                       </span>
                     )}
@@ -307,15 +295,15 @@ export default async function Home() {
           ]}
         />
 
-        <Stagger className={`mt-10 grid border-t ${FIO} sm:grid-cols-2 lg:grid-cols-4`}>
+        <Stagger className={`mt-8 grid border-t ${FIO} sm:grid-cols-2 lg:grid-cols-4`}>
           {metodo.map((etapa, i) => (
             <StaggerItem key={etapa.numero}>
               <div
-                className={`group relative flex h-full items-baseline gap-4 border-b ${FIO} py-6 lg:border-b-0 ${
+                className={`group relative flex h-full items-baseline gap-4 border-b ${FIO} py-4 lg:border-b-0 ${
                   i < metodo.length - 1 ? `lg:border-r ${FIO}` : ""
-                } ${i > 0 ? "lg:pl-7" : ""} lg:pr-7`}
+                } ${i > 0 ? "lg:pl-6" : ""} lg:pr-6`}
               >
-                <span className="numeral-fantasma text-sm text-tinta/30 transition-colors duration-500 group-hover:text-destaque">
+                <span className="numeral-fantasma text-sm text-tinta/45 transition-colors duration-500 group-hover:text-destaque">
                   {etapa.numero}
                 </span>
                 <h3 className="font-heading text-xl font-semibold tracking-[-0.025em] text-tinta">
@@ -327,7 +315,7 @@ export default async function Home() {
         </Stagger>
 
         <Reveal delay={0.15}>
-          <div className={`mt-10 border-t ${FIO} pt-7`}>
+          <div className={`mt-8 border-t ${FIO} pt-6`}>
             <span className="eyebrow text-destaque">
               O que você recebe, todo mês
             </span>
@@ -335,7 +323,7 @@ export default async function Home() {
             <ul className="mt-6 grid gap-x-10 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
               {entregaveis.map((item) => (
                 <li key={item} className="flex items-baseline gap-3">
-                  <span aria-hidden className="text-salmon">
+                  <span aria-hidden className="text-destaque">
                     ✦
                   </span>
                   <span className="text-tinta/70">{item}</span>

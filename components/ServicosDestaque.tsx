@@ -97,17 +97,14 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
                 molde. O ícone continua onde tem função, na página de serviços,
                 onde são oito e o desenho ajuda a achar. */}
             <div className="px-7 pb-7 pt-8">
-              <div className="flex items-center gap-4 border-b border-contorno pb-5">
-                <span className="numeral-fantasma text-sm text-tinta/30 transition-colors duration-500 group-hover:text-destaque">
-                  {String(itens.indexOf(s) + 1).padStart(2, "0")}
-                </span>
-                <span aria-hidden className="h-px flex-1 bg-contorno" />
-              </div>
+              <span className="numeral-fantasma block text-sm text-tinta/45 transition-colors duration-500 group-hover:text-destaque">
+                {String(itens.indexOf(s) + 1).padStart(2, "0")}
+              </span>
 
-              <h3 className="font-heading mt-6 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-tinta">
+              <h3 className="font-heading mt-4 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-tinta">
                 {s.name}
               </h3>
-              <span className="mt-3 block max-w-[26ch] leading-relaxed text-tinta/55">
+              <span className="mt-3 block max-w-[26ch] leading-relaxed text-tinta/65">
                 {s.shortDescription}
               </span>
             </div>

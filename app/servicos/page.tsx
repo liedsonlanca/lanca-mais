@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { services } from "@/lib/site-config";
-import { lerNumeros } from "@/lib/conteudo";
+import { lerNumeros, lerVitrine } from "@/lib/conteudo";
 import ArcoDeFotos, { type FotoDoArco } from "@/components/ArcoDeFotos";
 import CtaFinal from "@/components/CtaFinal";
 import ServiceIcon from "@/components/ServiceIcon";
@@ -13,19 +13,22 @@ export const metadata: Metadata = {
     "Marketing pessoal, marketing empresarial, audiovisual, consultoria, tráfego pago, identidade visual, desenvolvimento web e arquitetura: tudo em uma única agência.",
 };
 
-// Os cinco retratos que abrem o arco. São os da equipe, um por pessoa: em
-// leque, dizem "somos um time" antes de qualquer frase.
-const FOTOS_DO_ARCO: FotoDoArco[] = [
-  { src: "/images/team/liedson-rodrigues.jpg", alt: "Liedson Rodrigues, da LANÇA+" },
-  { src: "/images/team/vitoria-dantas.jpg", alt: "Vitória Dantas, da LANÇA+" },
-  { src: "/images/team/equipe-1.jpg", alt: "A equipe da LANÇA+ reunida" },
-  { src: "/images/team/silas-oliveira.jpg", alt: "Silas Oliveira, da LANÇA+" },
-  { src: "/images/team/diogenes-mesquita.jpg", alt: "Diógenes Mesquita, da LANÇA+" },
-];
-
 export default async function ServicosPage() {
-  // Os números vêm do painel; sem banco, caem no conteúdo dos arquivos.
-  const numeros = await lerNumeros();
+  // Tudo aqui vem do painel; sem banco, cai no conteúdo dos arquivos.
+  const [numeros, vitrine] = await Promise.all([lerNumeros(), lerVitrine()]);
+
+  // As peças que abrem o arco são as do trilho de trabalho: vídeos,
+  // carrosséis, estáticos, o que estiver cadastrado. Antes eram retratos da
+  // equipe fixos no código, e numa página de serviços o que precisa aparecer
+  // é o trabalho, não quem faz. Cadastrou uma peça nova no painel, ela entra
+  // aqui sozinha.
+  //
+  // Do vídeo entra a capa, e não o vídeo: cinco vídeos tocando ao mesmo tempo
+  // num leque de miniaturas seria peso de download sem nada a ganhar.
+  const fotosDoArco: FotoDoArco[] = vitrine
+    .filter((peca) => Boolean(peca.src))
+    .slice(0, 5)
+    .map((peca) => ({ src: peca.src, alt: peca.alt }));
 
   return (
     <>
@@ -37,7 +40,7 @@ export default async function ServicosPage() {
         ]}
         lead="Contrate uma ou várias. O que não muda é o padrão e o alinhamento entre elas."
         botao={{ href: "/contato", texto: "Falar com a equipe" }}
-        fotos={FOTOS_DO_ARCO}
+        fotos={fotosDoArco}
         numeros={numeros}
       />
 
@@ -74,7 +77,7 @@ export default async function ServicosPage() {
 
                     <span
                       aria-hidden
-                      className="shrink-0 text-tinta/35 transition-colors duration-500 group-hover:text-destaque"
+                      className="shrink-0 text-tinta/45 transition-colors duration-500 group-hover:text-destaque"
                     >
                       <ServiceIcon slug={service.slug} className="h-7 w-7" />
                     </span>

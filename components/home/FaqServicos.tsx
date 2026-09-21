@@ -123,17 +123,17 @@ export default function FaqServicos({ abas }: { abas: AbaFaq[] }) {
                 <span
                   aria-hidden
                   className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-500 ${
-                    estaAberta ? "bg-fundo/12" : "bg-salmon/12"
+                    estaAberta ? "bg-fundo/12" : "bg-destaque/12"
                   }`}
                 >
                   <span
                     className={`absolute h-[1.5px] w-3.5 rounded-full transition-colors duration-500 ${
-                      estaAberta ? "bg-fundo" : "bg-salmon"
+                      estaAberta ? "bg-fundo" : "bg-destaque"
                     }`}
                   />
                   <span
                     className={`absolute h-[1.5px] w-3.5 rounded-full transition-all duration-500 ${
-                      estaAberta ? "scale-x-0 bg-fundo" : "rotate-90 bg-salmon"
+                      estaAberta ? "scale-x-0 bg-fundo" : "rotate-90 bg-destaque"
                     }`}
                   />
                 </span>

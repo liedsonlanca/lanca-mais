@@ -99,29 +99,34 @@ export const servicePages: Record<string, ServicePage> = {
     ],
     faq: [
       {
-        question: "Marketing Pessoal ou Empresarial: qual é o meu?",
+        question:
+          "Meu concorrente posta todo dia e eu não. É só isso que está faltando?",
         answer:
-          "Se as pessoas contratam você, pelo seu nome, é o Pessoal. Se contratam a empresa, com uma equipe e uma marca que não dependem de uma pessoa só, é o Empresarial. Dá para ter os dois, e a primeira conversa serve para decidir isso.",
+          "Frequência sem direção acelera o que já não estava funcionando. Antes do calendário vem decidir por qual assunto você quer ser lembrado e o que a sua marca defende. Com isso no lugar, a constância vira vantagem. Sem isso, vira volume.",
       },
       {
-        question: "Preciso aparecer nos vídeos?",
+        question:
+          "Como vocês constroem autoridade sem me transformar em influenciador?",
         answer:
-          "Aparecer faz diferença, porque quem contrata um profissional quer ver quem vai atender. Mas a quantidade é combinada com você, e há formatos em que você não precisa estar na tela.",
+          "Autoridade é ser lembrado como referência num assunto, e não ser conhecido por muita gente. O conteúdo parte do que você já faz e sabe, no seu vocabulário. Não entra trend, não entra dança e não entra opinião sobre assunto que não é seu.",
       },
       {
-        question: "Minha profissão tem regras de publicidade. Como fica?",
+        question:
+          "Minha profissão é regulada por conselho. Até onde dá para ir?",
         answer:
-          "O conteúdo é planejado dentro das regras do seu conselho profissional, como CFM, CRO e OAB. O que não pode ser dito não entra, e isso é conferido antes de publicar.",
+          "O conteúdo é planejado dentro das regras de publicidade do seu conselho, e o que a norma não permite não entra. Quando aparece um caso de dúvida, ele é levantado antes da produção e resolvido com você, e não depois de publicado.",
       },
       {
-        question: "Quanto do meu tempo isso vai tomar?",
+        question:
+          "Em quanto tempo isso aparece na minha agenda?",
         answer:
-          "Pouco, e de forma previsível. Você participa da estratégia no começo, das gravações combinadas e das aprovações. O resto é nosso.",
+          "Os primeiros sinais aparecem no alcance e nas conversas, e são medidos desde o primeiro mês. A agenda responde depois, porque depende de quanta gente já procurava o que você faz e de quanto a sua área demora entre descobrir e contratar. Quem promete data exata para isso está chutando.",
       },
       {
-        question: "Vocês atendem fora de Cajazeiras?",
+        question:
+          "Se eu encerrar depois de alguns meses, o que fica comigo?",
         answer:
-          "Atendemos. A estratégia e a edição acontecem à distância sem perda nenhuma, e quando é preciso gravar com você a equipe se desloca. Isso entra combinado na proposta, sem custo surpresa depois.",
+          "Fica o posicionamento documentado, a linha editorial, o calendário e o conteúdo já publicado, que continua trabalhando. A audiência e a reputação são suas, não da agência. A destinação dos arquivos brutos é definida em contrato.",
       },
     ],
     ctaLabel: "Quero ser referência na minha área",
@@ -202,29 +207,34 @@ export const servicePages: Record<string, ServicePage> = {
     ],
     faq: [
       {
-        question: "Vocês atendem empresas de fora de Cajazeiras?",
+        question:
+          "Já tenho alguém cuidando das redes. Por que trocar por uma agência?",
         answer:
-          "Atendemos. A gestão acontece à distância sem perda nenhuma, e quando a empresa precisa de produção presencial a equipe se desloca. Isso entra combinado na proposta, sem custo surpresa depois.",
+          "Muitas vezes não é trocar. Uma pessoa sozinha faz estratégia, roteiro, foto, vídeo, design, texto, publicação e relatório, e alguma dessas pontas sempre cede. A agência entra onde a conta não fecha, e quem já está continua no que faz melhor.",
       },
       {
-        question: "Quem vai cuidar da minha empresa no dia a dia?",
+        question:
+          "Como vocês provam que o conteúdo trouxe cliente, e não foi coincidência?",
         answer:
-          "Um time da casa, e não freelancers rotativos. Estratégia, design, audiovisual e texto ficam sob o mesmo teto, então a sua marca não muda de voz quando muda de formato.",
+          "Definindo antes o que conta como resultado para a sua empresa e acompanhando isso todo mês: de onde veio o contato, o que ele viu antes de chegar, o que mudou em relação ao mês anterior. Não é prova de laboratório, mas é o contrário de achismo.",
       },
       {
-        question: "Quanto do meu tempo isso vai tomar?",
+        question:
+          "Quem responde pela minha empresa no dia a dia?",
         answer:
-          "Pouco, e de forma previsível. Você participa da definição da estratégia no começo e das aprovações depois. O resto do trabalho é nosso.",
+          "Uma equipe fixa, com um ponto de contato só para você. Estratégia, audiovisual e design são da casa, então quem pensa e quem executa sentam na mesma mesa e nada se perde na tradução entre uma etapa e outra.",
       },
       {
-        question: "E se eu já tiver alguém cuidando das redes?",
+        question:
+          "E se a minha empresa vende para outras empresas, e não para o consumidor final?",
         answer:
-          "Funciona bem. Essa pessoa passa a executar com direção definida em vez de decidir sozinha o que postar. Se preferir manter a execução inteira internamente, o caminho é a consultoria.",
+          "Muda o conteúdo, não o método. Quando quem compra é outra empresa, o ciclo é mais longo e mais de uma pessoa decide, então o conteúdo trabalha reputação e prova em vez de impulso. O plano nasce dessa diferença.",
       },
       {
-        question: "Preciso contratar tráfego pago junto?",
+        question:
+          "O que acontece no primeiro mês, antes de qualquer publicação?",
         answer:
-          "Não precisa, são frentes separadas. Mas vale saber: com conteúdo consistente sustentando o anúncio, o custo por resultado costuma cair, então a conta muda quando as duas andam juntas.",
+          "O primeiro mês é de estruturação: leitura do negócio e do mercado, posicionamento, linha editorial e calendário. Publicar antes disso é gastar alcance para descobrir no escuro o que deveria ter sido decidido antes.",
       },
     ],
     ctaLabel: "Quero minha empresa como referência",
@@ -405,29 +415,34 @@ export const servicePages: Record<string, ServicePage> = {
     ],
     faq: [
       {
-        question: "Preciso ter experiência na frente da câmera?",
+        question:
+          "Eu travo na frente da câmera. Isso inviabiliza?",
         answer:
-          "Não. A direção de cena existe justamente para isso, e boa parte dos nossos clientes grava pela primeira vez com a gente.",
+          "Não, e é o caso mais comum. A gravação é conduzida, com roteiro pronto e teleprompter quando ajuda, e os tropeços ficam na edição. Quem nunca gravou costuma precisar de mais tempo na primeira diária e de bem menos na segunda.",
       },
       {
-        question: "A gravação é no meu espaço ou em estúdio?",
+        question:
+          "Quantas peças saem de uma diária, e de que tipo?",
         answer:
-          "Os dois são possíveis. A escolha depende do que o vídeo precisa comunicar e do tempo que você tem disponível.",
+          "Depende do formato e de quanto o roteiro pede de troca de cenário e de figurino. O número é fechado na proposta, antes da diária, junto com o que cada peça vai ser: vertical curto, institucional, depoimento ou corte para anúncio.",
       },
       {
-        question: "Quantos vídeos saem de uma diária?",
+        question:
+          "Quantas rodadas de alteração estão incluídas?",
         answer:
-          "Varia com o formato e com o roteiro. Essa quantidade é definida antes da gravação, para que o dia renda exatamente o combinado.",
+          "O número entra no contrato, combinado antes de começar. Mas o que de fato economiza rodada é aprovar o roteiro antes de gravar: alteração cara é a que exige regravação, e ela quase sempre nasce de roteiro aprovado às pressas.",
       },
       {
-        question: "Posso pedir alterações na edição?",
+        question:
+          "Vocês editam material que eu mesmo gravei?",
         answer:
-          "Pode. Cada entrega inclui uma rodada de revisão sua antes de a peça ir ao ar.",
+          "Editamos, desde que a captação tenha qualidade para isso. A gente avalia o material antes e diz com franqueza o que dá para salvar na edição e o que só se resolve gravando de novo.",
       },
       {
-        question: "Vocês fazem só a edição?",
+        question:
+          "Em que formatos as peças são entregues?",
         answer:
-          "Fazemos. Se você já tem o material captado, cuidamos da finalização e da adaptação para o formato de cada canal.",
+          "Nos formatos de cada plataforma onde a peça vai rodar, cortados para isso e não redimensionados na pressa. O que muda entre um vertical de feed e um corte para anúncio é enquadramento e ritmo, e isso é decidido no roteiro.",
       },
     ],
     ctaLabel: "Quero vídeos profissionais",
