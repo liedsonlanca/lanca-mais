@@ -26,7 +26,10 @@ export type AbaFaq = {
 
 export default function FaqServicos({ abas }: { abas: AbaFaq[] }) {
   const [aba, setAba] = useState(0);
-  const [aberta, setAberta] = useState<number | null>(0);
+  // Tudo fechado ao chegar: a lista de perguntas se lê de relance, e uma
+  // resposta já aberta rouba a vista das outras quatro antes de a pessoa
+  // escolher a dela.
+  const [aberta, setAberta] = useState<number | null>(null);
   const botoesAba = useRef<Array<HTMLButtonElement | null>>([]);
 
   if (abas.length === 0) return null;
@@ -35,9 +38,10 @@ export default function FaqServicos({ abas }: { abas: AbaFaq[] }) {
 
   function trocarAba(indice: number) {
     setAba(indice);
-    // A primeira pergunta da aba nova já nasce aberta: aba que abre com tudo
-    // fechado parece que não carregou.
-    setAberta(0);
+    // Fecha o que estava aberto: a resposta da aba antiga não tem nada a ver
+    // com a nova, e deixá-la aberta na mesma posição parecia que o conteúdo
+    // não tinha trocado.
+    setAberta(null);
   }
 
   // Setas andam entre as abas, como manda o padrão de abas: sem isto, quem
