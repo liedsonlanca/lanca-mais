@@ -9,12 +9,14 @@ import {
   FOTO_EQUIPE,
 } from "@/lib/home";
 import { lerVitrine, lerDepoimentos, lerCases, lerNumeros } from "@/lib/conteudo";
+import { servicePages } from "@/lib/service-pages";
 import { ehProvisorio } from "@/lib/provisorio";
 import Hero from "@/components/Hero";
 import WorkShowcase from "@/components/WorkShowcase";
 import ClientLogos from "@/components/ClientLogos";
 import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
 import ServicosDestaque from "@/components/ServicosDestaque";
+import FaqServicos, { type AbaFaq } from "@/components/home/FaqServicos";
 import { Rotulo, Titulo, Botao, LinkSeta } from "@/components/home/Pecas";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -130,6 +132,24 @@ export default async function Home() {
   const depoimentosReais = depoimentos.filter(
     (d) => !ehProvisorio(d.citacao, d.nome, d.cargo)
   );
+
+  // As duvidas dos tres servicos em evidencia, uma aba para cada. Servico sem
+  // pergunta cadastrada nao vira aba vazia: some.
+  const abasFaq: AbaFaq[] = destaques.flatMap((s) => {
+    const pagina = servicePages[s.slug];
+    if (!pagina || pagina.faq.length === 0) return [];
+
+    return [
+      {
+        slug: s.slug,
+        nome: s.name,
+        perguntas: pagina.faq.map((d) => ({
+          pergunta: d.question,
+          resposta: d.answer,
+        })),
+      },
+    ];
+  });
 
   // ---------- Os painéis depois da abertura ----------
   const secoes: Array<(claro: boolean) => React.ReactNode> = [];
@@ -417,7 +437,31 @@ export default async function Home() {
     ));
   }
 
-  // 8. Quem está por trás, e a chamada final no mesmo painel.
+  // 8. As dúvidas dos três serviços, em abas.
+  //
+  // Fica perto do fim, e não no meio: pergunta frequente é objeção, e objeção
+  // só interessa a quem já quer. Quem chegou até aqui passou pelos serviços,
+  // pelo método e pelo trabalho, e o que falta é a dúvida que ele não fez em
+  // voz alta. Cada serviço tem as suas, e as quinze numa lista só obrigariam a
+  // garimpar as que são dele.
+  if (abasFaq.length > 0) {
+    secoes.push((claro) => (
+      <Painel key="faq" claro={claro}>
+        <Miolo className="py-12 lg:py-16">
+          <Rotulo>Antes de falar com a gente</Rotulo>
+          <Titulo
+            linhas={[
+              { texto: "As dúvidas que todo mundo tem.", acento: "dúvidas" },
+            ]}
+          />
+
+          <FaqServicos abas={abasFaq} />
+        </Miolo>
+      </Painel>
+    ));
+  }
+
+  // 9. Quem está por trás, e a chamada final no mesmo painel.
   //
   // Juntos porque separados eram dois blocos magros em sequência, e a página
   // acabava com um título solto no escuro.
