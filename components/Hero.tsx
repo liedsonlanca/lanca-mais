@@ -426,7 +426,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                       <p className="text-[15px] font-bold leading-tight text-tinta">
                         {audiovisual.name}
                       </p>
-                      <p className="mt-0.5 text-[11px] leading-snug text-tinta/55">
+                      <p className="mt-0.5 text-xs leading-snug text-tinta/60">
                         Do roteiro à edição final
                       </p>
                     </div>
@@ -474,7 +474,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
           {...entrada(0.9)}
           className="mx-5 flex flex-col gap-5 border-t border-contorno py-6 sm:mx-8 lg:mx-12 lg:flex-row lg:items-center lg:gap-10"
         >
-          <span className="shrink-0 text-[11px] font-medium uppercase tracking-[0.16em] text-tinta/55">
+          <span className="shrink-0 text-xs font-medium uppercase tracking-[0.16em] text-tinta/60">
             Nichos que atendemos
           </span>
 

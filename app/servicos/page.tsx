@@ -64,40 +64,38 @@ export default async function ServicosPage() {
                     className="absolute left-0 top-0 h-0 w-[3px] bg-salmon transition-all duration-700 ease-out group-hover:h-full group-focus-visible:h-full"
                   />
 
-                  {/* Marcador numerado sobre um trilho que corre até o ícone —
-                      o mesmo device dos marcadores da linha do tempo do método. */}
-                  <div className="flex items-center gap-4">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-contorno bg-cartao transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon">
-                      <span className="numeral-fantasma text-base text-destaque transition-colors duration-500 group-hover:text-tinta">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
+                  {/* O número e o ícone nas pontas da mesma linha. Entre eles
+                      havia um fio que não ligava nada, e o número vinha dentro
+                      de um círculo com borda: dois enfeites onde bastava a
+                      ordem e o desenho da frente. */}
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="numeral-fantasma text-sm text-tinta/45 transition-colors duration-500 group-hover:text-destaque">
+                      {String(i + 1).padStart(2, "0")}
                     </span>
-
-                    <span aria-hidden className="h-px flex-1 bg-contorno" />
 
                     <span
                       aria-hidden
-                      className="shrink-0 text-tinta/45 transition-colors duration-500 group-hover:text-destaque"
+                      className="shrink-0 text-tinta/35 transition-colors duration-500 group-hover:text-destaque"
                     >
                       <ServiceIcon slug={service.slug} className="h-7 w-7" />
                     </span>
                   </div>
 
-                  <h2 className="mt-7 text-xl font-semibold leading-snug text-tinta transition-colors duration-500 group-hover:text-destaque">
+                  <h2 className="font-heading mt-7 text-[1.5rem] font-semibold leading-[1.1] tracking-[-0.03em] text-tinta">
                     {service.name}
                   </h2>
-                  <p className="mt-3 leading-relaxed text-tinta/70">
+                  <p className="mt-3 leading-relaxed text-tinta/65">
                     {service.shortDescription}
                   </p>
 
                   <div className="mt-8 flex flex-1 items-end justify-between gap-4 border-t border-contorno pt-6">
-                    <span className="text-sm leading-relaxed text-tinta/55">
+                    <span className="text-sm leading-relaxed text-tinta/60">
                       {service.bullets.slice(0, 2).join(" · ")}
                     </span>
 
                     <span
                       aria-hidden
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-tinta/15 text-tinta/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-tinta"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-contorno text-tinta/60 transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto"
                     >
                       <svg
                         viewBox="0 0 24 24"

@@ -188,7 +188,7 @@ export default function EquipeTrilho({ equipe }: { equipe: Pessoa[] }) {
                   {/* Rótulo sem cápsula: os cargos reais são longos e, em card
                       estreito, a pílula quebrava em duas linhas com alturas
                       desiguais na fileira. */}
-                  <span className="block text-[11px] font-semibold uppercase leading-tight tracking-[0.14em] text-salmon">
+                  <span className="block text-xs font-semibold uppercase leading-tight tracking-[0.14em] text-salmon">
                     {pessoa.funcao}
                   </span>
                   <h3 className="mt-2.5 text-lg font-semibold leading-tight text-branco">

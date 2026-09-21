@@ -125,10 +125,13 @@ html.lenis body {
 }
 
 /* Rótulo de seção em caixa alta espaçada, como nas três referências. */
+/* 0.75rem, e não 0.7rem: a 11,2px o rótulo já saía abaixo do que se lê sem
+   esforço no celular, e ele aparece em toda seção do site. O espacejamento
+   cedeu um pouco junto, senão a linha crescia demais em largura. */
 .eyebrow {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
 }
 

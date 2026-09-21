@@ -75,7 +75,7 @@ export default function FormularioAcesso() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="Senha de acesso"
-              className="w-full rounded-full border border-bege/25 bg-bege/[0.06] px-6 py-3.5 text-bege outline-none transition-colors duration-300 placeholder:text-bege/40 focus:border-salmon"
+              className="w-full rounded-full border border-bege/25 bg-bege/[0.06] px-6 py-3.5 text-bege outline-none transition-colors duration-300 placeholder:text-bege/55 focus:border-salmon"
             />
             <button
               type="submit"

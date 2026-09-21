@@ -21,7 +21,8 @@ import GerenciarConsentimento from "@/components/GerenciarConsentimento";
 //      curta encostada numa comprida;
 //   3. A assinatura legal, numa linha só no desktop.
 //
-// A marca grande fecha embaixo de tudo, cortada pela borda.
+// Chegou a ter a marca em tamanho gigante, esmaecida, fechando embaixo de
+// tudo. Saiu a pedido do cliente: no escuro ela virava um borrão sem leitura.
 
 const socials = [
   {
@@ -204,7 +205,7 @@ export default async function Footer() {
           <p className="flex flex-wrap items-center gap-x-2">
             <Link
               href="/politica-de-privacidade"
-              className="flex min-h-11 items-center transition-colors duration-500 hover:text-salmon"
+              className="flex min-h-11 min-w-11 items-center justify-center transition-colors duration-500 hover:text-salmon"
             >
               Privacidade
             </Link>
@@ -213,7 +214,7 @@ export default async function Footer() {
             </span>
             <Link
               href="/politica-de-cookies"
-              className="flex min-h-11 items-center transition-colors duration-500 hover:text-salmon"
+              className="flex min-h-11 min-w-11 items-center justify-center transition-colors duration-500 hover:text-salmon"
             >
               Cookies
             </Link>
@@ -222,7 +223,7 @@ export default async function Footer() {
             </span>
             <Link
               href="/aviso-legal"
-              className="flex min-h-11 items-center transition-colors duration-500 hover:text-salmon"
+              className="flex min-h-11 min-w-11 items-center justify-center transition-colors duration-500 hover:text-salmon"
             >
               Aviso legal
             </Link>
@@ -231,7 +232,7 @@ export default async function Footer() {
             </span>
             <Link
               href="/termos-de-uso"
-              className="flex min-h-11 items-center transition-colors duration-500 hover:text-salmon"
+              className="flex min-h-11 min-w-11 items-center justify-center transition-colors duration-500 hover:text-salmon"
             >
               Termos
             </Link>

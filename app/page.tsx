@@ -251,7 +251,7 @@ export default async function Home() {
                   <span key={s.slug}>
                     <Link
                       href={`/servicos/${s.slug}`}
-                      className="text-tinta/65 transition-colors duration-500 hover:text-destaque"
+                      className="inline-flex min-h-11 items-center text-tinta/65 transition-colors duration-500 hover:text-destaque"
                     >
                       {s.name}
                     </Link>

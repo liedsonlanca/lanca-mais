@@ -48,9 +48,16 @@ export default function Header() {
   const claroEmCima = sobreClaro && !aberto;
 
   // Fecha o menu ao trocar de página.
-  useEffect(() => {
+  //
+  // Ajuste durante a renderização, e não num efeito. Num efeito, o React
+  // desenha a tela nova com o menu ainda aberto e só depois fecha, o que dá um
+  // piscar do menu por cima da página que acabou de chegar. Comparando a rota
+  // aqui, a tela nunca chega a ser pintada com o menu aberto.
+  const [rotaDoMenu, setRotaDoMenu] = useState(pathname);
+  if (rotaDoMenu !== pathname) {
+    setRotaDoMenu(pathname);
     setAberto(false);
-  }, [pathname]);
+  }
 
   // Trava a rolagem enquanto o menu cheio está aberto.
   //
@@ -290,7 +297,7 @@ export default function Header() {
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-500 ${
                             ativo
                               ? "border-salmon bg-salmon text-preto"
-                              : "border-contorno text-tinta/40"
+                              : "border-contorno text-tinta/55"
                           }`}
                         >
                           <svg

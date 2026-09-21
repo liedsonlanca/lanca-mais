@@ -290,7 +290,7 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                 {peca.tipo === "trinca" && (
                   <span
                     aria-hidden
-                    className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-abismo/65 px-2 py-1 text-[11px] font-medium text-branco backdrop-blur-sm"
+                    className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-abismo/65 px-2 py-1 text-xs font-medium text-branco backdrop-blur-sm"
                   >
                     <svg
                       viewBox="0 0 24 24"
@@ -310,7 +310,7 @@ export default function WorkShowcase({ vitrine }: { vitrine: PecaVitrine[] }) {
                 {peca.tipo === "carrossel" && (
                   <span
                     aria-hidden
-                    className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-abismo/65 px-2 py-1 text-[11px] font-medium text-branco backdrop-blur-sm"
+                    className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1 rounded-full bg-abismo/65 px-2 py-1 text-xs font-medium text-branco backdrop-blur-sm"
                   >
                     <svg
                       viewBox="0 0 24 24"
@@ -385,7 +385,7 @@ function BotaoTrilho({
       type="button"
       onClick={aoClicar}
       aria-label={direcao === "anterior" ? "Peças anteriores" : "Próximas peças"}
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-tinta/15 text-tinta/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-tinta"
+      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-contorno text-tinta/60 transition-all duration-500 hover:border-salmon hover:bg-salmon hover:text-tinta"
     >
       <svg
         viewBox="0 0 24 24"

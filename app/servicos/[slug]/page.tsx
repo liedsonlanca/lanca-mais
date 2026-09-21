@@ -180,7 +180,7 @@ export default async function ServicoPage({
             {page.process.map((step, i) => (
               <StaggerItem key={step.title} className="h-full">
                 <div className="group h-full rounded-3xl border border-contorno bg-fundo-alt p-7 transition-all duration-500 hover:-translate-y-1 hover:border-salmon/45 hover:bg-cartao hover:shadow-[0_28px_60px_-38px_rgba(10,10,8,0.5)]">
-                  <span className="numeral-fantasma block text-4xl text-tinta/28 transition-colors duration-500 group-hover:text-salmon/40">
+                  <span className="numeral-fantasma block text-4xl text-tinta/45 transition-colors duration-500 group-hover:text-destaque">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 className="mt-5 text-lg font-semibold text-tinta">
