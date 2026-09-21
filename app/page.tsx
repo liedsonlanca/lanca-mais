@@ -7,6 +7,7 @@ import {
   entregaveis,
   FOTO_PROBLEMA,
   FOTO_EQUIPE,
+  FOTO_CHAMADA,
 } from "@/lib/home";
 import { lerVitrine, lerDepoimentos, lerCases, lerNumeros } from "@/lib/conteudo";
 import { servicePages } from "@/lib/service-pages";
@@ -508,16 +509,44 @@ export default async function Home() {
       </Miolo>
 
       {/* A chamada final, ainda dentro do mesmo painel. */}
-      <div className={`relative border-t ${FIO}`}>
-        <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[460px] w-[460px] -translate-x-1/2 -translate-y-1/2 opacity-30 blur-3xl" />
+      {/* A chamada final sobre foto, e não sobre cor chapada.
 
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-7 px-6 py-12 text-center lg:flex-row lg:justify-between lg:gap-12 lg:px-12 lg:py-14 lg:text-left">
-          <h2 className="font-heading text-[2rem] font-semibold leading-[1.05] tracking-[-0.035em] text-tinta lg:text-[2.9rem]">
+          O véu escuro é pesado de propósito: a foto entra como textura, para
+          o último bloco ter matéria em vez de vazio, e não como retrato que
+          disputa a atenção com a frase.
+
+          As cores aqui são fixas, e não do tema: o painel do fecho pode cair
+          claro na alternância, e texto de tema claro sobre foto escurecida
+          sumiria. */}
+      <div className="relative isolate overflow-hidden border-t border-contorno">
+        <Image
+          src={FOTO_CHAMADA.src}
+          alt=""
+          aria-hidden
+          fill
+          sizes="100vw"
+          className="-z-10 object-cover object-[50%_28%]"
+        />
+        <div aria-hidden className="absolute inset-0 -z-10 bg-preto/82" />
+        <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
+
+        <div className="relative mx-auto max-w-3xl px-6 py-16 text-center lg:py-24">
+          <span className="eyebrow inline-flex items-center gap-2.5 rounded-full border border-bege/25 px-4 py-2 text-bege/70">
+            <span aria-hidden className="h-1 w-1 rounded-full bg-salmon" />
+            O próximo passo
+          </span>
+
+          <h2 className="font-heading mt-7 text-[2.1rem] font-semibold leading-[1.04] tracking-[-0.035em] text-bege sm:text-5xl lg:text-[3.4rem]">
             Pronto para lançar a sua{" "}
-            <span className="text-destaque">marca?</span>
+            <span className="text-salmon">marca?</span>
           </h2>
 
-          <div className="shrink-0">
+          <p className="mx-auto mt-5 max-w-md leading-relaxed text-bege/65">
+            Conte o momento da sua marca e a gente devolve uma proposta, com o
+            ponto de partida que faz sentido para ela.
+          </p>
+
+          <div className="mt-9 flex justify-center">
             <Botao href="/contato">Pedir orçamento</Botao>
           </div>
         </div>

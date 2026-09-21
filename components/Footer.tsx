@@ -100,6 +100,26 @@ export default async function Footer() {
         </div>
       </div>
 
+      {/* A marca grande fechando o rodapé, cortada pela borda de baixo.
+
+          É a última coisa que a pessoa vê, e o único lugar do site onde a
+          marca aparece em tamanho de assinatura. Fica esmaecida e cortada de
+          propósito: não é para ler de novo, é para ficar. Decorativa, então
+          sai da árvore de acessibilidade, onde a marca já foi anunciada no
+          topo do rodapé. */}
+      <div
+        aria-hidden
+        className="pointer-events-none relative mt-4 h-[14vw] min-h-[64px] overflow-hidden"
+      >
+        <Image
+          src="/images/logo-1.png"
+          alt=""
+          width={2855}
+          height={796}
+          className="absolute inset-x-6 bottom-[-22%] w-[calc(100%-3rem)] opacity-[0.07]"
+        />
+      </div>
+
       <div className="border-t border-borda px-6 py-6 text-center text-xs text-bege/70">
         <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
           <span>

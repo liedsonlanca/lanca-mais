@@ -123,6 +123,17 @@ export const FOTO_EQUIPE = {
   alt: "A equipe da LANÇA+ reunida em estúdio",
 };
 
+/**
+ * O fundo da chamada final.
+ *
+ * Entra sob um véu escuro pesado, então funciona como textura e não como
+ * retrato: o que ela faz é tirar o último bloco da cor chapada, que era onde
+ * a página terminava mais fraca. Por isso é decorativa, com alt vazio.
+ */
+export const FOTO_CHAMADA = {
+  src: "/images/team/LFF_0473_resized.jpg",
+};
+
 /* ---------------- Pra quem fazem ---------------- */
 
 export const publicos: Publico[] = [
