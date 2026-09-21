@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Service } from "@/lib/site-config";
-import ServiceIcon from "@/components/ServiceIcon";
 import PreviaServico from "@/components/PreviaServico";
 
 // Os serviços em evidência, em trilho.
@@ -88,33 +87,40 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
               className="absolute inset-x-0 top-0 h-[3px] w-0 bg-salmon transition-all duration-700 group-hover:w-full group-focus-visible:w-full"
             />
 
-            <div className="flex items-start gap-4 px-7 pb-6 pt-8">
-              <span
-                aria-hidden
-                className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-salmon/12 text-salmon transition-colors duration-500 group-hover:bg-salmon group-hover:text-preto"
-              >
-                <ServiceIcon slug={s.slug} className="h-5 w-5" />
-              </span>
-
-              <span className="min-w-0">
-                <h3 className="text-xl font-semibold leading-snug tracking-[-0.02em] text-tinta">
-                  {s.name}
-                </h3>
-                <span className="mt-2 block text-sm leading-relaxed text-tinta/55">
-                  {s.shortDescription}
+            {/* Número, nome e a linha de resumo. Sem ícone em quadradinho: era
+                o mesmo quadradinho em todo card de todo bloco, e é justamente
+                esse tipo de peça repetida que faz um site parecer feito por
+                molde. O ícone continua onde tem função, na página de serviços,
+                onde são oito e o desenho ajuda a achar. */}
+            <div className="px-7 pb-7 pt-8">
+              <div className="flex items-center gap-4 border-b border-contorno pb-5">
+                <span className="numeral-fantasma text-sm text-tinta/30 transition-colors duration-500 group-hover:text-destaque">
+                  {String(itens.indexOf(s) + 1).padStart(2, "0")}
                 </span>
+                <span aria-hidden className="h-px flex-1 bg-contorno" />
+              </div>
+
+              <h3 className="font-heading mt-6 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-tinta">
+                {s.name}
+              </h3>
+              <span className="mt-3 block max-w-[26ch] leading-relaxed text-tinta/55">
+                {s.shortDescription}
               </span>
             </div>
 
-            {/* A prévia. Fica recuada das bordas, como uma tela dentro do
-                card, e é o que dá a cada serviço um rosto próprio. */}
-            <div className="relative flex-1 px-3 pb-3">
-              <div className="relative h-full min-h-[210px] overflow-hidden rounded-[20px] border border-contorno/80 bg-fundo-alt">
+            {/* A prévia sangra até a borda de baixo do card, como uma tela
+                deslizando para dentro dele. Recuada nos quatro lados, ela era
+                mais um retângulo flutuando dentro de outro retângulo.
+
+                tema-claro só aqui dentro: a prévia acende como tela ligada no
+                meio do escuro. Desenhada no escuro, sumia no fundo. */}
+            <div className="relative mt-auto px-5">
+              <div className="tema-claro relative h-[190px] overflow-hidden rounded-t-[18px] border border-b-0 border-contorno bg-fundo-alt">
                 <span
                   aria-hidden
                   className="glow-salmon pointer-events-none absolute -bottom-16 left-1/2 h-48 w-48 -translate-x-1/2 opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-60"
                 />
-                <div className="relative h-full p-1 transition-transform duration-700 group-hover:scale-[1.03]">
+                <div className="relative h-full pt-3 transition-transform duration-700 group-hover:scale-[1.04]">
                   <PreviaServico slug={s.slug} />
                 </div>
               </div>
