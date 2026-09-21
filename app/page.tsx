@@ -23,12 +23,14 @@ import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
 //   2. Os três serviços em evidência, e os outros atrás de um botão;
 //   3. Nosso trabalho: as peças e os vídeos, que se veem sem ler;
 //   4. Cases e 5. Depoimentos, só quando forem reais;
-//   6. Logos de clientes, só quando houver;
-//   7. A chamada final.
+//   6. Sobre a agência, curto, com o convite para conhecer a equipe;
+//   7. Logos de clientes, só quando houver;
+//   8. A chamada final.
 //
-// O problema, o método, as perguntas e o "quem somos" saíram. O que eles
-// diziam continua no site: a frase-problema abre a abertura, cada página de
-// serviço tem as suas etapas e perguntas, e a equipe está em /sobre.
+// O problema, o método e as perguntas saíram. O que eles diziam continua no
+// site: a frase-problema abre a abertura, e cada página de serviço tem as suas
+// etapas e perguntas. O "sobre" chegou a sair também, e voltou a pedido do
+// cliente: sem ele a home era só oferta, sem dizer quem está por trás.
 //
 // Os fundos alternam sozinhos. Cases e depoimentos podem estar escondidos, e
 // uma ordem fixa de fundos deixaria duas seções vizinhas da mesma cor quando
@@ -267,6 +269,63 @@ export default async function Home() {
       </section>
     ));
   }
+
+  // 6. Sobre a agência
+  // Voltou a pedido do cliente, que sentiu falta de a home dizer quem está por
+  // trás do trabalho. Fica logo antes da chamada final: quem chegou até aqui já
+  // quer saber com quem vai falar. Sem os números, que a abertura já mostra.
+  secoes.push((fundo) => (
+    <section key="sobre" className={`relative overflow-hidden ${fundo}`}>
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-16">
+          <div>
+            <SectionHeading
+              eyebrow="Sobre a LANÇA+"
+              alinhamento="esquerda"
+              titulo={[
+                { texto: "Uma agência inteira" },
+                { texto: "debaixo do mesmo teto.", acento: "teto." },
+              ]}
+              lead="Estratégia, audiovisual, tráfego, identidade visual, web e arquitetura. Sem terceirização, sem ruído entre quem pensa e quem executa."
+            />
+
+            <Reveal delay={0.2}>
+              <Link
+                href="/sobre"
+                className="group mt-9 inline-flex min-h-12 items-center gap-2 rounded-full border border-tinta/20 px-7 font-medium text-tinta transition-colors duration-500 hover:border-tinta"
+              >
+                Conhecer a equipe
+                <Seta />
+              </Link>
+            </Reveal>
+          </div>
+
+          <Reveal distance={40}>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-3xl">
+                <Image
+                  src="/images/team/equipe-1.jpg"
+                  alt="Equipe da LANÇA+"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-[1.2s] hover:scale-105"
+                />
+              </div>
+              <div className="relative mt-10 aspect-[3/4] overflow-hidden rounded-3xl">
+                <Image
+                  src="/images/team/equipe-2.jpg"
+                  alt="Equipe da LANÇA+ nos bastidores"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-[1.2s] hover:scale-105"
+                />
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  ));
 
   // 7. Chamada final
   secoes.push((fundo) => (
