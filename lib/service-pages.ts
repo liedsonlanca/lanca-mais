@@ -120,7 +120,7 @@ export const servicePages: Record<string, ServicePage> = {
         question:
           "Em quanto tempo isso aparece na minha agenda?",
         answer:
-          "Os primeiros sinais aparecem no alcance e nas conversas, e são medidos desde o primeiro mês. A agenda responde depois, porque depende de quanta gente já procurava o que você faz e de quanto a sua área demora entre descobrir e contratar. Quem promete data exata para isso está chutando.",
+          "Marketing não dá pico, dá acúmulo. Os primeiros sinais aparecem no alcance e nas conversas, e são medidos desde o primeiro mês, mas a agenda responde à constância: o que muda o jogo não é o mês que foi bem, é o sexto mês seguido no ar com a mesma direção. Quem promete data exata está vendendo sorte.",
       },
       {
         question:
