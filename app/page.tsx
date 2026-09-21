@@ -7,10 +7,10 @@ import Hero from "@/components/Hero";
 import WorkShowcase from "@/components/WorkShowcase";
 import ClientLogos from "@/components/ClientLogos";
 import SectionHeading from "@/components/SectionHeading";
-import ServiceIcon from "@/components/ServiceIcon";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
+import ServicosDestaque from "@/components/ServicosDestaque";
 
 // A home, desde 18/09/2026.
 //
@@ -84,55 +84,33 @@ export default async function Home() {
   const secoes: Array<(fundo: string) => React.ReactNode> = [];
 
   // 2. Serviços em evidência
+  //
+  // Título à esquerda e o texto de apoio à direita, na mesma linha. Assim a
+  // seção abre larga e os cards entram logo em seguida, sem um parágrafo
+  // centralizado atravessando o caminho.
   secoes.push((fundo) => (
     <section key="servicos" className={`relative overflow-hidden ${fundo}`}>
       <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-        <SectionHeading
-          eyebrow="Serviços"
-          alinhamento="esquerda"
-          titulo={[
-            { texto: "Três formas de" },
-            { texto: "lançar a sua marca.", acento: "lançar" },
-          ]}
-        />
+        <div className="grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:items-end lg:gap-16">
+          <SectionHeading
+            eyebrow="Serviços"
+            alinhamento="esquerda"
+            titulo={[
+              { texto: "Três formas de" },
+              { texto: "lançar a sua marca.", acento: "lançar" },
+            ]}
+          />
 
-        {/* Cards numerados, como os da referência escura: o número em salmão
-            diz a ordem de leitura sem precisar de texto. */}
-        <Stagger className="mt-12 grid gap-5 md:grid-cols-3">
-          {destaques.map((s, i) => (
-            <StaggerItem key={s.slug} className="h-full">
-              <Link
-                href={`/servicos/${s.slug}`}
-                className="group relative flex h-full min-h-[300px] flex-col rounded-3xl border border-contorno bg-cartao p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:p-8 lg:min-h-[340px]"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <span className="numeral-fantasma text-5xl leading-none text-salmon">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span
-                    aria-hidden
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl bg-salmon/12 text-salmon"
-                  >
-                    <ServiceIcon slug={s.slug} className="h-6 w-6" />
-                  </span>
-                </div>
+          <Reveal delay={0.1}>
+            <p className="max-w-xl leading-relaxed text-tinta/60 lg:pb-3">
+              Duas frentes de marketing e a produção audiovisual. Cada uma
+              resolve um problema diferente, e as três andam juntas quando a
+              marca precisa de tudo ao mesmo tempo.
+            </p>
+          </Reveal>
+        </div>
 
-                <div className="mt-auto pt-12">
-                  <h3 className="text-2xl font-semibold tracking-[-0.02em] text-tinta">
-                    {s.name}
-                  </h3>
-                  <p className="mt-3 leading-relaxed text-tinta/65">
-                    {s.shortDescription}
-                  </p>
-                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-destaque">
-                    Conhecer
-                    <Seta />
-                  </span>
-                </div>
-              </Link>
-            </StaggerItem>
-          ))}
-        </Stagger>
+        <ServicosDestaque itens={destaques} />
 
         {/* Os outros serviços: nomes à vista, para quem procura um deles
             achar sem clicar às cegas, e o botão para a página com todos. */}
