@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Service } from "@/lib/site-config";
-import PreviaServico from "@/components/PreviaServico";
+import { FOTOS_SERVICO } from "@/lib/home";
 
 // Os serviços em evidência, em trilho.
 //
@@ -75,7 +76,10 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
         data-lenis-prevent
         className="sem-barra flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth"
       >
-        {itens.map((s) => (
+        {itens.map((s) => {
+          const foto = FOTOS_SERVICO[s.slug];
+
+          return (
           <Link
             key={s.slug}
             href={`/servicos/${s.slug}`}
@@ -108,23 +112,29 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
               </span>
             </div>
 
-            {/* A prévia sangra até a borda de baixo do card, como uma tela
-                deslizando para dentro dele. Recuada nos quatro lados, ela era
-                mais um retângulo flutuando dentro de outro retângulo.
+            {/* A foto sangra até as três bordas de baixo do card. Antes aqui
+                havia um desenho abstrato de interface, e desenho abstrato é o
+                que qualquer máquina produz de graça: a sessão de estúdio da
+                equipe, não. Ela é da LANÇA+ e de mais ninguém, e é o que faz o
+                card parecer de uma agência de verdade. */}
+            {foto && (
+              <div className="relative mt-auto h-[230px] overflow-hidden">
+                <Image
+                  src={foto.src}
+                  alt={foto.alt}
+                  fill
+                  sizes="(max-width: 640px) 86vw, (max-width: 1024px) 45vw, 30vw"
+                  className="object-cover object-top transition-transform duration-[1.2s] group-hover:scale-105"
+                />
 
-                tema-claro só aqui dentro: a prévia acende como tela ligada no
-                meio do escuro. Desenhada no escuro, sumia no fundo. */}
-            <div className="relative mt-auto px-5">
-              <div className="tema-claro relative h-[190px] overflow-hidden rounded-t-[18px] border border-b-0 border-contorno bg-fundo-alt">
+                {/* O véu escuro por baixo da seta: sem ele, a seta cai em
+                    cima de uma região clara da foto e some. */}
                 <span
                   aria-hidden
-                  className="glow-salmon pointer-events-none absolute -bottom-16 left-1/2 h-48 w-48 -translate-x-1/2 opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-60"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-preto/70 to-transparent"
                 />
-                <div className="relative h-full pt-3 transition-transform duration-700 group-hover:scale-[1.04]">
-                  <PreviaServico slug={s.slug} />
-                </div>
               </div>
-            </div>
+            )}
 
             {/* A seta grande, apoiada no canto da prévia. É ela que diz que o
                 card inteiro leva a algum lugar, sem precisar de "saiba mais". */}
@@ -145,7 +155,8 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
               </svg>
             </span>
           </Link>
-        ))}
+          );
+        })}
       </div>
 
       {paginas > 1 && (

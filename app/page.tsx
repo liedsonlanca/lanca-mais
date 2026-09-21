@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { services, SERVICOS_EM_DESTAQUE } from "@/lib/site-config";
-import { sintomas, metodo, entregaveis } from "@/lib/home";
+import {
+  sintomas,
+  metodo,
+  entregaveis,
+  FOTO_PROBLEMA,
+  FOTO_EQUIPE,
+} from "@/lib/home";
 import { lerVitrine, lerDepoimentos, lerCases, lerNumeros } from "@/lib/conteudo";
 import { ehProvisorio } from "@/lib/provisorio";
 import Hero from "@/components/Hero";
@@ -140,31 +146,53 @@ export default async function Home() {
   secoes.push((claro) => (
     <Painel key="problema" claro={claro}>
       <Miolo className="pt-12 lg:pt-16">
-        <Rotulo>O que trava a sua marca</Rotulo>
-        <Titulo
-          linhas={[
-            { texto: "Bom negócio, presença mediana.", acento: "mediana." },
-          ]}
-        />
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-14">
+          <div>
+            <Rotulo>O que trava a sua marca</Rotulo>
+            <Titulo
+              linhas={[
+                { texto: "Bom negócio, presença mediana.", acento: "mediana." },
+              ]}
+            />
 
-        <Stagger className={`mt-10 grid border-t ${FIO} md:grid-cols-3`}>
-          {sintomas.map((sintoma, i) => (
-            <StaggerItem key={sintoma.titulo}>
-              <div
-                className={`group relative flex h-full items-start gap-4 border-b ${FIO} py-6 md:border-b-0 md:pr-8 ${
-                  i < sintomas.length - 1 ? `md:border-r ${FIO}` : ""
-                } ${i > 0 ? "md:pl-8" : ""}`}
-              >
-                <span className="numeral-fantasma mt-1 text-sm text-tinta/30 transition-colors duration-500 group-hover:text-destaque">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-heading text-xl font-semibold leading-[1.2] tracking-[-0.025em] text-tinta lg:text-[1.35rem]">
-                  {sintoma.titulo}
-                </h3>
-              </div>
-            </StaggerItem>
-          ))}
-        </Stagger>
+            <Stagger className={`mt-9 border-t ${FIO}`}>
+              {sintomas.map((sintoma, i) => (
+                <StaggerItem key={sintoma.titulo}>
+                  <div
+                    className={`group relative flex items-baseline gap-5 border-b ${FIO} py-5`}
+                  >
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-px left-0 h-px w-0 bg-salmon transition-all duration-[900ms] ease-out group-hover:w-full"
+                    />
+                    <span className="numeral-fantasma text-sm text-tinta/30 transition-colors duration-500 group-hover:text-destaque">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="font-heading text-xl font-semibold leading-[1.2] tracking-[-0.025em] text-tinta lg:text-[1.45rem]">
+                      {sintoma.titulo}
+                    </h3>
+                  </div>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </div>
+
+          {/* O retrato. Figura andando, que é o que a marca diz de si na
+              assinatura: somos movimento. Fica alto e colado no texto, do
+              tamanho da coluna inteira, e não como uma miniatura decorando
+              o canto. */}
+          <Reveal distance={40}>
+            <div className="relative h-full min-h-[360px] overflow-hidden rounded-[22px] lg:min-h-[460px]">
+              <Image
+                src={FOTO_PROBLEMA.src}
+                alt={FOTO_PROBLEMA.alt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover object-[50%_25%]"
+              />
+            </div>
+          </Reveal>
+        </div>
       </Miolo>
 
       {/* A virada, de ponta a ponta do painel, numa linha só. */}
@@ -418,26 +446,18 @@ export default async function Home() {
             </Reveal>
           </div>
 
+          {/* Uma foto grande, e não duas pequenas desencontradas. Quando a
+              pergunta é "quem é a LANÇA+", a resposta é o time inteiro, em
+              tamanho que dê para ver a cara de cada um. */}
           <Reveal distance={40}>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[22px]">
-                <Image
-                  src="/images/team/equipe-1.jpg"
-                  alt="Equipe da LANÇA+"
-                  fill
-                  sizes="(max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-[1.2s] hover:scale-105"
-                />
-              </div>
-              <div className="relative mt-8 aspect-[4/5] overflow-hidden rounded-[22px]">
-                <Image
-                  src="/images/team/equipe-2.jpg"
-                  alt="Equipe da LANÇA+ nos bastidores"
-                  fill
-                  sizes="(max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-[1.2s] hover:scale-105"
-                />
-              </div>
+            <div className="group relative aspect-[5/4] overflow-hidden rounded-[22px]">
+              <Image
+                src={FOTO_EQUIPE.src}
+                alt={FOTO_EQUIPE.alt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-top transition-transform duration-[1.4s] group-hover:scale-[1.04]"
+              />
             </div>
           </Reveal>
         </div>
