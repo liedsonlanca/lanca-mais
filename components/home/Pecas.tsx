@@ -28,8 +28,11 @@ export function Rotulo({ children }: { children: React.ReactNode }) {
 /**
  * Título de bloco, em corpo de display.
  *
- * Grande de propósito: num site sem caixa, é o tamanho do título que diz que
- * começou assunto novo.
+ * Num site sem caixa, é o tamanho do título que diz que começou assunto novo.
+ * Mas título de duas linhas em corpo enorme, repetido em seis blocos, vira
+ * rolagem: cada um custava quase duzentos pixels de altura só para anunciar o
+ * que vinha embaixo. Aqui ele é grande o bastante para mandar na página, e
+ * curto o bastante para caber numa linha na maioria das telas.
  */
 export function Titulo({
   linhas,
@@ -40,7 +43,7 @@ export function Titulo({
 }) {
   return (
     <h2
-      className={`font-heading mt-7 text-[2.35rem] font-semibold leading-[1.03] tracking-[-0.035em] text-tinta sm:text-5xl lg:text-[3.9rem] ${className}`}
+      className={`font-heading mt-5 text-[1.95rem] font-semibold leading-[1.05] tracking-[-0.035em] text-tinta sm:text-4xl lg:text-[2.9rem] ${className}`}
     >
       <WordReveal linhas={linhas} gatilho="scroll" delay={0.05} />
     </h2>
