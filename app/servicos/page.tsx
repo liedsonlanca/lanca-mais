@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { services } from "@/lib/site-config";
-import PageHero from "@/components/PageHero";
+import { lerNumeros } from "@/lib/conteudo";
+import ArcoDeFotos, { type FotoDoArco } from "@/components/ArcoDeFotos";
 import CtaFinal from "@/components/CtaFinal";
 import ServiceIcon from "@/components/ServiceIcon";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -12,16 +13,32 @@ export const metadata: Metadata = {
     "Marketing pessoal, marketing empresarial, audiovisual, consultoria, tráfego pago, identidade visual, desenvolvimento web e arquitetura: tudo em uma única agência.",
 };
 
-export default function ServicosPage() {
+// Os cinco retratos que abrem o arco. São os da equipe, um por pessoa: em
+// leque, dizem "somos um time" antes de qualquer frase.
+const FOTOS_DO_ARCO: FotoDoArco[] = [
+  { src: "/images/team/liedson-rodrigues.jpg", alt: "Liedson Rodrigues, da LANÇA+" },
+  { src: "/images/team/vitoria-dantas.jpg", alt: "Vitória Dantas, da LANÇA+" },
+  { src: "/images/team/equipe-1.jpg", alt: "A equipe da LANÇA+ reunida" },
+  { src: "/images/team/silas-oliveira.jpg", alt: "Silas Oliveira, da LANÇA+" },
+  { src: "/images/team/diogenes-mesquita.jpg", alt: "Diógenes Mesquita, da LANÇA+" },
+];
+
+export default async function ServicosPage() {
+  // Os números vêm do painel; sem banco, caem no conteúdo dos arquivos.
+  const numeros = await lerNumeros();
+
   return (
     <>
-      <PageHero
+      <ArcoDeFotos
         eyebrow="Serviços"
         titulo={[
           { texto: "Oito frentes que constroem" },
           { texto: "uma marca por inteiro.", acento: "inteiro." },
         ]}
-        lead="Cada serviço pode ser contratado isoladamente ou combinado, o que não muda é o padrão de qualidade e o alinhamento estratégico entre eles."
+        lead="Contrate uma ou várias. O que não muda é o padrão e o alinhamento entre elas."
+        botao={{ href: "/contato", texto: "Falar com a equipe" }}
+        fotos={FOTOS_DO_ARCO}
+        numeros={numeros}
       />
 
       {/* Grade de serviços. Em lista longa as oito frentes viravam rolagem;
