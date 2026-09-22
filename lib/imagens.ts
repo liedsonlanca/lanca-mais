@@ -87,7 +87,7 @@ const FIXAS: Posicao[] = [
     },
     moldura: { proporcao: "373 / 230", recorte: "top" },
     ajuda:
-      "No computador aparece só a faixa de baixo do card, cortada pelo topo da foto. No celular a foto preenche o card inteiro, em pé, com o texto por cima da parte de baixo — então deixe o rosto na metade de cima e não ponha nada importante embaixo. JPG ou WEBP, 1200 pixels de largura ou mais.",
+      "No computador aparece só a faixa de baixo do card, cortada pelo topo da foto. No celular a foto preenche o card inteiro, em pé, com o texto por cima da parte de baixo — então deixe o rosto na metade de cima e não ponha nada importante embaixo. JPG, WEBP ou HEIC do iPhone, com 1200 pixels de largura ou mais.",
   },
   {
     chave: "home-servico-marketing-empresarial",

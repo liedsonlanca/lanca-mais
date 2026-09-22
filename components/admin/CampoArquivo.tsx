@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { enviarArquivo } from "@/lib/envio-arquivo";
 import { type Pasta } from "@/lib/pastas";
 import { arquivo } from "@/components/admin/estilos";
+import { prepararImagem } from "@/lib/heic";
 
 // Campo de arquivo do painel.
 //
@@ -77,9 +78,15 @@ async function medirLargura(arquivo: File) {
   }
 }
 
+// As extensões vão junto dos tipos por causa do HEIC: no Windows ele
+// costuma chegar com tipo vazio, e só o tipo deixaria a foto do iPhone
+// esmaecida no seletor de arquivos. Ela é convertida em JPEG antes de
+// subir — ver lib/heic.ts.
+const HEIC = "image/heic,image/heif,.heic,.heif";
+
 const ACEITE = {
-  imagem: "image/jpeg,image/png,image/webp",
-  video: "image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime",
+  imagem: `image/jpeg,image/png,image/webp,${HEIC}`,
+  video: `image/jpeg,image/png,image/webp,${HEIC},video/mp4,video/webm,video/quicktime`,
 };
 
 export default function CampoArquivo({
@@ -101,6 +108,7 @@ export default function CampoArquivo({
   const [progresso, setProgresso] = useState<number | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [convertendo, setConvertendo] = useState(false);
 
   // O URL de objeto da prévia fica guardado para ser revogado depois.
   // Sem revogar, cada arquivo escolhido deixa uma cópia presa na memória do
@@ -123,6 +131,7 @@ export default function CampoArquivo({
     setProgresso(null);
     setErro(null);
     setAviso(null);
+    setConvertendo(false);
     prever(null);
     if (entrada.current) entrada.current.value = "";
   }, [prever]);
@@ -149,12 +158,29 @@ export default function CampoArquivo({
   }, [pending, limpar]);
 
   async function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
-    const arquivo = e.target.files?.[0];
-    if (!arquivo) return;
+    const escolhido = e.target.files?.[0];
+    if (!escolhido) return;
 
     setErro(null);
     setAviso(null);
     setUrl("");
+    setNome(escolhido.name);
+
+    // A foto de iPhone vira JPEG antes de qualquer outra coisa: nem a
+    // prévia nem a medida de largura sabem desenhar um HEIC, e o
+    // resultado seria uma miniatura quebrada e um aviso de nitidez que
+    // nunca apareceria.
+    let arquivo: File;
+    try {
+      arquivo = await prepararImagem(escolhido, setConvertendo);
+    } catch (falha) {
+      limpar();
+      setErro(
+        falha instanceof Error ? falha.message : "Não foi possível abrir a imagem."
+      );
+      return;
+    }
+
     setNome(arquivo.name);
     prever(arquivo);
 
@@ -219,6 +245,12 @@ export default function CampoArquivo({
         />
       )}
 
+      {convertendo && (
+        <p role="status" className="mt-2 text-xs text-tinta/60">
+          Convertendo a foto do iPhone…
+        </p>
+      )}
+
       {enviando && (
         <div className="mt-3">
           <div className="h-1 w-full overflow-hidden rounded-full bg-contorno">
@@ -257,7 +289,7 @@ export default function CampoArquivo({
         </p>
       )}
 
-      {ajuda && !enviando && !erro && !aviso && (
+      {ajuda && !enviando && !convertendo && !erro && !aviso && (
         <p className="mt-2 text-xs leading-relaxed text-tinta/50">{ajuda}</p>
       )}
     </div>

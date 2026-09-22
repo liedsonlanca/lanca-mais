@@ -31,7 +31,7 @@ async function carregar(): Promise<Linha[]> {
 
 
 const AJUDA_FOTO =
-  "JPG, PNG ou WEBP, até 8 MB, em pé (3:4). O card mostra a foto alinhada pelo topo, então deixe o rosto na parte de cima. Ela aparece em preto e branco e ganha cor quando o visitante passa o mouse, então fundos limpos funcionam melhor.";
+  "JPG, PNG, WEBP ou HEIC do iPhone, até 8 MB, em pé (3:4). O card mostra a foto alinhada pelo topo, então deixe o rosto na parte de cima. Ela aparece em preto e branco e ganha cor quando o visitante passa o mouse, então fundos limpos funcionam melhor.";
 
 export default async function AdminEquipe() {
   // Portão próprio, além do layout: no App Router o layout não impede a

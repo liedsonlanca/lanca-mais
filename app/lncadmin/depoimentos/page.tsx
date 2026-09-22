@@ -134,7 +134,7 @@ export default async function AdminDepoimentos() {
             name="foto"
             pasta="depoimentos"
             label="Foto do cliente (opcional)"
-            ajuda="JPG, PNG ou WEBP, até 8 MB. Aparece redonda, então prefira uma foto com o rosto centralizado. Sem foto, o card mostra a inicial do nome."
+            ajuda="JPG, PNG, WEBP ou HEIC do iPhone, até 8 MB. Aparece redonda, então prefira uma foto com o rosto centralizado. Sem foto, o card mostra a inicial do nome."
           />
         </div>
 

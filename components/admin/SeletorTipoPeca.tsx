@@ -79,7 +79,7 @@ export default function SeletorTipoPeca() {
             pasta="vitrine"
             label="Imagem"
             obrigatorio
-            ajuda="JPG, PNG ou WEBP, até 8 MB, em pé (4:5)."
+            ajuda="JPG, PNG, WEBP ou HEIC do iPhone, até 8 MB, em pé (4:5)."
           />
         )}
 
@@ -93,7 +93,7 @@ export default function SeletorTipoPeca() {
             label="Imagem da trinca"
             obrigatorio
             larguraMinima={2400}
-            ajuda="JPG, PNG ou WEBP, até 8 MB, deitada: os três quadros do feed lado a lado. Exporte em 3240 por 1350, que é 1080 por quadro. No trilho aparece o recorte do meio, e ao abrir, a peça inteira."
+            ajuda="JPG, PNG, WEBP ou HEIC do iPhone, até 8 MB, deitada: os três quadros do feed lado a lado. Exporte em 3240 por 1350, que é 1080 por quadro. No trilho aparece o recorte do meio, e ao abrir, a peça inteira."
           />
         )}
 

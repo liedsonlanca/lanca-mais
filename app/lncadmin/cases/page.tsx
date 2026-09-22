@@ -137,7 +137,7 @@ export default async function AdminCases() {
             pasta="cases"
             label="Imagem"
             obrigatorio
-            ajuda="Deitada, 16:11. JPG, PNG ou WEBP, até 8 MB."
+            ajuda="Deitada, 16:11. JPG, PNG, WEBP ou HEIC do iPhone, até 8 MB."
           />
         </div>
 

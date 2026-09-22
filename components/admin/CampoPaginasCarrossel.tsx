@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { enviarArquivo } from "@/lib/envio-arquivo";
+import { prepararImagem } from "@/lib/heic";
 import { type Pasta } from "@/lib/pastas";
 
 // Páginas do carrossel.
@@ -108,7 +109,11 @@ export default function CampoPaginasCarrossel({
       // Um de cada vez, e não em paralelo: a barra mostra "3 de 7" em vez de
       // sete barras competindo, e numa conexão ruim uma falha não leva as
       // outras junto. As que já subiram ficam.
-      for (const [i, arquivo] of arquivos.entries()) {
+      for (const [i, escolhido] of arquivos.entries()) {
+        // Foto de iPhone vira JPEG antes de subir: nenhum navegador além do
+        // Safari desenha HEIC, e a página do carrossel ficaria em branco
+        // para a maioria de quem visita. Ver lib/heic.ts.
+        const arquivo = await prepararImagem(escolhido);
         const endereco = await enviarArquivo(arquivo, pasta, "imagem");
         setPaginas((atuais) => [...atuais, endereco]);
         setEnviando({ feitas: i + 1, total: arquivos.length });
@@ -226,7 +231,7 @@ export default function CampoPaginasCarrossel({
         ref={entrada}
         id={idCampo}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
         multiple
         onChange={aoEscolher}
         className="sr-only"
@@ -261,7 +266,7 @@ export default function CampoPaginasCarrossel({
         <p className="mt-3 text-xs leading-relaxed text-tinta/50">
           {faltam > 0
             ? `Escolha pelo menos ${MINIMO} imagens. Um carrossel de uma página só é uma peça estática.`
-            : "As páginas entram na ordem do nome do arquivo, então exportar como 01, 02, 03 já resolve. A primeira é a capa, e é ela que aparece no trilho da home. JPG, PNG ou WEBP, até 8 MB cada, em pé (4:5)."}
+            : "As páginas entram na ordem do nome do arquivo, então exportar como 01, 02, 03 já resolve. A primeira é a capa, e é ela que aparece no trilho da home. JPG, PNG, WEBP ou HEIC do iPhone, até 8 MB cada, em pé (4:5)."}
         </p>
       )}
     </div>
