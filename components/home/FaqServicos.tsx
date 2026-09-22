@@ -59,12 +59,22 @@ export default function FaqServicos({ abas }: { abas: AbaFaq[] }) {
 
   return (
     <div className="mt-10">
-      {/* A barra de abas. Rola no celular, onde os três nomes não cabem. */}
+      {/* A barra de abas.
+
+          No celular os três nomes não cabem lado a lado, e antes a barra
+          rolava: a terceira aba ficava fora da tela e a segunda aparecia
+          cortada no meio da palavra, sem nada avisando que aquilo arrastava.
+          Aba que não se vê não é escolhida.
+
+          Agora elas quebram linha e aparecem inteiras. O contêiner perde o
+          arredondamento de pílula no celular, porque pílula com duas fileiras
+          dentro vira uma cápsula estranha; da tablet para cima, onde as três
+          cabem numa linha só, a pílula volta. */}
       <div
         role="tablist"
         aria-label="Dúvidas por serviço"
         onKeyDown={aoTeclar}
-        className="sem-barra -mx-1 flex gap-1.5 overflow-x-auto rounded-full border border-contorno bg-cartao p-1.5 sm:mx-0 sm:w-fit"
+        className="flex flex-wrap gap-1.5 rounded-[20px] border border-contorno bg-cartao p-1.5 sm:w-fit sm:flex-nowrap sm:rounded-full"
       >
         {abas.map((item, i) => (
           <button
@@ -79,7 +89,9 @@ export default function FaqServicos({ abas }: { abas: AbaFaq[] }) {
             aria-controls={`painel-${item.slug}`}
             tabIndex={i === aba ? 0 : -1}
             onClick={() => trocarAba(i)}
-            className={`flex min-h-11 shrink-0 items-center rounded-full px-5 text-sm font-medium transition-colors duration-500 ${
+            // grow no celular, para as abas de uma mesma fileira dividirem a
+            // largura em vez de deixarem um buraco na ponta direita.
+            className={`flex min-h-11 grow shrink-0 items-center justify-center rounded-full px-5 text-center text-sm font-medium transition-colors duration-500 sm:grow-0 ${
               i === aba
                 ? "bg-salmon text-preto"
                 : "text-tinta/60 hover:text-tinta"
