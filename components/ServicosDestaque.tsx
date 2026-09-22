@@ -91,7 +91,7 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
         //
         // A partir do tablet volta o trilho, onde dois ou três cabem lado a
         // lado e a comparação entre eles se faz de relance.
-        className="sem-barra grid gap-4 sm:flex sm:snap-x sm:snap-mandatory sm:gap-5 sm:overflow-x-auto sm:scroll-smooth"
+        className="sem-barra grid gap-4 sm:-my-3 sm:flex sm:snap-x sm:snap-mandatory sm:gap-5 sm:overflow-x-auto sm:py-3 sm:scroll-smooth"
       >
         {itens.map((s) => {
           const foto = FOTOS_SERVICO[s.slug];
@@ -104,10 +104,19 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
             // Tablet para cima: o texto em cima e a foto sangrando no pé.
             className="group relative flex min-h-[290px] w-full shrink-0 snap-start flex-col justify-end overflow-hidden rounded-[26px] border border-contorno bg-cartao transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:min-h-0 sm:w-[calc((100%-1.25rem)/2)] sm:justify-start sm:rounded-[28px] lg:w-[calc((100%-2.5rem)/3)]"
           >
-            {/* Régua de lançamento no topo, a mesma dos cards do site. */}
+            {/* Régua de lançamento no topo, a mesma dos cards do site.
+
+                Recuada dos cantos, e não de ponta a ponta: o card tem 26px de
+                raio, então uma barra de 3px colada na borda entrava na curva e
+                era comida pelo recorte, aparecendo mordida nas pontas. Aqui
+                ela vive no trecho reto do topo.
+
+                E cresce por escala, não por largura: com left e right fixos a
+                largura não anima sozinha, e scale-x com origem à esquerda dá o
+                mesmo gesto sem conta nenhuma. */}
             <span
               aria-hidden
-              className="absolute inset-x-0 top-0 h-[3px] w-0 bg-salmon transition-all duration-700 group-hover:w-full group-focus-visible:w-full"
+              className="absolute inset-x-7 top-0 h-[3px] origin-left scale-x-0 bg-salmon transition-transform duration-700 group-hover:scale-x-100 group-focus-visible:scale-x-100"
             />
 
             {/* Número, nome e a linha de resumo. Sem ícone em quadradinho: era

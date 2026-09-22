@@ -114,7 +114,7 @@ export default function DepoimentosCarrossel({
         // sem-barra esconde a barra de rolagem sem tirar a rolagem.
         // data-lenis-prevent: sem isto o Lenis engoliria o gesto horizontal.
         data-lenis-prevent
-        className="sem-barra flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth"
+        className="sem-barra -my-3 flex snap-x snap-mandatory gap-5 overflow-x-auto py-3 scroll-smooth"
       >
         {itens.map((depoimento, i) => {
           // A nota só vira estrela se for inteira e couber de 1 a 5. Dado

@@ -280,7 +280,7 @@ export default async function Home() {
           {metodo.map((etapa, i) => (
             <StaggerItem key={etapa.numero}>
               <div
-                className={`group relative flex h-full items-baseline gap-4 border-b ${FIO} py-4 lg:border-b-0 ${
+                className={`group relative flex h-full items-baseline gap-4 border-b ${FIO} py-4 ${
                   i < metodo.length - 1 ? `lg:border-r ${FIO}` : ""
                 } ${i > 0 ? "lg:pl-6" : ""} lg:pr-6`}
               >
@@ -296,7 +296,7 @@ export default async function Home() {
         </Stagger>
 
         <Reveal delay={0.15}>
-          <div className={`mt-8 border-t ${FIO} pt-6`}>
+          <div className="mt-8">
             <span className="eyebrow text-destaque">
               O que você recebe, todo mês
             </span>
