@@ -36,7 +36,15 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
         cards.length > 1
           ? cards[1].offsetLeft - cards[0].offsetLeft
           : cards[0].offsetWidth;
-      if (passo <= 0) return;
+
+      // Passo zero quer dizer que os cards estão empilhados, e não em trilho:
+      // é o celular. Ali não há o que navegar, então os pontos somem. O
+      // setPaginas(1) importa para quem estreita a janela vindo do desktop,
+      // onde já havia mais de uma página contada.
+      if (passo <= 0) {
+        setPaginas(1);
+        return;
+      }
 
       const cabem = Math.max(1, Math.round(el.clientWidth / passo));
       porVista.current = cabem;
@@ -74,7 +82,16 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
         // data-lenis-prevent: sem isto a rolagem suave da página engoliria o
         // gesto horizontal dentro do trilho.
         data-lenis-prevent
-        className="sem-barra flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth"
+        // No celular os três ficam empilhados, e não em trilho.
+        //
+        // São os três serviços principais: em trilho, aparecia um e meio, e
+        // conhecer os outros dois dependia de a pessoa descobrir que aquilo
+        // arrastava. O que cabe numa tela de telefone não é a largura dos
+        // três, é a altura, então eles descem em vez de andar de lado.
+        //
+        // A partir do tablet volta o trilho, onde dois ou três cabem lado a
+        // lado e a comparação entre eles se faz de relance.
+        className="sem-barra grid gap-4 sm:flex sm:snap-x sm:snap-mandatory sm:gap-5 sm:overflow-x-auto sm:scroll-smooth"
       >
         {itens.map((s) => {
           const foto = FOTOS_SERVICO[s.slug];
@@ -83,7 +100,9 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
           <Link
             key={s.slug}
             href={`/servicos/${s.slug}`}
-            className="group relative flex w-[86%] shrink-0 snap-start flex-col overflow-hidden rounded-[28px] border border-contorno bg-cartao transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+            // Celular: card inteiro de foto, com o texto pousado embaixo.
+            // Tablet para cima: o texto em cima e a foto sangrando no pé.
+            className="group relative flex min-h-[290px] w-full shrink-0 snap-start flex-col justify-end overflow-hidden rounded-[26px] border border-contorno bg-cartao transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:min-h-0 sm:w-[calc((100%-1.25rem)/2)] sm:justify-start sm:rounded-[28px] lg:w-[calc((100%-2.5rem)/3)]"
           >
             {/* Régua de lançamento no topo, a mesma dos cards do site. */}
             <span
@@ -96,15 +115,18 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
                 esse tipo de peça repetida que faz um site parecer feito por
                 molde. O ícone continua onde tem função, na página de serviços,
                 onde são oito e o desenho ajuda a achar. */}
-            <div className="px-7 pb-7 pt-8">
-              <span className="numeral-fantasma block text-sm text-tinta/45 transition-colors duration-500 group-hover:text-destaque">
+            {/* As cores viram duas vezes: no celular o texto está sobre a foto
+                escurecida, então é claro; do tablet para cima está sobre o
+                card, então segue o tema. */}
+            <div className="relative z-10 px-7 pb-7 pt-8">
+              <span className="numeral-fantasma block text-sm text-bege/55 transition-colors duration-500 group-hover:text-salmon sm:text-tinta/45 sm:group-hover:text-destaque">
                 {String(itens.indexOf(s) + 1).padStart(2, "0")}
               </span>
 
-              <h3 className="font-heading mt-4 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-tinta">
+              <h3 className="font-heading mt-3 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-bege sm:mt-4 sm:text-tinta">
                 {s.name}
               </h3>
-              <span className="mt-3 block max-w-[26ch] leading-relaxed text-tinta/65">
+              <span className="mt-2.5 block max-w-[26ch] leading-relaxed text-bege/75 sm:mt-3 sm:text-tinta/65">
                 {s.shortDescription}
               </span>
             </div>
@@ -115,29 +137,41 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
                 equipe, não. Ela é da LANÇA+ e de mais ninguém, e é o que faz o
                 card parecer de uma agência de verdade. */}
             {foto && (
-              <div className="relative mt-auto h-[230px] overflow-hidden">
+              // No celular a foto preenche o card inteiro, por baixo do texto.
+              // A partir do tablet ela volta a ser uma faixa no pé.
+              <div className="absolute inset-0 overflow-hidden sm:relative sm:inset-auto sm:mt-auto sm:h-[230px]">
                 <Image
                   src={foto.src}
                   alt={foto.alt}
                   fill
-                  sizes="(max-width: 640px) 86vw, (max-width: 1024px) 45vw, 30vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 45vw, 30vw"
                   className="object-cover object-top transition-transform duration-[1.2s] group-hover:scale-105"
                 />
 
-                {/* O véu escuro por baixo da seta: sem ele, a seta cai em
-                    cima de uma região clara da foto e some. */}
+                {/* Véu de baixo para cima, forte no pé e transparente no topo:
+                    é ele que segura o texto legível sobre a foto sem apagar o
+                    rosto. Só no celular, que é onde o texto fica por cima. */}
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-preto/70 to-transparent"
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-preto via-preto/70 to-preto/10 sm:hidden"
+                />
+
+                {/* No tablet para cima, só o véu curto por baixo da seta: sem
+                    ele, a seta cai numa região clara da foto e some. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-28 bg-gradient-to-t from-preto/70 to-transparent sm:block"
                 />
               </div>
             )}
 
             {/* A seta grande, apoiada no canto da prévia. É ela que diz que o
                 card inteiro leva a algum lugar, sem precisar de "saiba mais". */}
+            {/* No celular ela vai para o topo: embaixo cairia em cima do
+                texto, que ali ocupa o pé do card. */}
             <span
               aria-hidden
-              className="absolute bottom-7 right-7 flex h-14 w-14 items-center justify-center rounded-full border border-contorno bg-fundo text-tinta shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto group-focus-visible:border-salmon group-focus-visible:bg-salmon group-focus-visible:text-preto"
+              className="absolute right-6 top-6 z-10 flex h-14 w-14 items-center justify-center rounded-full border border-contorno bg-fundo text-tinta shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto group-focus-visible:border-salmon group-focus-visible:bg-salmon group-focus-visible:text-preto sm:bottom-7 sm:right-7 sm:top-auto"
             >
               <svg
                 viewBox="0 0 24 24"

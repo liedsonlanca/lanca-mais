@@ -238,31 +238,52 @@ export default async function Home() {
 
         <ServicosDestaque itens={destaques} />
 
-        {/* Os outros serviços, numa linha só. Em lista, eram cinco itens
-            ocupando duas alturas de texto para dizer o que cabe numa. */}
+        {/* Os outros serviços.
+
+            Eram uma frase corrida, com os cinco nomes separados por ponto. No
+            celular aquilo quebrava em três linhas e cada uma terminava com um
+            separador pendurado, o que faz a lista parecer texto mal formatado
+            em vez de menu. E nome de serviço no meio de frase não se lê como
+            item clicável.
+
+            Agora é lista de verdade: no celular uma por linha, com fio entre
+            elas e a seta indicando que leva a algum lugar. Do tablet para
+            cima elas voltam a correr na horizontal, onde cabem, mas sem
+            separador nenhum: o vão entre elas já separa, e vão não fica
+            pendurado no fim da linha quando quebra. */}
         {outros.length > 0 && (
           <Reveal delay={0.15}>
             <div
-              className={`mt-10 flex flex-col gap-5 border-t ${FIO} pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10`}
+              className={`mt-10 flex flex-col gap-6 border-t ${FIO} pt-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10`}
             >
-              <p className="text-tinta/65">
-                <span className="text-tinta/55">Também fazemos </span>
-                {outros.map((s, i) => (
-                  <span key={s.slug}>
-                    <Link
-                      href={`/servicos/${s.slug}`}
-                      className="inline-flex min-h-11 items-center text-tinta/65 transition-colors duration-500 hover:text-destaque"
-                    >
-                      {s.name}
-                    </Link>
-                    {i < outros.length - 1 && (
-                      <span aria-hidden className="px-2 text-destaque/70">
-                        ·
-                      </span>
-                    )}
-                  </span>
-                ))}
-              </p>
+              <div className="min-w-0">
+                <span className="eyebrow text-tinta/45">Também fazemos</span>
+
+                <ul className="mt-3 divide-y divide-contorno sm:mt-2 sm:flex sm:flex-wrap sm:gap-x-7 sm:divide-y-0">
+                  {outros.map((s) => (
+                    <li key={s.slug}>
+                      <Link
+                        href={`/servicos/${s.slug}`}
+                        className="group flex min-h-12 items-center justify-between gap-4 text-tinta/70 transition-colors duration-500 hover:text-destaque sm:min-h-11 sm:justify-start"
+                      >
+                        {s.name}
+                        <svg
+                          aria-hidden
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4 shrink-0 text-tinta/30 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-destaque sm:hidden"
+                        >
+                          <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               <div className="shrink-0">
                 <Botao
