@@ -22,9 +22,23 @@ export default async function ClientLogos() {
   const volta = Array.from({ length: repeticoes }, () => clientes).flat();
   const trilha = [...volta, ...volta];
 
+  // A faixa é clara, e é o único lugar do site onde a cor não foi escolha
+  // de estilo e sim de necessidade.
+  //
+  // Logo de cliente chega como o cliente manda, e quase sempre é traço preto
+  // sobre transparente, feito para papel timbrado e fundo branco. Sobre o
+  // escuro do site, arte preta some, e não há ajuste de brilho que resolva:
+  // brilho multiplica, e preto multiplicado por qualquer número continua
+  // preto. Inverter salvaria os pretos e mataria os claros, e a faixa tem os
+  // dois.
+  //
+  // Então em vez de brigar com os arquivos, a faixa devolve a eles o fundo
+  // para o qual foram desenhados. O tema-claro troca as cores só aqui dentro,
+  // e o filtro de cinza escurecido logo abaixo volta a fazer o que foi
+  // calibrado para fazer.
   return (
-    <section className="relative overflow-hidden border-y border-contorno bg-fundo">
-      <div className="py-10 lg:py-14">
+    <section className="bg-fundo px-2.5 pt-2.5 sm:px-4 sm:pt-4">
+      <div className="tema-claro noise relative overflow-hidden rounded-[26px] border border-contorno bg-fundo py-10 lg:rounded-[32px] lg:py-14">
         <Reveal>
           <p className="eyebrow text-center text-tinta/58">
             Marcas que confiam na LANÇA+

@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type PecaVitrine } from "@/lib/showcase";
 
 // Os vídeos da abertura da home.
 //
-// Tocam um de cada vez e passam para o próximo quando terminam. Um só carrega
+// Tocam um de cada vez, cinco segundos cada, e passam para o próximo. Um só carrega
 // por vez, e é por isso que a troca é feita por chave, e não montando todos e
 // escondendo: cada <video> montado baixaria o seu arquivo, e a abertura é a
 // parte mais vista do site, aberta num celular com pacote de dados.
@@ -29,6 +29,17 @@ type Props = {
 
 /** Quanto tempo cada imagem fica, quando não há vídeo. */
 const TEMPO_IMAGEM_MS = 4200;
+
+/**
+ * Quantos segundos de cada vídeo a abertura mostra.
+ *
+ * Antes cada peça tocava até o fim, e um vídeo de um minuto segurava a
+ * abertura inteira nele: quem chegasse na hora errada via um pedaço do meio,
+ * sem começo nem contexto, e nunca chegava a saber que havia outros. A vitrine
+ * aqui é amostra, não sessão de cinema. Quem quiser ver inteiro tem o trilho
+ * de "Nosso trabalho" logo abaixo.
+ */
+const TEMPO_VIDEO_S = 5;
 
 function economizarDados() {
   if (typeof navigator === "undefined") return false;
@@ -56,12 +67,37 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
   const ehVideo = atual?.tipo === "video" && Boolean(atual.video);
   const sozinho = pecas.length <= 1;
 
-  // Imagem troca por tempo; vídeo troca quando termina (onEnded, abaixo).
+  const avancar = useCallback(() => {
+    aoTrocar((indice + 1) % pecas.length);
+  }, [aoTrocar, indice, pecas.length]);
+
+  // Imagem troca por tempo de relógio.
   useEffect(() => {
     if (!atual || ehVideo || sozinho || parado) return;
-    const t = setTimeout(() => aoTrocar((indice + 1) % pecas.length), TEMPO_IMAGEM_MS);
+    const t = setTimeout(avancar, TEMPO_IMAGEM_MS);
     return () => clearTimeout(t);
-  }, [atual, ehVideo, sozinho, parado, indice, pecas.length, aoTrocar]);
+  }, [atual, ehVideo, sozinho, parado, avancar]);
+
+  // Vídeo troca por tempo tocado, e não por relógio.
+  //
+  // A diferença aparece em celular com rede ruim: um cronômetro correria
+  // durante o carregamento e trocaria a peça antes de ela ter mostrado
+  // alguma coisa. Contando pelo currentTime, os cinco segundos são cinco
+  // segundos vistos.
+  //
+  // A trava evita a troca dupla: o evento de tempo dispara umas quatro vezes
+  // por segundo, e sem ela o quadro seguinte poderia pular duas peças.
+  const jaAvancou = useRef(false);
+  useEffect(() => {
+    jaAvancou.current = false;
+  }, [indice]);
+
+  function aoAndarOTempo(video: HTMLVideoElement) {
+    if (sozinho || jaAvancou.current) return;
+    if (video.currentTime < TEMPO_VIDEO_S) return;
+    jaAvancou.current = true;
+    avancar();
+  }
 
   // Aba escondida não precisa tocar: pausa, e volta quando a pessoa voltar.
   useEffect(() => {
@@ -106,7 +142,14 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
             autoPlay={!parado}
             loop={sozinho}
             preload={parado ? "metadata" : "auto"}
-            onEnded={() => aoTrocar((indice + 1) % pecas.length)}
+            onTimeUpdate={(e) => aoAndarOTempo(e.currentTarget)}
+            // Rede de segurança, para a peça mais curta que o corte: um vídeo
+            // de três segundos nunca chegaria aos cinco do contador.
+            onEnded={() => {
+              if (sozinho || jaAvancou.current) return;
+              jaAvancou.current = true;
+              avancar();
+            }}
             aria-label={atual.legenda ?? atual.alt}
             className="h-full w-full object-cover"
           />

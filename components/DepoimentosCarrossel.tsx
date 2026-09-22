@@ -102,36 +102,45 @@ export default function DepoimentosCarrossel({
           >
             {/* Cartão, e não a cor da seção: a home alterna os fundos conforme
                 as seções que aparecem, e o card precisa se destacar das duas. */}
-            <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-contorno bg-cartao p-8 shadow-[var(--sombra-cartao)] transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50">
+            <div className="group relative flex h-full flex-col overflow-hidden rounded-[26px] border border-contorno bg-cartao p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/45 lg:p-9">
+              {/* As aspas viram marca d'água, grandes e quase invisíveis, no
+                  canto de cima. Antes eram um caractere solto no topo do card,
+                  com um vão morto entre ele e a frase: ocupavam altura sem dar
+                  nada em troca. Aqui elas preenchem o card inteiro de fundo,
+                  não empurram texto nenhum e acendem um pouco ao passar o
+                  ponteiro. */}
               <span
                 aria-hidden
-                className="absolute inset-x-0 top-0 h-1 w-0 bg-salmon transition-all duration-700 group-hover:w-full"
-              />
-
-              <span
-                aria-hidden
-                className="font-heading block text-7xl leading-[0.6] text-salmon"
+                className="font-heading pointer-events-none absolute -right-3 -top-12 select-none text-[10rem] leading-none text-salmon/[0.07] transition-colors duration-700 group-hover:text-salmon/[0.13]"
               >
-                &ldquo;
+                &rdquo;
               </span>
 
-              <p className="mt-7 flex-1 text-[17px] leading-relaxed text-tinta/85">
+              <span
+                aria-hidden
+                className="glow-salmon pointer-events-none absolute -left-20 -top-20 h-52 w-52 opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-45"
+              />
+
+              <p className="relative flex-1 text-lg leading-[1.62] text-tinta/85 lg:text-[1.2rem]">
                 {depoimento.citacao}
               </p>
 
-              <div className="mt-8 flex items-center gap-4 border-t border-contorno pt-6">
+              {/* Quem falou importa tanto quanto o que foi dito, então a foto
+                  cresce e o nicho ganha a cor da marca: é ele que faz alguém
+                  do mesmo ramo se reconhecer. */}
+              <div className="relative mt-8 flex items-center gap-4 border-t border-contorno pt-6">
                 {depoimento.foto ? (
                   <Image
                     src={depoimento.foto}
                     alt={`Foto de ${depoimento.nome}`}
-                    width={44}
-                    height={44}
-                    className="h-11 w-11 shrink-0 rounded-full object-cover"
+                    width={52}
+                    height={52}
+                    className="h-13 w-13 shrink-0 rounded-full object-cover ring-1 ring-contorno"
                   />
                 ) : (
                   <span
                     aria-hidden
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-salmon/15 text-sm font-semibold text-destaque"
+                    className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-salmon/15 font-semibold text-destaque"
                   >
                     {depoimento.nome
                       .replace(/[^A-Za-zÀ-ÿ ]/g, "")
@@ -141,11 +150,11 @@ export default function DepoimentosCarrossel({
                   </span>
                 )}
 
-                <span>
-                  <span className="block font-semibold text-tinta">
+                <span className="min-w-0">
+                  <span className="font-heading block text-[1.05rem] font-semibold leading-tight tracking-[-0.02em] text-tinta">
                     {depoimento.nome}
                   </span>
-                  <span className="block text-sm text-tinta/60">
+                  <span className="mt-1 block text-sm text-destaque">
                     {depoimento.cargo}
                   </span>
                 </span>
