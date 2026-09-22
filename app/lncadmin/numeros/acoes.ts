@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { avisar } from "@/lib/painel";
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
 
@@ -33,7 +34,7 @@ export async function criarNumero(dados: FormData) {
   const banco = await preparar();
 
   const rotulo = texto(dados, "rotulo");
-  if (!rotulo) return;
+  if (!rotulo) return avisar("Escreva o que o número significa.", "atencao");
 
   const ultimo = (await banco.query(
     "SELECT COALESCE(MAX(ordem), -1) + 1 AS proxima FROM numeros"
@@ -50,6 +51,7 @@ export async function criarNumero(dados: FormData) {
     ]
   );
 
+  await avisar("Número acrescentado.");
   atualizarSite();
 }
 
@@ -70,6 +72,7 @@ export async function salvarNumero(dados: FormData) {
     ]
   );
 
+  await avisar("Número salvo.");
   atualizarSite();
 }
 
@@ -80,6 +83,7 @@ export async function apagarNumero(dados: FormData) {
   if (!Number.isFinite(id)) return;
 
   await banco.query("DELETE FROM numeros WHERE id = $1", [id]);
+  await avisar("Número retirado.");
   atualizarSite();
 }
 
@@ -108,5 +112,6 @@ export async function moverNumero(dados: FormData) {
     ]);
   }
 
+  await avisar("Ordem dos números alterada.");
   atualizarSite();
 }

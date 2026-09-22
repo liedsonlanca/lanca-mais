@@ -1,14 +1,15 @@
 import Image from "next/image";
 import { services, SERVICOS_EM_DESTAQUE } from "@/lib/site-config";
+import { sintomas, metodo, entregaveis } from "@/lib/home";
 import {
-  sintomas,
-  metodo,
-  entregaveis,
-  FOTO_PROBLEMA,
-  FOTO_EQUIPE,
-  FOTO_CHAMADA,
-} from "@/lib/home";
-import { lerVitrine, lerDepoimentos, lerCases, lerNumeros } from "@/lib/conteudo";
+  lerVitrine,
+  lerDepoimentos,
+  lerCases,
+  lerNumeros,
+  lerImagens,
+  lerDepoimentosVideo,
+} from "@/lib/conteudo";
+import { imagem } from "@/lib/imagens";
 import { servicePages } from "@/lib/service-pages";
 import { ehProvisorio } from "@/lib/provisorio";
 import Hero from "@/components/Hero";
@@ -18,6 +19,9 @@ import DepoimentosCarrossel from "@/components/DepoimentosCarrossel";
 import ServicosDestaque from "@/components/ServicosDestaque";
 import FaqServicos, { type AbaFaq } from "@/components/home/FaqServicos";
 import Sintomas from "@/components/home/Sintomas";
+import DepoimentosVideo, {
+  ReservaDoBloco,
+} from "@/components/home/DepoimentosVideo";
 import { Rotulo, Titulo, Botao, LinkSeta } from "@/components/home/Pecas";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -114,12 +118,28 @@ function Miolo({
 export default async function Home() {
   // Conteúdo editável pelo painel. Sem banco configurado cada leitura devolve
   // o conteúdo estático de lib/, então a home nunca fica vazia.
-  const [vitrine, depoimentos, cases, numeros] = await Promise.all([
-    lerVitrine(),
-    lerDepoimentos(),
-    lerCases(),
-    lerNumeros(),
-  ]);
+  const [vitrine, depoimentos, cases, numeros, imagens, videos] =
+    await Promise.all([
+      lerVitrine(),
+      lerDepoimentos(),
+      lerCases(),
+      lerNumeros(),
+      lerImagens(),
+      lerDepoimentosVideo(),
+    ]);
+
+  // As fotos dos três cards, por slug. O card monta a partir daqui em vez de
+  // importar uma lista fixa: assim a troca feita no painel chega sem deploy.
+  const fotosDeServico = Object.fromEntries(
+    SERVICOS_EM_DESTAQUE.map((slug) => [
+      slug,
+      imagem(imagens, `home-servico-${slug}`),
+    ])
+  );
+
+  const fotoProblema = imagem(imagens, "home-problema");
+  const fotoEquipe = imagem(imagens, "home-equipe");
+  const fotoChamada = imagem(imagens, "home-chamada");
 
   const destaques = SERVICOS_EM_DESTAQUE.map((slug) =>
     services.find((s) => s.slug === slug)
@@ -167,7 +187,7 @@ export default async function Home() {
   secoes.push((claro) => (
     <Painel key="problema" claro={claro}>
       <Miolo className="pt-12 lg:pt-16">
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch lg:gap-14">
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
           <div>
             <Rotulo>O que trava a sua marca</Rotulo>
             <Titulo
@@ -179,20 +199,23 @@ export default async function Home() {
             <Sintomas itens={sintomas} />
           </div>
 
-          {/* O retrato. Figura andando, que é o que a marca diz de si na
-              assinatura: somos movimento. Fica alto e colado no texto, do
-              tamanho da coluna inteira, e não como uma miniatura decorando
-              o canto. */}
+          {/* Os depoimentos em vídeo do cliente, do lado do problema.
+
+              A ordem não é por acaso: a pessoa acabou de ler três sintomas e
+              de se reconhecer em pelo menos um. É o instante em que a fala de
+              alguém que passou pelo mesmo vale mais do que qualquer frase
+              nossa — por isso a prova fica colada no problema, e não numa
+              seção de depoimentos lá embaixo.
+
+              Sem nenhum vídeo cadastrado, entra a foto de reserva. As duas
+              têm a mesma proporção, então o bloco não muda de altura no dia
+              em que o primeiro depoimento for enviado. */}
           <Reveal distance={40}>
-            <div className="relative h-full min-h-[360px] overflow-hidden rounded-[22px] lg:min-h-[460px]">
-              <Image
-                src={FOTO_PROBLEMA.src}
-                alt={FOTO_PROBLEMA.alt}
-                fill
-                sizes="(max-width: 1024px) 100vw, 45vw"
-                className="object-cover object-[50%_25%]"
-              />
-            </div>
+            {videos.length > 0 ? (
+              <DepoimentosVideo itens={videos} />
+            ) : (
+              <ReservaDoBloco src={fotoProblema.src} alt={fotoProblema.alt} />
+            )}
           </Reveal>
         </div>
       </Miolo>
@@ -235,7 +258,7 @@ export default async function Home() {
           linhas={[{ texto: "Três formas de lançar.", acento: "lançar." }]}
         />
 
-        <ServicosDestaque itens={destaques} />
+        <ServicosDestaque itens={destaques} fotos={fotosDeServico} />
 
         {/* Os outros serviços: só o convite, centralizado.
 
@@ -466,8 +489,8 @@ export default async function Home() {
           <Reveal distance={40}>
             <div className="group relative aspect-[5/4] overflow-hidden rounded-[22px]">
               <Image
-                src={FOTO_EQUIPE.src}
-                alt={FOTO_EQUIPE.alt}
+                src={fotoEquipe.src}
+                alt={fotoEquipe.alt}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover object-top transition-transform duration-[1.4s] group-hover:scale-[1.04]"
@@ -489,7 +512,7 @@ export default async function Home() {
           sumiria. */}
       <div className="relative isolate overflow-hidden border-t border-contorno">
         <Image
-          src={FOTO_CHAMADA.src}
+          src={fotoChamada.src}
           alt=""
           aria-hidden
           fill
@@ -530,7 +553,12 @@ export default async function Home() {
 
   return (
     <>
-      <Hero numeros={numeros} vitrine={vitrine} depoimentos={depoimentos} />
+      <Hero
+        numeros={numeros}
+        vitrine={vitrine}
+        depoimentos={depoimentos}
+        marca={imagem(imagens, "marca-escura")}
+      />
 
       {antesDoFecho.map((secao, i) => secao(i % 2 === 1))}
 

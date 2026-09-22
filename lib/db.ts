@@ -56,6 +56,38 @@ const TABELAS = [
      em    TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
 
+  // As imagens fixas do site: os cards de serviço, os blocos grandes, o logo,
+  // as cinco fotos do arco de cada página de serviço.
+  //
+  // Guarda só o que foi trocado pelo painel. A posição em si vive em código,
+  // em lib/imagens.ts, porque é o desenho do site que diz quais buracos
+  // existem — e o padrão de cada uma também. Linha ausente quer dizer
+  // "nunca mexeram nesta", e restaurar o padrão é apagar a linha.
+  `CREATE TABLE IF NOT EXISTS imagens (
+     chave         TEXT PRIMARY KEY,
+     src           TEXT NOT NULL,
+     alt           TEXT NOT NULL DEFAULT '',
+     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+
+  // Depoimentos em vídeo, o bloco do problema na home.
+  //
+  // Tabela própria, e não uma coluna em `depoimentos`: são duas peças
+  // diferentes em dois lugares diferentes da página. O depoimento escrito
+  // vive num card com aspas e estrelas, no meio da home; este é um vídeo de
+  // 4 por 5 ao lado dos sintomas. Misturar os dois faria toda leitura ter
+  // que filtrar por "tem vídeo?", e um depoimento salvo sem vídeo sumiria
+  // de um lugar e apareceria no outro sem ninguém entender por quê.
+  `CREATE TABLE IF NOT EXISTS depoimentos_video (
+     id        SERIAL PRIMARY KEY,
+     video     TEXT NOT NULL,
+     capa      TEXT,
+     nome      TEXT NOT NULL DEFAULT '',
+     cargo     TEXT NOT NULL DEFAULT '',
+     ordem     INTEGER NOT NULL DEFAULT 0,
+     criado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+
   `CREATE TABLE IF NOT EXISTS vitrine (
      id         SERIAL PRIMARY KEY,
      src        TEXT NOT NULL,

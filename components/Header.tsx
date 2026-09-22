@@ -8,7 +8,18 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { navLinks, siteConfig } from "@/lib/site-config";
 import { pararRolagem, retomarRolagem } from "@/lib/scroll";
 
-export default function Header() {
+type Marca = { src: string; alt: string };
+
+// A marca chega por propriedade, e não lida aqui dentro: este é um
+// componente de navegador, e leitura de banco só acontece no servidor. Quem
+// lê é o layout, uma vez por página, e passa para o topo e para o rodapé.
+export default function Header({
+  marcaClara,
+  marcaEscura,
+}: {
+  marcaClara: Marca;
+  marcaEscura: Marca;
+}) {
   const pathname = usePathname();
   const [aberto, setAberto] = useState(false);
   const [rolou, setRolou] = useState(false);
@@ -120,8 +131,8 @@ export default function Header() {
               {/* Duas versões do logo em cross-fade: a clara vale sobre fundo
                   escuro, a escura sobre fundo claro. */}
               <Image
-                src="/images/logo-1.png"
-                alt="LANÇA+"
+                src={marcaClara.src}
+                alt={marcaClara.alt}
                 fill
                 priority
                 sizes="110px"
@@ -130,7 +141,7 @@ export default function Header() {
                 }`}
               />
               <Image
-                src="/images/logo-2.png"
+                src={marcaEscura.src}
                 alt=""
                 aria-hidden
                 fill

@@ -1,6 +1,8 @@
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
+import { cookies } from "next/headers";
 import { HOST_PUBLICO } from "@/lib/upload";
+import { COOKIE_AVISO, type TomDoAviso } from "@/lib/aviso";
 
 
 // Peças comuns às Server Actions do painel.
@@ -18,7 +20,8 @@ export type Tabela =
   | "cases"
   | "logos"
   | "numeros"
-  | "posts";
+  | "posts"
+  | "depoimentos_video";
 
 export async function preparar() {
   await exigirAdmin();
@@ -189,4 +192,31 @@ export function paraSlug(valor: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
+}
+
+/**
+ * Guarda o recado que a tela vai mostrar depois desta ação.
+ *
+ * O porquê do cookie, e não de um valor devolvido pela ação, está no
+ * cabeçalho de lib/aviso.ts.
+ *
+ * O valor vai codificado: JSON cru tem aspas, vírgulas e acentos, que não são
+ * válidos dentro de um cookie e chegariam picados do outro lado.
+ */
+export async function avisar(mensagem: string, tom: TomDoAviso = "feito") {
+  const jar = await cookies();
+
+  jar.set(
+    COOKIE_AVISO,
+    encodeURIComponent(JSON.stringify({ mensagem, tom, em: Date.now() })),
+    {
+      // Só o painel precisa dele. Fora daqui o cookie nem é enviado.
+      path: "/lncadmin",
+      // Vida curta: é recado de uma tela. Se a aba ficou um minuto aberta sem
+      // ninguém ver, o recado perdeu a validade junto com o contexto.
+      maxAge: 60,
+      httpOnly: false,
+      sameSite: "lax",
+    }
+  );
 }

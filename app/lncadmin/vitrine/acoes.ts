@@ -10,6 +10,7 @@ import {
   proximaOrdem,
   moverItem,
   reposicionarItem,
+  avisar,
 } from "@/lib/painel";
 
 /** Teto de páginas por carrossel, igual ao das redes de onde vem o post. */
@@ -32,11 +33,17 @@ export async function criarPeca(dados: FormData) {
   const video = urlEnviada(dados, "video");
   const paginas = urlsEnviadas(dados, "paginas");
 
+  // Recado em vez de erro: escolher arquivo errado é engano de quem
+  // preenche, e não falha do sistema. Lançar trocaria o formulário por
+  // uma tela de erro, e o que já estava preenchido se perderia.
   if (tipo === "video" && !video) {
-    throw new Error("Escolha o arquivo de vídeo.");
+    return avisar("Escolha o arquivo de vídeo.", "atencao");
   }
   if (tipo === "carrossel" && paginas.length < 2) {
-    throw new Error("Um carrossel precisa de pelo menos duas páginas.");
+    return avisar(
+      "Um carrossel precisa de pelo menos duas páginas.",
+      "atencao"
+    );
   }
 
   // Teto, além do piso.
@@ -47,12 +54,13 @@ export async function criarPeca(dados: FormData) {
   // trabalho grande para desfazer. Vinte é o teto das próprias redes de
   // onde esse conteúdo vem.
   if (tipo === "carrossel" && paginas.length > MAXIMO_PAGINAS) {
-    throw new Error(
-      `Um carrossel aceita no máximo ${MAXIMO_PAGINAS} páginas.`
+    return avisar(
+      `Um carrossel aceita no máximo ${MAXIMO_PAGINAS} páginas.`,
+      "atencao"
     );
   }
   if ((tipo === "imagem" || tipo === "trinca") && !capa) {
-    throw new Error("Escolha a imagem.");
+    return avisar("Escolha a imagem.", "atencao");
   }
 
   // `src` é sempre o que o trilho mostra: a imagem, a primeira página do
@@ -77,6 +85,7 @@ export async function criarPeca(dados: FormData) {
     ]
   );
 
+  await avisar("Peça publicada em Nosso trabalho.");
   atualizarSite();
 }
 
@@ -137,6 +146,7 @@ export async function salvarPeca(dados: FormData) {
     await apagarArquivo(antes[0]?.src);
   }
 
+  await avisar("Peça salva.");
   atualizarSite();
 }
 
@@ -159,12 +169,14 @@ export async function apagarPeca(dados: FormData) {
   await apagarArquivo(antes[0]?.video);
   for (const pagina of antes[0]?.imagens ?? []) await apagarArquivo(pagina);
 
+  await avisar("Peça retirada do trilho.");
   atualizarSite();
 }
 
 export async function moverPeca(dados: FormData) {
   await preparar();
   await moverItem("vitrine", Number(dados.get("id")), Number(dados.get("direcao")));
+  await avisar("Ordem do trilho alterada.");
   atualizarSite();
 }
 
@@ -176,5 +188,6 @@ export async function posicionarPeca(dados: FormData) {
     Number(dados.get("id")),
     Number(dados.get("posicao"))
   );
+  await avisar("Peça movida de posição.");
   atualizarSite();
 }

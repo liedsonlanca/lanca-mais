@@ -9,6 +9,7 @@ import {
   proximaOrdem,
   moverItem,
   paraSlug,
+  avisar,
 } from "@/lib/painel";
 
 // Cases aparecem na home e na página de portfólio.
@@ -31,10 +32,13 @@ export async function criarCase(dados: FormData) {
   const banco = await preparar();
 
   const cliente = texto(dados, "cliente");
-  if (!cliente) throw new Error("Escreva o nome do cliente.");
+  // Recado em vez de erro: campo em branco é engano de quem preenche.
+  // Lançar trocaria o formulário por uma tela de erro e apagaria o que
+  // já tinha sido digitado.
+  if (!cliente) return avisar("Escreva o nome do cliente.", "atencao");
 
   const imagem = urlEnviada(dados, "imagem");
-  if (!imagem) throw new Error("Escolha a imagem do case.");
+  if (!imagem) return avisar("Escolha a imagem do case.", "atencao");
 
   // O slug é o endereço do case. Nasce do nome do cliente e ganha um número
   // no fim se já existir outro igual, em vez de recusar o cadastro.
@@ -62,6 +66,7 @@ export async function criarCase(dados: FormData) {
     ]
   );
 
+  await avisar("Case publicado no portfólio.");
   atualizarSite();
 }
 
@@ -95,6 +100,7 @@ export async function salvarCase(dados: FormData) {
 
   if (nova) await apagarArquivo(antes[0]?.imagem);
 
+  await avisar("Case salvo.");
   atualizarSite();
 }
 
@@ -111,11 +117,13 @@ export async function apagarCase(dados: FormData) {
   await banco.query("DELETE FROM cases WHERE id = $1", [id]);
   await apagarArquivo(antes[0]?.imagem);
 
+  await avisar("Case retirado do portfólio.");
   atualizarSite();
 }
 
 export async function moverCase(dados: FormData) {
   await preparar();
   await moverItem("cases", Number(dados.get("id")), Number(dados.get("direcao")));
+  await avisar("Ordem dos cases alterada.");
   atualizarSite();
 }

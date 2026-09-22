@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
 import { apagarArquivo } from "@/lib/upload";
-import { urlEnviada } from "@/lib/painel";
+import { urlEnviada, avisar } from "@/lib/painel";
 
 // Server Actions do bloco da equipe.
 //
@@ -43,7 +43,9 @@ export async function criarPessoa(dados: FormData) {
 
   // A foto é obrigatória, e não opcional como a do depoimentista: o card da
   // equipe é a foto. Sem ela sobraria um retângulo vazio com um nome dentro.
-  if (!nome || !foto) return;
+  if (!nome || !foto) {
+    return avisar("Escreva o nome e escolha a foto.", "atencao");
+  }
 
   // Entra no fim da fileira.
   const ultimo = (await banco.query(
@@ -55,6 +57,7 @@ export async function criarPessoa(dados: FormData) {
     [nome, texto(dados, "funcao"), foto, ultimo[0]?.proxima ?? 0]
   );
 
+  await avisar("Pessoa acrescentada à equipe.");
   atualizarSite();
 }
 
@@ -67,7 +70,9 @@ export async function salvarPessoa(dados: FormData) {
   const nome = texto(dados, "nome");
   // Nome em branco apagaria a legenda do card e deixaria um retrato anônimo.
   // Ignorar é melhor que gravar: o campo continua na tela com o valor antigo.
-  if (!nome) return;
+  if (!nome) {
+    return avisar("O nome não pode ficar em branco.", "atencao");
+  }
 
   const nova = fotoEnviada(dados);
 
@@ -92,6 +97,7 @@ export async function salvarPessoa(dados: FormData) {
     [nome, texto(dados, "funcao"), nova, id]
   );
 
+  await avisar("Alteração salva.");
   atualizarSite();
 }
 
@@ -108,6 +114,7 @@ export async function apagarPessoa(dados: FormData) {
   await banco.query("DELETE FROM equipe WHERE id = $1", [id]);
   await apagarArquivo(antes[0]?.foto);
 
+  await avisar("Pessoa retirada da equipe.");
   atualizarSite();
 }
 
@@ -139,5 +146,6 @@ export async function moverPessoa(dados: FormData) {
     ]);
   }
 
+  await avisar("Ordem da equipe alterada.");
   atualizarSite();
 }

@@ -4,12 +4,36 @@ import { sql, garantirEsquema } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-const SECOES = [
+const SECOES: Array<{
+  href: string;
+  tabela: string | null;
+  rotulo: string;
+  descricao: string;
+  pronto: boolean;
+}> = [
   {
     href: "/lncadmin/vitrine",
     tabela: "vitrine",
     rotulo: "Nosso trabalho",
     descricao: "As fotos e vídeos do trilho que roda na home.",
+    pronto: true,
+  },
+  {
+    href: "/lncadmin/depoimentos-video",
+    tabela: "depoimentos_video",
+    rotulo: "Depoimentos em vídeo",
+    descricao: "Os vídeos de cliente, ao lado do bloco do problema na home.",
+    pronto: true,
+  },
+  {
+    href: "/lncadmin/imagens",
+    // Sem contagem: aqui o que importa não é quantas linhas há no banco, e
+    // sim que as cinquenta posições existem sempre — as que ninguém trocou
+    // seguem no padrão, sem linha nenhuma gravada.
+    tabela: null,
+    rotulo: "Imagens do site",
+    descricao:
+      "Toda imagem de lugar fixo: cards de serviço, blocos da home, logo e o leque de cada serviço.",
     pronto: true,
   },
   {
@@ -63,6 +87,7 @@ async function contar() {
   try {
     await garantirEsquema();
     for (const secao of SECOES) {
+      if (!secao.tabela) continue;
       const linhas = (await sql.query(
         `SELECT count(*)::int AS total FROM ${secao.tabela}`
       )) as Array<{ total: number }>;
@@ -103,7 +128,7 @@ export default async function AdminInicio() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {SECOES.map((secao) => {
-          const total = totais[secao.tabela];
+          const total = secao.tabela ? totais[secao.tabela] : undefined;
 
           const cartao = (
             <>

@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Service } from "@/lib/site-config";
-import { FOTOS_SERVICO } from "@/lib/home";
 
 // Os serviços em evidência, em trilho.
 //
@@ -15,7 +14,14 @@ import { FOTOS_SERVICO } from "@/lib/home";
 //
 // A rolagem é nativa, com scroll-snap, então dedo, roda, teclado e leitor de
 // tela continuam funcionando sem estado nosso para sincronizar.
-export default function ServicosDestaque({ itens }: { itens: Service[] }) {
+export default function ServicosDestaque({
+  itens,
+  fotos,
+}: {
+  itens: Service[];
+  /** A foto de cada card, por slug. Vem do painel, com o padrão como reserva. */
+  fotos: Record<string, { src: string; alt: string }>;
+}) {
   const trilho = useRef<HTMLDivElement>(null);
   const porVista = useRef(1);
   const [pagina, setPagina] = useState(0);
@@ -94,7 +100,7 @@ export default function ServicosDestaque({ itens }: { itens: Service[] }) {
         className="sem-barra grid gap-4 sm:-my-3 sm:flex sm:snap-x sm:snap-mandatory sm:gap-5 sm:overflow-x-auto sm:py-3 sm:scroll-smooth"
       >
         {itens.map((s) => {
-          const foto = FOTOS_SERVICO[s.slug];
+          const foto = fotos[s.slug];
 
           return (
           <Link

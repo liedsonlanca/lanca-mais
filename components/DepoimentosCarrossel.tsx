@@ -37,6 +37,80 @@ function Estrela({ cheia }: { cheia: boolean }) {
   );
 }
 
+/**
+ * Até onde a citação aparece antes de o card oferecer o resto.
+ *
+ * O nome da classe é escrito por extenso, e não montado a partir de um
+ * número: o Tailwind lê o código-fonte procurando nomes de classe inteiros,
+ * e um nome montado em tempo de execução não existiria na folha de estilo.
+ */
+const CORTE = "line-clamp-5";
+
+/**
+ * A citação, cortada na quinta linha.
+ *
+ * Sem o corte, o depoimento mais longo definia a altura de todos: num trilho
+ * de três cards lado a lado, um texto de oito linhas deixava os vizinhos com
+ * dois palmos de vazio embaixo. O olho lê isso como card quebrado, não como
+ * depoimento curto.
+ *
+ * Com o corte, os três nascem do mesmo tamanho e quem se interessou abre o
+ * que falta. Nada é escondido: o texto inteiro continua no HTML, então busca
+ * e leitor de tela alcançam tudo — o que muda é só quantas linhas o CSS
+ * mostra de uma vez.
+ */
+function Citacao({ texto }: { texto: string }) {
+  const alvo = useRef<HTMLParagraphElement>(null);
+  const [aberta, setAberta] = useState(false);
+  const [transborda, setTransborda] = useState(false);
+
+  // A medida vem de um ResizeObserver, e não de uma conta de caracteres: o
+  // que decide se sobrou texto é a largura real do card, que muda com a tela
+  // e com a fonte que o navegador acabou usando.
+  //
+  // Ele dispara uma vez ao começar a observar, então a primeira medida sai
+  // dele também — sem gravar estado dentro do efeito.
+  useEffect(() => {
+    const el = alvo.current;
+    if (!el) return;
+
+    const observador = new ResizeObserver(() => {
+      // Aberta, a altura já é a do texto inteiro e a conta daria sempre
+      // falso — o que faria o botão de fechar sumir junto.
+      if (el.dataset.aberta === "1") return;
+      setTransborda(el.scrollHeight > el.clientHeight + 1);
+    });
+
+    observador.observe(el);
+    return () => observador.disconnect();
+  }, []);
+
+  return (
+    <div className="relative flex-1">
+      <p
+        ref={alvo}
+        data-aberta={aberta ? "1" : "0"}
+        className={`text-lg leading-[1.62] text-tinta/85 lg:text-[1.2rem] ${
+          aberta ? "" : CORTE
+        }`}
+      >
+        {texto}
+      </p>
+
+      {transborda && (
+        <button
+          type="button"
+          onClick={() => setAberta((antes) => !antes)}
+          // min-h-11: o mesmo alvo mínimo de toque do resto do site.
+          className="relative z-10 inline-flex min-h-11 items-center text-sm font-medium text-destaque transition-colors duration-300 hover:text-salmon"
+        >
+          {aberta ? "Ver menos" : "Ver mais"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function DepoimentosCarrossel({
   itens,
 }: {
@@ -179,9 +253,9 @@ export default function DepoimentosCarrossel({
                 </p>
               )}
 
-              <p className="relative flex-1 text-lg leading-[1.62] text-tinta/85 lg:text-[1.2rem]">
-                {depoimento.citacao}
-              </p>
+              <div className="relative flex flex-1 flex-col">
+                <Citacao texto={depoimento.citacao} />
+              </div>
 
               {/* Quem falou importa tanto quanto o que foi dito, então a foto
                   cresce e o nicho ganha a cor da marca: é ele que faz alguém

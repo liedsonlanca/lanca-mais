@@ -64,7 +64,11 @@ function ItemLink({
   );
 }
 
-export default async function Footer() {
+export default function Footer({
+  marca,
+}: {
+  marca: { src: string; alt: string };
+}) {
   return (
     <footer className="border-t border-borda bg-abismo text-bege">
       {/* ---------- 1. O convite ---------- */}
@@ -72,8 +76,8 @@ export default async function Footer() {
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
           <div className="min-w-0">
             <Image
-              src="/images/logo-1.png"
-              alt="LANÇA+"
+              src={marca.src}
+              alt={marca.alt}
               width={140}
               height={39}
               className="h-7 w-auto"

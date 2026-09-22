@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { enviarArquivo } from "@/lib/envio-arquivo";
 import { type Pasta } from "@/lib/pastas";
@@ -45,6 +45,18 @@ type Props = {
    * o site ir ao ar, e não depois.
    */
   larguraMinima?: number;
+  /**
+   * Recebe um endereço local do arquivo escolhido, para quem quiser
+   * mostrá-lo antes de o envio terminar.
+   *
+   * É um URL de objeto, criado no próprio navegador: vale na hora, sem
+   * esperar a viagem até o R2. Sem isto a prévia só apareceria depois do
+   * upload, que é justamente quando já não adianta descobrir que a imagem
+   * está errada.
+   *
+   * Chega null quando o campo se limpa: ao salvar, ou quando o envio falha.
+   */
+  aoPrever?: (endereco: string | null) => void;
 };
 
 /** Largura do arquivo escolhido. Zero quando não der para medir. */
@@ -78,6 +90,7 @@ export default function CampoArquivo({
   ajuda,
   obrigatorio = false,
   larguraMinima,
+  aoPrever,
 }: Props) {
   const entrada = useRef<HTMLInputElement>(null);
   // useId dá um identificador único por instância: várias peças na mesma
@@ -89,14 +102,30 @@ export default function CampoArquivo({
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
 
-  function limpar() {
+  // O URL de objeto da prévia fica guardado para ser revogado depois.
+  // Sem revogar, cada arquivo escolhido deixa uma cópia presa na memória do
+  // navegador até a aba fechar, e quem está montando uma galeria escolhe
+  // dezenas de arquivos seguidos na mesma tela.
+  const enderecoLocal = useRef<string | null>(null);
+
+  // useCallback nas duas: elas entram no efeito do useFormStatus mais
+  // abaixo, e sem identidade estável o efeito passaria a rodar a cada
+  // desenho — o que o levaria a limpar o campo no meio de um envio.
+  const prever = useCallback((arquivo: File | null) => {
+    if (enderecoLocal.current) URL.revokeObjectURL(enderecoLocal.current);
+    enderecoLocal.current = arquivo ? URL.createObjectURL(arquivo) : null;
+    aoPrever?.(enderecoLocal.current);
+  }, [aoPrever]);
+
+  const limpar = useCallback(() => {
     setUrl("");
     setNome("");
     setProgresso(null);
     setErro(null);
     setAviso(null);
+    prever(null);
     if (entrada.current) entrada.current.value = "";
-  }
+  }, [prever]);
 
   // useFormStatus enxerga o formulário que envolve este campo. Quando ele
   // sai de "enviando" para parado, a gravação terminou e o que estava aqui
@@ -117,7 +146,7 @@ export default function CampoArquivo({
       salvando.current = false;
       limpar();
     }
-  }, [pending]);
+  }, [pending, limpar]);
 
   async function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0];
@@ -127,6 +156,7 @@ export default function CampoArquivo({
     setAviso(null);
     setUrl("");
     setNome(arquivo.name);
+    prever(arquivo);
 
     // Mede antes de subir, e não depois: descobrir no fim faria a pessoa
     // esperar o envio inteiro para só então saber que valia reexportar.

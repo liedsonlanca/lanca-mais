@@ -5,6 +5,7 @@ import { caseStudies, type CaseStudy } from "@/lib/portfolio";
 import { clientes, type Cliente } from "@/lib/clients";
 import { equipe as equipeEstatica, type Pessoa } from "@/lib/equipe";
 import { blogPosts, type BlogPost } from "@/lib/blog-posts";
+import { imagensPadrao, POR_CHAVE, type Imagens } from "@/lib/imagens";
 
 // Leitura do conteúdo editável do site.
 //
@@ -303,6 +304,67 @@ export async function lerPosts(): Promise<BlogPost[]> {
       content: l.conteudo ?? [],
     }));
   }, blogPosts);
+}
+
+/* ---------------- As imagens fixas ---------------- */
+
+/**
+ * As imagens de posição fixa do site, com o padrão como reserva.
+ *
+ * Diferente das outras leituras daqui: não há semeadura. O padrão de cada
+ * posição vive em lib/imagens.ts, e o banco guarda só o que a agência trocou.
+ *
+ * Isso muda o que "vazio" significa. Nas listas, tabela vazia quer dizer
+ * "a seção não aparece"; aqui quer dizer "ninguém mexeu em nada ainda", e o
+ * site segue mostrando o que sempre mostrou. É o que torna "restaurar o
+ * padrão" um DELETE de uma linha, sem reenviar arquivo nenhum.
+ *
+ * Linha com chave desconhecida é ignorada de propósito: uma posição retirada
+ * do catálogo deixa lixo no banco, e ele não pode virar entrada de um
+ * mapa que alguma página leia sem querer.
+ */
+export async function lerImagens(): Promise<Imagens> {
+  const padrao = imagensPadrao();
+
+  return lerDoBanco(async () => {
+    const linhas = (await sql!.query(
+      'SELECT chave, src, alt FROM imagens'
+    )) as Array<{ chave: string; src: string; alt: string }>;
+
+    const mapa: Imagens = { ...padrao };
+    for (const linha of linhas) {
+      if (!linha.src || !POR_CHAVE.has(linha.chave)) continue;
+      mapa[linha.chave] = { src: linha.src, alt: linha.alt ?? '' };
+    }
+    return mapa;
+  }, padrao);
+}
+
+/* ---------------- Depoimentos em vídeo ---------------- */
+
+export type DepoimentoVideo = {
+  id: number;
+  video: string;
+  /** Primeiro quadro, mostrado antes de o vídeo carregar. */
+  capa: string | null;
+  nome: string;
+  cargo: string;
+};
+
+/**
+ * Os depoimentos em vídeo, do bloco do problema na home.
+ *
+ * Reserva vazia, e não conteúdo de exemplo: um vídeo de depoimento é a
+ * afirmação de que um cliente falou. Inventar um seria o tipo de detalhe que,
+ * se questionado, derruba a confiança no resto da página. Lista vazia faz o
+ * bloco cair na foto de reserva, que não afirma nada.
+ */
+export async function lerDepoimentosVideo(): Promise<DepoimentoVideo[]> {
+  return lerDoBanco(async () => {
+    return (await sql!.query(
+      'SELECT id, video, capa, nome, cargo FROM depoimentos_video ORDER BY ordem, id'
+    )) as DepoimentoVideo[];
+  }, []);
 }
 
 /** Usada pelo painel: garante que as tabelas existem antes de qualquer escrita. */

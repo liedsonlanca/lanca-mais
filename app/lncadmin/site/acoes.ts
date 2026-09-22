@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { avisar } from "@/lib/painel";
 import { exigirAdmin } from "@/lib/admin";
 import { sql, garantirEsquema } from "@/lib/db";
 import {
@@ -43,6 +44,16 @@ export async function salvarModo(dados: FormData) {
     bruto === "publico" || bruto === "manutencao" ? bruto : "em-breve";
 
   await gravar(CHAVE_MODO, modo);
+  // A frase diz o estado, e não um genérico "salvo": esta é a única tela
+  // do painel que abre e fecha o site para o público, e confirmar em
+  // palavras o que ficou valendo evita o susto de ter clicado no errado.
+  const estado =
+    modo === "publico"
+      ? "Site aberto ao público."
+      : modo === "manutencao"
+        ? "Site em manutenção."
+        : "Site em modo pré-lançamento.";
+  await avisar(`${estado} Pode levar até meio minuto para valer em todo lugar.`);
   aplicar();
 }
 
@@ -54,6 +65,7 @@ export async function salvarLancamento(dados: FormData) {
 
   if (!data) {
     await gravar(CHAVE_LANCAMENTO, null);
+    await avisar("Contagem regressiva desligada.");
     aplicar();
     return;
   }
@@ -64,15 +76,17 @@ export async function salvarLancamento(dados: FormData) {
   const iso = `${data}T${hora}:00-03:00`;
 
   if (!Number.isFinite(Date.parse(iso))) {
-    throw new Error("Data ou hora inválida.");
+    return avisar("Data ou hora inválida.", "erro");
   }
 
   await gravar(CHAVE_LANCAMENTO, iso);
+  await avisar("Data do lançamento salva.");
   aplicar();
 }
 
 export async function limparLancamento() {
   await exigirAdmin();
   await gravar(CHAVE_LANCAMENTO, null);
+  await avisar("Contagem regressiva desligada.");
   aplicar();
 }

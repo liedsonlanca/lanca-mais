@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { sql, garantirEsquema } from "@/lib/db";
 import { exigirAdmin } from "@/lib/admin";
 import { apagarArquivo } from "@/lib/upload";
-import { urlEnviada } from "@/lib/painel";
+import { urlEnviada, avisar } from "@/lib/painel";
 
 // Server Actions do bloco de depoimentos.
 //
@@ -57,7 +57,9 @@ export async function criarDepoimento(dados: FormData) {
 
   const citacao = texto(dados, "citacao");
   const nome = texto(dados, "nome");
-  if (!citacao || !nome) return;
+  if (!citacao || !nome) {
+    return avisar("Escreva a frase e o nome de quem falou.", "atencao");
+  }
 
   // Entra no fim da lista.
   const ultimo = (await banco.query(
@@ -76,6 +78,7 @@ export async function criarDepoimento(dados: FormData) {
     ]
   );
 
+  await avisar("Depoimento publicado.");
   atualizarSite();
 }
 
@@ -112,6 +115,7 @@ export async function salvarDepoimento(dados: FormData) {
     ]
   );
 
+  await avisar("Depoimento salvo.");
   atualizarSite();
 }
 
@@ -129,6 +133,7 @@ export async function removerFoto(dados: FormData) {
   await banco.query("UPDATE depoimentos SET foto = NULL WHERE id = $1", [id]);
   await apagarArquivo(antes[0]?.foto);
 
+  await avisar("Foto removida. O card volta a mostrar a inicial do nome.");
   atualizarSite();
 }
 
@@ -145,6 +150,7 @@ export async function apagarDepoimento(dados: FormData) {
   await banco.query("DELETE FROM depoimentos WHERE id = $1", [id]);
   await apagarArquivo(antes[0]?.foto);
 
+  await avisar("Depoimento retirado do site.");
   atualizarSite();
 }
 
@@ -176,5 +182,6 @@ export async function moverDepoimento(dados: FormData) {
     ]);
   }
 
+  await avisar("Ordem dos depoimentos alterada.");
   atualizarSite();
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Avisos from "@/components/admin/Avisos";
 import type { Metadata } from "next";
 import { estadoDoAdmin } from "@/lib/admin";
 import LoginAdmin from "@/components/admin/LoginAdmin";
@@ -23,6 +24,8 @@ const SECOES = [
   { href: "/lncadmin/site", rotulo: "Estado do site" },
   { href: "/lncadmin/vitrine", rotulo: "Nosso trabalho" },
   { href: "/lncadmin/depoimentos", rotulo: "Depoimentos" },
+  { href: "/lncadmin/depoimentos-video", rotulo: "Depoimentos em vídeo" },
+  { href: "/lncadmin/imagens", rotulo: "Imagens do site" },
   { href: "/lncadmin/equipe", rotulo: "Equipe" },
   { href: "/lncadmin/cases", rotulo: "Cases" },
   { href: "/lncadmin/logos", rotulo: "Logos" },
@@ -107,6 +110,10 @@ export default async function AdminLayout({
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+
+      {/* Os recados das ações. Fixo no canto, por cima de tudo, então mora
+          fora do <main> e não entra no fluxo de nenhuma tela. */}
+      <Avisos />
     </div>
   );
 }

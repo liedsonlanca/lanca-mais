@@ -34,6 +34,8 @@ type Props = {
   numeros: Numero[];
   vitrine: PecaVitrine[];
   depoimentos: Depoimento[];
+  /** A marca na versão escura, que é a que vale sobre este fundo claro. */
+  marca: { src: string; alt: string };
 };
 
 const FACIL: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -89,7 +91,7 @@ function SetaDiagonal({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-export default function Hero({ numeros, vitrine, depoimentos }: Props) {
+export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
   const reduzir = useReducedMotion();
 
   // Os vídeos que a agência produziu, do banco da vitrine, na ordem de lá.
@@ -217,8 +219,8 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                     em preto, porque o + dele é desenhado junto da barra do A e
                     não dá para pintar só ele sem mexer no desenho da marca. */}
                 <Image
-                  src="/images/logo-2.png"
-                  alt="LANÇA+"
+                  src={marca.src}
+                  alt={marca.alt}
                   width={2855}
                   height={796}
                   priority

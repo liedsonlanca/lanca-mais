@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { preparar, texto, marcado, paraSlug } from "@/lib/painel";
+import {
+  preparar,
+  texto,
+  marcado,
+  paraSlug,
+  avisar,
+} from "@/lib/painel";
 
 // Os posts aparecem na home, na lista do blog, no rodapé e cada um na sua
 // própria página.
@@ -32,7 +38,9 @@ export async function criarPost(dados: FormData) {
   const banco = await preparar();
 
   const titulo = texto(dados, "titulo");
-  if (!titulo) throw new Error("Escreva o título.");
+  // Recado em vez de erro: título em branco é engano de quem escreve,
+  // e uma tela de erro levaria junto o texto já digitado.
+  if (!titulo) return avisar("Escreva o título do post.", "atencao");
 
   const base = paraSlug(titulo) || "post";
   let slug = base;
@@ -61,6 +69,7 @@ export async function criarPost(dados: FormData) {
     ]
   );
 
+  await avisar("Post criado.");
   atualizarSite(slug);
 }
 
@@ -90,6 +99,7 @@ export async function salvarPost(dados: FormData) {
     ]
   )) as Array<{ slug: string }>;
 
+  await avisar("Post salvo.");
   atualizarSite(linhas[0]?.slug);
 }
 
@@ -104,5 +114,6 @@ export async function apagarPost(dados: FormData) {
     [id]
   )) as Array<{ slug: string }>;
 
+  await avisar("Post apagado.");
   atualizarSite(linhas[0]?.slug);
 }

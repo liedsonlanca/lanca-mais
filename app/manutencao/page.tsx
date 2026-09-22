@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
 import FormularioAcesso from "@/components/FormularioAcesso";
+import { lerImagens } from "@/lib/conteudo";
+import { imagem } from "@/lib/imagens";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -34,7 +36,13 @@ export const metadata: Metadata = {
 //
 // Por isso ela é mais curta e mais sóbria: ninguém quer ler uma página bonita
 // quando só queria entrar.
-export default function ManutencaoPage() {
+export default async function ManutencaoPage() {
+  // Esta é a tela que aparece justamente quando algo pode estar fora do ar.
+  // lerImagens não derruba nada: sem banco, ou com o banco mudo, ela devolve
+  // o logo que veio no repositório. A tela de manutenção não pode depender
+  // do que ela própria existe para cobrir.
+  const marca = imagem(await lerImagens(), "marca-clara");
+
   return (
     <section
       data-lenis-prevent
@@ -45,7 +53,7 @@ export default function ManutencaoPage() {
 
       <div className="relative mx-auto flex min-h-full max-w-2xl flex-col items-center justify-center px-6 py-16 text-center">
         <Image
-          src="/images/logo-1.png"
+          src={marca.src}
           alt={siteConfig.name}
           width={220}
           height={62}

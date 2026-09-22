@@ -10,6 +10,9 @@ import FaqJsonLd from "@/components/FaqJsonLd";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 import WordReveal from "@/components/motion/WordReveal";
+import Arco from "@/components/Arco";
+import { lerImagens } from "@/lib/conteudo";
+import { fotosDoArco } from "@/lib/imagens";
 
 export function generateStaticParams() {
   return services.map((service) => ({ slug: service.slug }));
@@ -39,6 +42,11 @@ export default async function ServicoPage({
   const service = services.find((s) => s.slug === slug);
   const page = servicePages[slug];
   if (!service || !page) notFound();
+
+  // As cinco fotos do leque deste serviço. Vêm do painel, com a sessão de
+  // estúdio como reserva, então a agência troca por peça de cliente sem
+  // precisar de publicação nova.
+  const leque = fotosDoArco(await lerImagens(), slug);
 
   // Três serviços seguintes na lista, dando a volta no fim.
   const indice = services.findIndex((s) => s.slug === slug);
@@ -218,15 +226,29 @@ export default async function ServicoPage({
             lead="Entregas concretas, combinadas desde o começo, sem surpresa no meio do caminho."
           />
 
-          <Stagger className="flex flex-wrap content-start gap-3">
-            {page.deliverables.map((item) => (
-              <StaggerItem key={item}>
-                <span className="inline-block rounded-full border border-tinta/15 bg-cartao px-5 py-2.5 text-sm text-tinta/82 transition-colors duration-500 hover:border-salmon hover:text-tinta">
-                  {item}
-                </span>
-              </StaggerItem>
-            ))}
-          </Stagger>
+          {/* O leque de fotos deste serviço, e as etiquetas por baixo.
+
+              Esta coluna era só a nuvem de etiquetas, e sobrava vazio em
+              cima e embaixo dela: uma lista de seis palavras não enche meia
+              tela. O leque é o mesmo desenho que abre a página de serviços,
+              e aqui ele responde com imagem a pergunta que a coluna da
+              esquerda faz com texto — o que você recebe.
+
+              As fotos são por serviço, e não as mesmas oito vezes: quem
+              contrata identidade visual precisa ver marca, e não gravação. */}
+          <div>
+            <Arco fotos={leque} tamanho="coluna" tom="claro" />
+
+            <Stagger className="mt-10 flex flex-wrap content-start justify-center gap-3">
+              {page.deliverables.map((item) => (
+                <StaggerItem key={item}>
+                  <span className="inline-block rounded-full border border-tinta/15 bg-cartao px-5 py-2.5 text-sm text-tinta/82 transition-colors duration-500 hover:border-salmon hover:text-tinta">
+                    {item}
+                  </span>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </div>
         </div>
       </section>
 

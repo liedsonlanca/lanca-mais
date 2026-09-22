@@ -21,6 +21,10 @@ export const PASTAS = [
   "cases",
   "logos",
   "blog",
+  // As imagens de posição fixa: cards de serviço, blocos da home, logo, arco.
+  "imagens",
+  // Os vídeos de depoimento e as capas deles.
+  "depoimentos-video",
 ] as const;
 
 export type Pasta = (typeof PASTAS)[number];

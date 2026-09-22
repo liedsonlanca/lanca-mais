@@ -82,57 +82,12 @@ export const entregaveis: string[] = [
   "Relatório de métricas e reajuste da estratégia",
 ];
 
-/* ---------------- As fotos dos blocos ---------------- */
-
-// A sessão de estúdio da equipe: fundo cinza, todo mundo de preto. É o ativo
-// visual mais forte que o site tem, e é o que nenhum concorrente pode copiar.
+// As fotos dos blocos saíram daqui em 22/09/2026.
 //
-// Estas são as tomadas que NÃO estão no trilho de "Nosso trabalho", que usa as
-// sete fotos nomeadas. Assim nenhuma imagem aparece duas vezes na home.
-//
-// [SUBSTITUIR] quando houver peça de cliente: o card de cada serviço deve
-// mostrar trabalho entregue, e não a equipe. Enquanto isso, retrato da casa é
-// melhor do que desenho genérico.
-export const FOTOS_SERVICO: Record<string, { src: string; alt: string }> = {
-  // Mãos entrelaçadas, olhar direto: quando a pessoa é a marca, é a presença
-  // dela que vende.
-  "marketing-pessoal": {
-    src: "/images/team/LFF_0551_resized.jpg",
-    alt: "Retrato de estúdio de integrante da equipe da LANÇA+",
-  },
-  "marketing-empresarial": {
-    src: "/images/team/LFF_0482_resized.jpg",
-    alt: "Integrante da equipe da LANÇA+ em retrato de estúdio",
-  },
-  // Câmera na mão: o serviço inteiro numa imagem.
-  audiovisual: {
-    src: "/images/team/LFF_0602_resized.jpg",
-    alt: "Câmera da LANÇA+ com a Canon em punho, em estúdio",
-  },
-};
-
-/** A foto que acompanha o bloco do problema. Figura andando: movimento. */
-export const FOTO_PROBLEMA = {
-  src: "/images/team/LFF_0691_resized.jpg",
-  alt: "Integrante da equipe da LANÇA+ caminhando em estúdio",
-};
-
-/** A foto do fecho: o time inteiro, porque a pergunta ali é quem somos. */
-export const FOTO_EQUIPE = {
-  src: "/images/team/equipe-1.jpg",
-  alt: "A equipe da LANÇA+ reunida em estúdio",
-};
-
-/**
- * O fundo da chamada final.
- *
- * Entra sob um véu escuro pesado, então funciona como textura e não como
- * retrato: o que ela faz é tirar o último bloco da cor chapada, que era onde
- * a página terminava mais fraca. Por isso é decorativa, com alt vazio.
- */
-export const FOTO_CHAMADA = {
-  src: "/images/team/LFF_0473_resized.jpg",
-};
+// Elas viraram posições do catálogo em lib/imagens.ts, onde cada uma tem o
+// padrão, a moldura em que aparece e uma tela no painel para ser trocada sem
+// deploy. Duas listas com o mesmo endereço seriam duas verdades: a agência
+// trocaria numa e o site leria a outra.
 
 /* ---------------- Pra quem fazem ---------------- */
 

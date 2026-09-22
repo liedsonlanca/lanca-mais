@@ -6,7 +6,8 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 import EquipeTrilho from "@/components/EquipeTrilho";
-import { lerEquipe } from "@/lib/conteudo";
+import { lerEquipe, lerImagens } from "@/lib/conteudo";
+import { imagem } from "@/lib/imagens";
 
 export const metadata: Metadata = {
   title: "Sobre",
@@ -38,7 +39,8 @@ const values = [
 ];
 
 export default async function SobrePage() {
-  const equipe = await lerEquipe();
+  const [equipe, imagens] = await Promise.all([lerEquipe(), lerImagens()]);
+  const missao = imagem(imagens, "sobre-missao");
 
   return (
     <>
@@ -60,8 +62,8 @@ export default async function SobrePage() {
                 volta a ter proporção fixa, já que não há coluna vizinha. */}
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl md:aspect-auto md:h-full">
               <Image
-                src="/images/sobre.webp"
-                alt="Símbolo da LANÇA+"
+                src={missao.src}
+                alt={missao.alt}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"

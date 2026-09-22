@@ -9,6 +9,7 @@ import {
   inteiro,
   proximaOrdem,
   moverItem,
+  avisar,
 } from "@/lib/painel";
 
 // A faixa de logos vive na home, logo abaixo dos depoimentos, e só aparece
@@ -22,10 +23,13 @@ export async function criarLogo(dados: FormData) {
   const banco = await preparar();
 
   const nome = texto(dados, "nome");
-  if (!nome) throw new Error("Escreva o nome da marca.");
+  // Recado em vez de erro: nome em branco é engano de quem preenche, e
+  // não falha do sistema. Lançar trocaria o formulário por uma tela de
+  // erro, e quem estava usando perderia o que já tinha digitado.
+  if (!nome) return avisar("Escreva o nome da marca.", "atencao");
 
   const logo = urlEnviada(dados, "logo");
-  if (!logo) throw new Error("Escolha o arquivo do logo.");
+  if (!logo) return avisar("Escolha o arquivo do logo.", "atencao");
 
   await banco.query("INSERT INTO logos (nome, logo, ordem) VALUES ($1,$2,$3)", [
     nome,
@@ -33,6 +37,7 @@ export async function criarLogo(dados: FormData) {
     await proximaOrdem("logos"),
   ]);
 
+  await avisar(`${nome} entrou na faixa de clientes.`);
   atualizarSite();
 }
 
@@ -59,6 +64,7 @@ export async function salvarLogo(dados: FormData) {
 
   if (novo) await apagarArquivo(antes[0]?.logo);
 
+  await avisar("Logo salvo.");
   atualizarSite();
 }
 
@@ -75,11 +81,13 @@ export async function apagarLogo(dados: FormData) {
   await banco.query("DELETE FROM logos WHERE id = $1", [id]);
   await apagarArquivo(antes[0]?.logo);
 
+  await avisar("Logo retirado da faixa.");
   atualizarSite();
 }
 
 export async function moverLogo(dados: FormData) {
   await preparar();
   await moverItem("logos", Number(dados.get("id")), Number(dados.get("direcao")));
+  await avisar("Ordem da faixa alterada.");
   atualizarSite();
 }

@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
 import { lerConfigSite } from "@/lib/modo-site";
+import { lerImagens } from "@/lib/conteudo";
+import { imagem } from "@/lib/imagens";
 import FormularioAcesso from "@/components/FormularioAcesso";
 import ContagemRegressiva from "@/components/ContagemRegressiva";
 
@@ -72,7 +74,12 @@ const canais = [
 ];
 
 export default async function EmBrevePage() {
-  const { lancamento } = await lerConfigSite();
+  const [{ lancamento }, imagens] = await Promise.all([
+    lerConfigSite(),
+    lerImagens(),
+  ]);
+  const fundo = imagem(imagens, "em-breve-fundo");
+  const marca = imagem(imagens, "marca-clara");
 
   return (
     // A classe pagina-em-breve é o gancho que esconde header, rodapé e o botão
@@ -89,7 +96,7 @@ export default async function EmBrevePage() {
       {/* Padrão da marca ao fundo, agora só como textura: bem mais apagado que
           antes, para não competir com a contagem. */}
       <Image
-        src="/images/fundo-inicio.jpg"
+        src={fundo.src}
         alt=""
         fill
         priority
@@ -108,7 +115,7 @@ export default async function EmBrevePage() {
 
       <div className="relative mx-auto flex min-h-full max-w-4xl flex-col items-center px-6 py-14 text-center sm:py-20">
         <Image
-          src="/images/logo-1.png"
+          src={marca.src}
           alt={siteConfig.name}
           width={220}
           height={62}

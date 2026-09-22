@@ -1,39 +1,21 @@
-import Image from "next/image";
 import Link from "next/link";
+import Arco, { type FotoDoArco } from "@/components/Arco";
 import Reveal from "@/components/motion/Reveal";
 import WordReveal, { type Linha } from "@/components/motion/WordReveal";
 import type { Numero } from "@/lib/conteudo";
 
-// Abertura em arco: as fotos da equipe abrindo em leque sobre o título.
+// Abertura em arco: as fotos abrindo em leque sobre o título.
 //
 // O desenho é o da referência que o cliente escolheu, com o conteúdo e as
 // cores da LANÇA+. Funciona porque a agência tem uma sessão de estúdio inteira
 // com a mesma direção de arte, fundo cinza e todo mundo de preto: em leque,
 // cinco retratos assim dizem "somos um time" antes de qualquer frase.
 //
-// ---------- Como o arco é feito ----------
-//
-// Um ponto âncora invisível, embaixo do texto. Cada foto é posicionada nesse
-// ponto e então girada, empurrada para fora pelo raio e desgirada em parte:
-//
-//   rotate(a) translateY(-raio) rotate(-a * 0.72)
-//
-// A última rotação é o que controla a inclinação final. Desgirar tudo deixaria
-// as fotos de pé, como uma fileira curva; não desgirar nada deixaria cada uma
-// deitada no sentido do arco, o que é tonto de ler. A 0,72 sobram uns graus de
-// inclinação, que é o que dá o ar de fotos jogadas na mesa.
-//
-// O raio vive numa variável de CSS, então o arco encolhe junto com a tela sem
-// nenhuma conta em JavaScript, e nada precisa ser remedido quando a janela
-// muda de tamanho.
+// O leque em si mora em components/Arco: ele é usado também no bloco de
+// entregáveis de cada página de serviço. Aqui ficam só a moldura escura, o
+// título e os números.
 
-export type FotoDoArco = { src: string; alt: string };
-
-/** Os ângulos, em graus, a partir do topo do arco. Cinco fotos, simétricas. */
-const ANGULOS = [-68, -34, 0, 34, 68];
-
-/** Quanto de cada rotação é desfeita. Ver o comentário do arco. */
-const DESGIRO = 0.72;
+export type { FotoDoArco };
 
 export default function ArcoDeFotos({
   eyebrow,
@@ -50,66 +32,14 @@ export default function ArcoDeFotos({
   fotos: FotoDoArco[];
   numeros?: Numero[];
 }) {
-  // Cinco é o que o arco comporta sem as pontas saírem da tela no celular.
-  const emCena = fotos.slice(0, ANGULOS.length);
-
   return (
     <section className="superficie-escura noise relative overflow-hidden bg-abismo">
       <div className="glow-salmon pointer-events-none absolute left-1/2 top-0 h-[520px] w-[760px] -translate-x-1/2 opacity-30 blur-3xl" />
 
       <div className="relative mx-auto max-w-6xl px-6 pb-16 pt-28 lg:pb-24 lg:pt-32">
-        {/* --raio manda no tamanho do arco; --ancora é onde fica o centro
-            dele, medido do topo deste bloco. */}
-        <div className="relative [--ancora:calc(var(--raio)+3.5rem)] [--raio:170px] sm:[--raio:250px] lg:[--raio:330px]">
-          {/* O fio tracejado do arco. Vive dentro de um recorte da altura da
-              âncora, senão a metade de baixo do círculo passaria por cima do
-              título. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-[var(--ancora)] overflow-hidden"
-          >
-            <div className="absolute left-1/2 top-[var(--ancora)] h-[calc(var(--raio)*2)] w-[calc(var(--raio)*2)] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-bege/25" />
-          </div>
-
-          {emCena.map((foto, i) => {
-            const angulo = ANGULOS[i] ?? 0;
-            const meio = angulo === 0;
-
-            return (
-              <div
-                key={foto.src}
-                className="absolute left-1/2 top-[var(--ancora)]"
-                style={{
-                  transform: `translate(-50%, -50%) rotate(${angulo}deg) translateY(calc(var(--raio) * -1)) rotate(${
-                    -angulo * DESGIRO
-                  }deg)`,
-                }}
-              >
-                <Reveal delay={0.08 * i} distance={20}>
-                  {/* A do meio é maior: é o topo do arco, e o olho precisa de
-                      um ponto de chegada. */}
-                  <div
-                    className={`relative aspect-[4/5] overflow-hidden rounded-2xl shadow-[0_28px_60px_-30px_rgba(0,0,0,0.85)] ${
-                      meio
-                        ? "w-[88px] sm:w-[120px] lg:w-[148px]"
-                        : "w-[76px] sm:w-[104px] lg:w-[128px]"
-                    }`}
-                  >
-                    <Image
-                      src={foto.src}
-                      alt={foto.alt}
-                      fill
-                      sizes="(max-width: 640px) 90px, (max-width: 1024px) 120px, 150px"
-                      className="object-cover object-top"
-                    />
-                  </div>
-                </Reveal>
-              </div>
-            );
-          })}
-
+        <Arco fotos={fotos} tamanho="abertura" tom="escuro">
           {/* O texto, no vão sob as fotos. */}
-          <div className="relative pt-[calc(var(--ancora)+0.5rem)] text-center">
+          <div className="text-center">
             <Reveal>
               <span className="eyebrow inline-flex items-center gap-3 rounded-full border border-borda px-4 py-2 text-bege/75">
                 <span aria-hidden className="h-1 w-1 rounded-full bg-salmon" />
@@ -158,7 +88,7 @@ export default function ArcoDeFotos({
               </Reveal>
             )}
           </div>
-        </div>
+        </Arco>
 
         {/* Os números, em fileira, separados por fio. */}
         {numeros && numeros.length > 0 && (

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { avisar } from "@/lib/painel";
 import { exigirAdmin, guardarSegredoTotp, removerSegredoTotp, segredoTotp } from "@/lib/admin";
 import { codigoValido } from "@/lib/totp";
 
@@ -15,15 +16,17 @@ export async function ativarDuasEtapas(dados: FormData) {
   const segredo = String(dados.get("segredo") ?? "").trim();
   const codigo = String(dados.get("codigo") ?? "").trim();
 
-  if (!segredo) throw new Error("Segredo ausente. Recarregue a página.");
+  if (!segredo) return avisar("Segredo ausente. Recarregue a página.", "erro");
 
   if (!(await codigoValido(segredo, codigo))) {
-    throw new Error(
-      "Código incorreto. Confira se o relógio do celular está automático e tente com o código atual."
+    return avisar(
+      "Código incorreto. Confira se o relógio do celular está automático e tente com o código atual.",
+      "erro"
     );
   }
 
   await guardarSegredoTotp(segredo);
+  await avisar("Verificação em duas etapas ativada.");
   revalidatePath("/lncadmin/seguranca");
 }
 
@@ -37,9 +40,10 @@ export async function desativarDuasEtapas(dados: FormData) {
 
   const codigo = String(dados.get("codigo") ?? "").trim();
   if (!(await codigoValido(atual, codigo))) {
-    throw new Error("Código incorreto. A verificação continua ativa.");
+    return avisar("Código incorreto. A verificação continua ativa.", "erro");
   }
 
   await removerSegredoTotp();
+  await avisar("Verificação em duas etapas desativada.", "atencao");
   revalidatePath("/lncadmin/seguranca");
 }
