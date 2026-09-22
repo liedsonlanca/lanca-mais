@@ -23,6 +23,13 @@ export type Depoimento = {
   cargo: string;
   /** Foto do cliente, no Blob. Sem ela, o card mostra a inicial do nome. */
   foto?: string | null;
+  /**
+   * Nota de 1 a 5, dada pelo cliente.
+   *
+   * Anulável: sem nota preenchida, o card não mostra estrelas. Estrela é
+   * afirmação de que alguém avaliou, e nenhuma aparece por conta própria.
+   */
+  nota?: number | null;
 };
 export type Numero = {
   prefixo: string;
@@ -129,9 +136,19 @@ export async function lerDepoimentos(): Promise<Depoimento[]> {
       }
     });
 
-    return (await sql!.query(
-      "SELECT citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"
-    )) as Depoimento[];
+    // A coluna `nota` é recente. Se a evolução do esquema ainda não tiver
+    // rodado neste banco, a consulta falharia inteira e a seção de depoimentos
+    // sumiria da home. Melhor os depoimentos aparecerem sem estrelas do que a
+    // home aparecer sem os depoimentos.
+    try {
+      return (await sql!.query(
+        "SELECT citacao, nome, cargo, foto, nota FROM depoimentos ORDER BY ordem, id"
+      )) as Depoimento[];
+    } catch {
+      return (await sql!.query(
+        "SELECT citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"
+      )) as Depoimento[];
+    }
   }, reserva);
 }
 

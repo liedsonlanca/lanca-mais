@@ -35,6 +35,23 @@ function fotoEnviada(dados: FormData) {
   return urlEnviada(dados, "foto");
 }
 
+/**
+ * A nota do cliente, de 1 a 5.
+ *
+ * Campo vazio vira null, e não zero: sem nota o card não mostra estrela
+ * nenhuma, que é diferente de mostrar cinco vazias. Valor fora da faixa
+ * também vira null, em vez de ser cortado para o limite mais próximo:
+ * estrela é afirmação sobre o que um cliente disse, e diante de um dado
+ * estranho é melhor não afirmar nada do que afirmar um palpite.
+ */
+function notaDada(dados: FormData) {
+  const bruto = texto(dados, "nota");
+  if (bruto === "") return null;
+
+  const valor = Number(bruto);
+  return Number.isInteger(valor) && valor >= 1 && valor <= 5 ? valor : null;
+}
+
 export async function criarDepoimento(dados: FormData) {
   const banco = await preparar();
 
@@ -48,12 +65,13 @@ export async function criarDepoimento(dados: FormData) {
   )) as Array<{ proxima: number }>;
 
   await banco.query(
-    "INSERT INTO depoimentos (citacao, nome, cargo, foto, ordem) VALUES ($1,$2,$3,$4,$5)",
+    "INSERT INTO depoimentos (citacao, nome, cargo, foto, nota, ordem) VALUES ($1,$2,$3,$4,$5,$6)",
     [
       citacao,
       nome,
       texto(dados, "cargo"),
       fotoEnviada(dados),
+      notaDada(dados),
       ultimo[0]?.proxima ?? 0,
     ]
   );
@@ -82,9 +100,16 @@ export async function salvarDepoimento(dados: FormData) {
   await banco.query(
     `UPDATE depoimentos
         SET citacao = $1, nome = $2, cargo = $3,
-            foto = COALESCE($4, foto)
-      WHERE id = $5`,
-    [texto(dados, "citacao"), texto(dados, "nome"), texto(dados, "cargo"), nova, id]
+            foto = COALESCE($4, foto), nota = $5
+      WHERE id = $6`,
+    [
+      texto(dados, "citacao"),
+      texto(dados, "nome"),
+      texto(dados, "cargo"),
+      nova,
+      notaDada(dados),
+      id,
+    ]
   );
 
   atualizarSite();

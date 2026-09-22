@@ -14,6 +14,29 @@ import type { Depoimento } from "@/lib/conteudo";
 // A rolagem é nativa, com scroll-snap: funciona com dedo, roda, teclado e
 // setas, sem estado de posição para sincronizar. As setas só empurram o
 // contêiner; quem manda na posição é o navegador.
+
+/**
+ * Uma estrela da nota.
+ *
+ * As vazias ficam, em cinza fraco, em vez de sumirem: é o contraste entre as
+ * cheias e as apagadas que deixa a nota legível de relance. Só as cheias, uma
+ * pessoa teria que contá-las para saber se são quatro ou cinco.
+ *
+ * Decorativa: quem informa a nota é o aria-label da linha inteira.
+ */
+function Estrela({ cheia }: { cheia: boolean }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className={`h-4 w-4 ${cheia ? "text-salmon" : "text-tinta/15"}`}
+      fill="currentColor"
+    >
+      <path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" />
+    </svg>
+  );
+}
+
 export default function DepoimentosCarrossel({
   itens,
 }: {
@@ -93,7 +116,20 @@ export default function DepoimentosCarrossel({
         data-lenis-prevent
         className="sem-barra flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth"
       >
-        {itens.map((depoimento, i) => (
+        {itens.map((depoimento, i) => {
+          // A nota só vira estrela se for inteira e couber de 1 a 5. Dado
+          // fora disso não é arredondado para o mais próximo: é descartado,
+          // e o card volta a não afirmar nota nenhuma.
+          const bruta = depoimento.nota;
+          const estrelas =
+            typeof bruta === "number" &&
+            Number.isInteger(bruta) &&
+            bruta >= 1 &&
+            bruta <= 5
+              ? bruta
+              : null;
+
+          return (
           <div
             key={i}
             // Um card por vista no celular, dois no tablet, três no desktop.
@@ -120,6 +156,28 @@ export default function DepoimentosCarrossel({
                 aria-hidden
                 className="glow-salmon pointer-events-none absolute -left-20 -top-20 h-52 w-52 opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-45"
               />
+
+              {/* As estrelas, quando houver nota.
+
+                  Aparecem acima da citação porque é o primeiro sinal que o
+                  olho pega num card de depoimento, antes mesmo de ler.
+
+                  Nota é dado do painel, um por depoimento, e não enfeite fixo:
+                  cliente sem avaliação registrada aparece sem estrela alguma.
+                  Cinco chumbadas em todo card seriam uma nota que ninguém deu.
+
+                  Para quem usa leitor de tela, o desenho não diz nada: o
+                  aria-label logo abaixo é que informa a nota, uma vez só. */}
+              {estrelas !== null && (
+                <p
+                  className="relative mb-5 flex items-center gap-1"
+                  aria-label={`Nota ${estrelas} de 5`}
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <Estrela key={n} cheia={n <= estrelas} />
+                  ))}
+                </p>
+              )}
 
               <p className="relative flex-1 text-lg leading-[1.62] text-tinta/85 lg:text-[1.2rem]">
                 {depoimento.citacao}
@@ -161,7 +219,8 @@ export default function DepoimentosCarrossel({
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Some quando tudo já cabe na tela: seta que não leva a lugar nenhum

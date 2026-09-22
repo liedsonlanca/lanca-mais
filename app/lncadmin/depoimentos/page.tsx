@@ -1,5 +1,5 @@
 import CampoArquivo from "@/components/admin/CampoArquivo";
-import { campo, rotulo, botao } from "@/components/admin/estilos";
+import { campo, rotulo, botao, ajuda } from "@/components/admin/estilos";
 import { painelLiberado } from "@/lib/admin";
 import Image from "next/image";
 import { sql, garantirEsquema } from "@/lib/db";
@@ -21,13 +21,14 @@ type Linha = {
   nome: string;
   cargo: string;
   foto: string | null;
+  nota: number | null;
 };
 
 async function carregar(): Promise<Linha[]> {
   if (!sql) return [];
   await garantirEsquema();
   return (await sql.query(
-    "SELECT id, citacao, nome, cargo, foto FROM depoimentos ORDER BY ordem, id"
+    "SELECT id, citacao, nome, cargo, foto, nota FROM depoimentos ORDER BY ordem, id"
   )) as Linha[];
 }
 
@@ -104,6 +105,28 @@ export default async function AdminDepoimentos() {
                 placeholder="Ex: Clínica de estética"
                 className={`${campo} mt-2`}
               />
+            </div>
+            <div>
+              <label htmlFor="nova-nota" className={rotulo}>
+                Nota
+              </label>
+              <select
+                id="nova-nota"
+                name="nota"
+                defaultValue=""
+                className={`${campo} mt-2`}
+              >
+                <option value="">Sem nota</option>
+                {[5, 4, 3, 2, 1].map((n) => (
+                  <option key={n} value={n}>
+                    {"★".repeat(n)} {n} de 5
+                  </option>
+                ))}
+              </select>
+              <p className={ajuda}>
+                Só preencha se o cliente realmente avaliou. Sem nota, o
+                depoimento aparece no site sem estrelas.
+              </p>
             </div>
           </div>
 
@@ -218,6 +241,24 @@ export default async function AdminDepoimentos() {
                     defaultValue={d.cargo}
                     className={`${campo} mt-2`}
                   />
+                </div>
+                <div>
+                  <label htmlFor={`nota-${d.id}`} className={rotulo}>
+                    Nota
+                  </label>
+                  <select
+                    id={`nota-${d.id}`}
+                    name="nota"
+                    defaultValue={d.nota ?? ""}
+                    className={`${campo} mt-2`}
+                  >
+                    <option value="">Sem nota</option>
+                    {[5, 4, 3, 2, 1].map((n) => (
+                      <option key={n} value={n}>
+                        {"★".repeat(n)} {n} de 5
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

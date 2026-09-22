@@ -151,6 +151,14 @@ const EVOLUCOES = [
   // tabela filha custaria uma junção em toda leitura da home para resolver
   // um problema que não existe neste tamanho.
   `ALTER TABLE vitrine ADD COLUMN IF NOT EXISTS imagens TEXT[]`,
+  // Nota do cliente, de 1 a 5 estrelas.
+  //
+  // Anulável de propósito, e sem valor padrão: estrela é afirmação de que
+  // alguém avaliou. Chumbar cinco em todo depoimento seria inventar uma nota
+  // que ninguém deu, e é justamente o tipo de detalhe que, se questionado,
+  // derruba a confiança no resto da página. Depoimento sem nota preenchida
+  // aparece sem estrelas, e isso não é falha: é o estado honesto.
+  `ALTER TABLE depoimentos ADD COLUMN IF NOT EXISTS nota SMALLINT`,
 ];
 
 /**
