@@ -85,17 +85,27 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
   // alguma coisa. Contando pelo currentTime, os cinco segundos são cinco
   // segundos vistos.
   //
-  // A trava evita a troca dupla: o evento de tempo dispara umas quatro vezes
-  // por segundo, e sem ela o quadro seguinte poderia pular duas peças.
-  const jaAvancou = useRef(false);
-  useEffect(() => {
-    jaAvancou.current = false;
-  }, [indice]);
+  // A trava evita a troca dupla, porque o evento de tempo dispara uma vez a
+  // cada quarto de segundo. Ela guarda QUAL peça já pediu a troca, e não um
+  // simples sim ou não.
+  //
+  // A diferença não é preciosismo, é o conserto de um bug real. O
+  // AnimatePresence mantém o vídeo que está saindo montado e tocando durante
+  // os 0,9s da transição, e ele já passou dos cinco segundos, então continua
+  // disparando o evento. Com uma trava booleana compartilhada, o vídeo velho
+  // destravava, queimava a trava recém-liberada e o vídeo novo ficava
+  // bloqueado para sempre: só saía pelo onEnded, ou seja, tocava até o fim.
+  // Era por isso que o primeiro respeitava os cinco segundos e todos os
+  // seguintes não.
+  //
+  // Guardando o índice, o vídeo que sai não consegue gastar a vez do que
+  // entra: o dele já está registrado, e o do novo é outro.
+  const quemJaPediu = useRef(-1);
 
   function aoAndarOTempo(video: HTMLVideoElement) {
-    if (sozinho || jaAvancou.current) return;
+    if (sozinho || quemJaPediu.current === indice) return;
     if (video.currentTime < TEMPO_VIDEO_S) return;
-    jaAvancou.current = true;
+    quemJaPediu.current = indice;
     avancar();
   }
 
@@ -146,8 +156,8 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
             // Rede de segurança, para a peça mais curta que o corte: um vídeo
             // de três segundos nunca chegaria aos cinco do contador.
             onEnded={() => {
-              if (sozinho || jaAvancou.current) return;
-              jaAvancou.current = true;
+              if (sozinho || quemJaPediu.current === indice) return;
+              quemJaPediu.current = indice;
               avancar();
             }}
             aria-label={atual.legenda ?? atual.alt}
