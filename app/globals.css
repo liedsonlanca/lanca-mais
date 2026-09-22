@@ -9,6 +9,11 @@
   --color-salmon: #dd8a55;
   --color-salmon-claro: #eaa87c;
   --color-salmon-escuro: #b96a3a;
+  /* Fundo dos botoes cheios, mais fechado que o salmao da marca.
+     Existe porque o texto deles e branco, e branco sobre o salmao puro da
+     2,68 de contraste, abaixo dos 4,5 exigidos: em celular sob sol o rotulo
+     do botao principal simplesmente some. Neste tom o branco da 5,34. */
+  --color-botao: #a15822;
 
   /* Tema. O site é escuro desde 18/09/2026; a abertura da home é clara.
 
@@ -69,6 +74,7 @@
   --color-salmon: var(--color-salmon);
   --color-salmon-claro: var(--color-salmon-claro);
   --color-salmon-escuro: var(--color-salmon-escuro);
+  --color-botao: var(--color-botao);
   --color-fundo: var(--color-fundo);
   --color-fundo-alt: var(--color-fundo-alt);
   --color-cartao: var(--color-cartao);

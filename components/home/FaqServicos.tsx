@@ -93,7 +93,7 @@ export default function FaqServicos({ abas }: { abas: AbaFaq[] }) {
             // largura em vez de deixarem um buraco na ponta direita.
             className={`flex min-h-11 grow shrink-0 items-center justify-center rounded-full px-5 text-center text-sm font-medium transition-colors duration-500 sm:grow-0 ${
               i === aba
-                ? "bg-salmon text-preto"
+                ? "bg-botao text-branco"
                 : "text-tinta/60 hover:text-tinta"
             }`}
           >

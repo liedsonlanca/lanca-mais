@@ -327,14 +327,14 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
               largura, o vídeo sai por cima dele, o card de vidro cruza a borda
               esquerda a 24% da altura, as bolhas cruzam a direita a 20% e o
               card de serviço a 46%. */}
-          <div className="relative mx-auto h-[480px] w-full max-w-[420px] sm:h-[560px] sm:max-w-[520px] lg:h-[600px] lg:max-w-none">
+          <div className="relative mx-auto h-[560px] w-full max-w-[420px] sm:max-w-[520px] lg:h-[600px] lg:max-w-none">
             {/* Bloco salmão. Começa mais baixo que o vídeo, e é isso que faz o
                 vídeo sair por cima dele, como na referência. */}
             <motion.div
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.25, ease: FACIL }}
-              className="absolute bottom-[2%] left-[6%] right-[6%] top-[9%] rounded-[26px] bg-salmon sm:left-[9%] sm:right-[27%]"
+              className="absolute bottom-[14%] left-0 right-[40%] top-[7%] rounded-[26px] bg-salmon sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
             >
               {pecas.length === 0 && (
                 <span
@@ -358,7 +358,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4, ease: FACIL }}
-                className="absolute left-1/2 top-0 aspect-[9/16] h-[86%] -translate-x-1/2 overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:h-[96%] sm:translate-x-0"
+                className="absolute left-[2%] top-0 aspect-[9/16] h-[62%] overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:h-[96%]"
               >
                 <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
               </motion.div>
@@ -370,14 +370,14 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
               // cobria metade do vídeo, e o miolo do vídeo é onde está o assunto.
               <motion.div
                 {...surgir(0.9, -16)}
-                className="absolute bottom-[9%] left-0 z-10 sm:bottom-auto sm:top-[24%]"
+                className="absolute bottom-0 left-0 z-10 sm:bottom-auto sm:top-[24%]"
               >
                 {/* A seta divide a linha com o ícone, em cima, e não com o nome:
                     nome de cliente é longo, e ao lado da seta sobravam 90px no
                     celular, cortando "Brazauto Cajazeiras" no meio. */}
                 <motion.div
                   {...flutuar(0)}
-                  className="w-[190px] rounded-2xl border border-branco/70 bg-cartao/70 p-4 shadow-[0_24px_50px_-26px_rgba(10,10,8,0.5)] backdrop-blur-xl sm:w-[220px]"
+                  className="w-[148px] rounded-2xl border border-branco/70 bg-cartao/70 p-3.5 shadow-[0_24px_50px_-26px_rgba(10,10,8,0.5)] backdrop-blur-xl sm:w-[220px] sm:p-4"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span aria-hidden className="flex items-end gap-[3px] pt-1">
@@ -429,16 +429,16 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
 
             {/* Bolhas: duas frentes e a de "digitando", que leva às outras.
                 Escondidas no celular estreito, onde cobririam o vídeo. */}
-            <div className="absolute right-0 top-[20%] z-10 hidden flex-col items-start gap-2.5 sm:flex">
+            <div className="absolute right-0 top-[2%] z-10 flex flex-col items-end gap-2 sm:top-[20%] sm:items-start sm:gap-2.5">
               {frentes.map((s, i) => (
                 <motion.div key={s.slug} {...surgir(1.05 + i * 0.12, 16)}>
                   <motion.span
                     {...flutuar(0.5 + i * 0.4)}
-                    className="flex items-center gap-2.5 rounded-full bg-cartao py-1.5 pl-1.5 pr-4 text-[13px] font-medium text-tinta shadow-[0_14px_34px_-20px_rgba(10,10,8,0.5)]"
+                    className="flex items-center gap-2 rounded-full bg-cartao py-1.5 pl-1.5 pr-3.5 text-xs font-medium text-tinta shadow-[0_14px_34px_-20px_rgba(10,10,8,0.5)] sm:gap-2.5 sm:pr-4 sm:text-[13px]"
                   >
                     <span
                       aria-hidden
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-salmon/15"
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-salmon/15 sm:h-7 sm:w-7"
                     >
                       <span className="h-2 w-2 rounded-full bg-salmon" />
                     </span>
@@ -473,7 +473,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
             {post && (
               <motion.div
                 {...surgir(1.2, 16)}
-                className="absolute right-[2%] top-[46%] z-10 hidden w-[196px] sm:block"
+                className="absolute bottom-[2%] right-0 z-10 w-[140px] sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:w-[196px]"
               >
                 <motion.div
                   {...flutuar(1.1)}

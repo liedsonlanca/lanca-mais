@@ -103,13 +103,13 @@ export function Botao({
   variante?: "cheio" | "vazado" | "contraste";
 }) {
   const fundo = {
-    cheio: "bg-salmon text-preto",
+    cheio: "bg-botao text-branco",
     vazado: "border border-tinta/25 text-tinta hover:border-tinta",
     contraste: "bg-preto text-bege",
   }[variante];
 
   const disco = {
-    cheio: "bg-preto text-bege",
+    cheio: "bg-preto text-branco",
     vazado: "bg-tinta/10 text-tinta",
     contraste: "bg-salmon text-preto",
   }[variante];
