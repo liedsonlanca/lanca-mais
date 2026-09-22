@@ -171,7 +171,28 @@ export default function ServicosDestaque({
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-preto via-preto/70 to-preto/10 sm:hidden"
                 />
 
-                {/* No tablet para cima, só o véu curto por baixo da seta: sem
+                {/* O escurecimento da foto, do tablet para cima.
+
+                    Nasceu quando as fotos de estúdio da equipe deram lugar às
+                    peças de cliente. Aquelas eram fundo cinza e roupa preta,
+                    então já chegavam no tom do site. Estas são o trabalho de
+                    verdade: parede laranja, estúdio branco, luz de set. Lado
+                    a lado, três fotos assim puxavam o olho para elas e o card
+                    virava moldura de uma imagem solta.
+
+                    O véu devolve as três ao mesmo registro sem tocar nos
+                    arquivos: quem publica manda a foto como ela é, e quem
+                    decide o tom é o site.
+
+                    E ele levanta ao passar o ponteiro, porque aí a pessoa
+                    escolheu olhar aquele card — o descanso é sóbrio, a
+                    atenção é colorida. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 hidden bg-preto/45 transition-colors duration-700 group-hover:bg-preto/10 group-focus-visible:bg-preto/10 sm:block"
+                />
+
+                {/* No tablet para cima, o véu curto por baixo da seta: sem
                     ele, a seta cai numa região clara da foto e some. */}
                 <span
                   aria-hidden

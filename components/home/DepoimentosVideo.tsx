@@ -165,9 +165,25 @@ export default function DepoimentosVideo({
             }`}
           >
             {atual.nome && (
-              <p className="font-heading text-lg font-semibold leading-tight tracking-[-0.02em] text-bege">
-                {atual.nome}
-              </p>
+              <>
+                {/* A chamada, acima do nome.
+
+                    Sem ela o card era um rosto parado com um nome embaixo,
+                    e o botao de tocar tinha que explicar sozinho o que
+                    aquilo era. Agora a frase diz o que se ganha ao clicar, e
+                    o nome logo abaixo diz de quem e a palavra — que e o que
+                    da peso a um depoimento.
+
+                    So aparece quando ha nome: "Assista o depoimento de"
+                    sozinho ficaria pendurado no ar. */}
+                <p className="eyebrow text-bege/55">
+                  Assista o depoimento de
+                </p>
+
+                <p className="font-heading mt-2 text-lg font-semibold leading-tight tracking-[-0.02em] text-bege">
+                  {atual.nome}
+                </p>
+              </>
             )}
             {atual.cargo && (
               <p className="mt-1 text-sm text-bege/65">{atual.cargo}</p>
