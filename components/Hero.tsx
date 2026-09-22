@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Counter from "@/components/motion/Counter";
 import HeroVideos from "@/components/HeroVideos";
 import { type Depoimento, type Numero } from "@/lib/conteudo";
@@ -26,8 +26,8 @@ import { nichos, services } from "@/lib/site-config";
 //   - nota com estrelas: não existe nota; o depoimento aparece sozinho quando
 //     houver um real, e sem estrelas;
 //   - bolhas de conversa de cliente: viram as frentes de serviço;
-//   - card de produto com preço: vira o card do Audiovisual, com uma peça real
-//     da vitrine e "sob medida" no lugar do preço;
+//   - card de produto com preço: vira o card "Nossos posts", que folheia as
+//     peças estáticas da vitrine e leva à página de serviços;
 //   - logos de clientes: viram os nichos, que a agência pode afirmar.
 // O card de vidro diz de qual cliente é o vídeo que está passando.
 type Props = {
@@ -37,6 +37,9 @@ type Props = {
 };
 
 const FACIL: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+/** De quanto em quanto tempo o card pequeno troca de post. */
+const TEMPO_POST_MS = 3800;
 
 // Escritas por extenso porque o Tailwind lê as classes no código: montada com
 // template, `sm:grid-cols-${n}` não existiria na folha de estilo.
@@ -102,16 +105,53 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
   const aoTrocar = useCallback((proximo: number) => setIndice(proximo), []);
   const atual = pecas[indice];
 
+  // Os dois textos do card de vidro, vindos dos dois campos do painel.
+  //
+  // Legenda é o nome da peça ("Forte Energy"); Descrição da imagem é o que
+  // se vê nela. A descrição existe primeiro para leitor de tela, e aparecer
+  // no card é ganho de graça: quem olha passa a saber do que é o vídeo, e
+  // não só de quem ele é.
+  //
+  // Sem legenda, a descrição sobe e vira o título, para o card nunca ficar
+  // com um vão no lugar do nome.
+  const legendaDaPeca = atual?.legenda?.trim() ?? "";
+  const altDaPeca = atual?.alt?.trim() ?? "";
+  const tituloDaPeca = legendaDaPeca || altDaPeca;
+  const descricaoDaPeca = altDaPeca && altDaPeca !== tituloDaPeca ? altDaPeca : "";
+
   // Duas frentes nas bolhas, como as duas mensagens da referência, e a
   // terceira bolha, a de "digitando", vira o atalho para todas as outras.
   const frentes = ["marketing-pessoal", "marketing-empresarial"]
     .map((slug) => services.find((s) => s.slug === slug))
     .filter((s): s is (typeof services)[number] => Boolean(s));
 
-  const audiovisual = services.find((s) => s.slug === "audiovisual");
-  // Uma peça real da vitrine no card do Audiovisual. Imagem, nunca vídeo: um
-  // segundo vídeo tocando aqui baixaria o dobro na abertura.
-  const pecaDoCard = vitrine.find((p) => p.src && p.tipo !== "video");
+  // Os posts do card pequeno: capas de carrossel, estáticos e trincas, na
+  // ordem do painel.
+  //
+  // Imagem, nunca vídeo: o vídeo grande ao lado já está baixando, e um segundo
+  // tocando aqui dobraria o peso da abertura num celular com pacote de dados.
+  const posts = useMemo(
+    () => vitrine.filter((p) => p.src && p.tipo !== "video"),
+    [vitrine]
+  );
+
+  const [indicePost, setIndicePost] = useState(0);
+
+  // Trocam sozinhos, num compasso diferente do vídeo grande, para os dois não
+  // virarem na mesma hora e a composição inteira piscar de uma vez.
+  useEffect(() => {
+    if (posts.length <= 1 || reduzir) return;
+    const t = setInterval(
+      () => setIndicePost((i) => (i + 1) % posts.length),
+      TEMPO_POST_MS
+    );
+    return () => clearInterval(t);
+  }, [posts.length, reduzir]);
+
+  // A lista pode encolher quando o painel muda, e aí o índice antigo sobra
+  // apontando para fora. O resto evita o card sumir nesse intervalo.
+  const post = posts[indicePost % (posts.length || 1)];
+  const tituloDoPost = post?.legenda?.trim() || post?.alt?.trim() || "";
 
   const depoimento = depoimentoReal(depoimentos);
 
@@ -353,18 +393,36 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                       <SetaDiagonal />
                     </Link>
                   </div>
-                  {/* O título do vídeo que está passando é a Legenda da peça no
-                      painel. Sem legenda, a descrição; sem nenhuma das duas, a
-                      linha some, em vez de deixar um vão no card. Legenda vazia
-                      chega como texto vazio, e não como ausente, por isso o ||. */}
-                  {(atual.legenda?.trim() || atual.alt?.trim()) && (
-                    <p className="mt-2 line-clamp-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-tinta">
-                      {atual.legenda?.trim() || atual.alt?.trim()}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-tinta/60">
+                  {/* Três degraus, e cada um vem de um lugar:
+
+                        Agora passando  ... o estado, dado pelo tipo da peça
+                        Forte Energy    ... a Legenda, do painel
+                        Vídeo institu…  ... a Descrição da imagem, do painel
+
+                      O rótulo subiu para o topo. Antes ele fechava o card, e
+                      com uma terceira linha embaixo dele a leitura embaralhava:
+                      rótulo no meio de dois textos não diz a qual dos dois
+                      pertence.
+
+                      A descrição só aparece se existir e se for diferente da
+                      legenda, senão o card repetiria a mesma frase duas vezes
+                      em corpos diferentes. Campo vazio chega como texto vazio,
+                      e não como ausente, por isso os trim(). */}
+                  <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-tinta/50">
                     {atual.tipo === "video" ? "Agora passando" : "Do nosso trabalho"}
                   </p>
+
+                  {tituloDaPeca && (
+                    <p className="mt-1.5 line-clamp-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-tinta">
+                      {tituloDaPeca}
+                    </p>
+                  )}
+
+                  {descricaoDaPeca && (
+                    <p className="mt-1.5 line-clamp-2 text-xs leading-snug text-tinta/60">
+                      {descricaoDaPeca}
+                    </p>
+                  )}
                 </motion.div>
               </motion.div>
             )}
@@ -412,7 +470,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
             </div>
 
             {/* Card de serviço, no lugar do card de produto da referência. */}
-            {audiovisual && (
+            {post && (
               <motion.div
                 {...surgir(1.2, 16)}
                 className="absolute right-[2%] top-[46%] z-10 hidden w-[196px] sm:block"
@@ -422,13 +480,19 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                   className="rounded-2xl bg-cartao p-3.5 shadow-[0_28px_60px_-28px_rgba(10,10,8,0.55)]"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[15px] font-bold leading-tight text-tinta">
-                        {audiovisual.name}
+                        Nossos posts
                       </p>
-                      <p className="mt-0.5 text-xs leading-snug text-tinta/60">
-                        Do roteiro à edição final
-                      </p>
+                      {/* O nome do post que está na vez: a Legenda do painel,
+                          ou a Descrição da imagem quando não houver legenda.
+                          Duas linhas no máximo, porque o card tem 196px e um
+                          nome longo empurraria a imagem para fora. */}
+                      {tituloDoPost && (
+                        <p className="mt-0.5 line-clamp-2 text-xs leading-snug text-tinta/60">
+                          {tituloDoPost}
+                        </p>
+                      )}
                     </div>
                     <span
                       aria-hidden
@@ -438,22 +502,42 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                     </span>
                   </div>
 
-                  {pecaDoCard && (
+                  {/* A imagem troca junto com o nome acima. A chave é o que faz
+                      o React trocar o arquivo em vez de reaproveitar o mesmo
+                      elemento, e é o que permite o esmaecer entre um post e o
+                      seguinte.
+
+                      alt vazio de propósito: a linha acima já diz qual post é,
+                      e o trilho de "Nosso trabalho" descreve cada peça uma vez.
+                      Repetir aqui faria o leitor de tela ler a mesma coisa duas
+                      vezes na mesma tela. */}
+                  {post && (
                     <div className="relative mt-3 aspect-[4/3] overflow-hidden rounded-xl bg-fundo-alt">
-                      <Image
-                        src={pecaDoCard.src}
-                        alt=""
-                        fill
-                        sizes="170px"
-                        className="object-cover"
-                      />
+                      <AnimatePresence initial={false}>
+                        <motion.div
+                          key={post.src}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.6, ease: FACIL }}
+                          className="absolute inset-0"
+                        >
+                          <Image
+                            src={post.src}
+                            alt=""
+                            fill
+                            sizes="170px"
+                            className="object-cover"
+                          />
+                        </motion.div>
+                      </AnimatePresence>
                     </div>
                   )}
 
                   <div className="mt-3 flex items-center justify-between gap-2">
-                    <span className="text-[15px] font-bold text-tinta">Sob medida</span>
+                    <span className="text-[15px] font-bold text-tinta">Serviços</span>
                     <Link
-                      href={`/servicos/${audiovisual.slug}`}
+                      href="/servicos"
                       className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-tinta px-3.5 text-xs font-medium text-fundo"
                     >
                       Ver
