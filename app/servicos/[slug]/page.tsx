@@ -56,18 +56,28 @@ export default async function ServicoPage({
         <div className="glow-salmon pointer-events-none absolute -left-40 top-1/4 h-[520px] w-[520px] opacity-30 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-32 lg:px-10 lg:pb-28 lg:pt-40">
+          {/* Seta para a direita, e não para a esquerda.
+
+              O site ganhou um "Voltar" global no alto de toda página interna,
+              e ele também é uma seta apontando para a esquerda. Empilhados,
+              os dois liam como o mesmo botão repetido por engano.
+
+              São coisas diferentes: o Voltar devolve a pessoa para onde ela
+              parou, e este leva ao índice das oito frentes. Como este avança
+              para outro lugar em vez de desfazer o caminho, a seta dele passa
+              a apontar para a frente. */}
           <Reveal>
             <Link
               href="/servicos"
               className="group inline-flex min-h-11 items-center gap-2 text-sm text-bege/70 transition-colors hover:text-salmon"
             >
+              Ver todos os serviços
               <span
                 aria-hidden
-                className="transition-transform duration-500 group-hover:-translate-x-1"
+                className="transition-transform duration-500 group-hover:translate-x-1"
               >
-                ←
+                →
               </span>
-              Todos os serviços
             </Link>
           </Reveal>
 

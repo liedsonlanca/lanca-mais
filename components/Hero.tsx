@@ -334,7 +334,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.25, ease: FACIL }}
-              className="absolute bottom-[14%] left-0 right-[40%] top-[7%] rounded-[26px] bg-salmon sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
+              className="absolute bottom-[40%] left-[4%] right-[4%] top-[4%] rounded-[26px] bg-salmon sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
             >
               {pecas.length === 0 && (
                 <span
@@ -358,7 +358,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4, ease: FACIL }}
-                className="absolute left-[2%] top-0 aspect-[9/16] h-[62%] overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:h-[96%]"
+                className="absolute left-1/2 top-0 aspect-[9/16] h-[56%] -translate-x-1/2 overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:h-[96%] sm:translate-x-0"
               >
                 <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
               </motion.div>
@@ -370,14 +370,14 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
               // cobria metade do vídeo, e o miolo do vídeo é onde está o assunto.
               <motion.div
                 {...surgir(0.9, -16)}
-                className="absolute bottom-0 left-0 z-10 sm:bottom-auto sm:top-[24%]"
+                className="absolute bottom-0 left-0 z-10 w-[calc(50%-0.375rem)] sm:bottom-auto sm:top-[24%] sm:w-auto"
               >
                 {/* A seta divide a linha com o ícone, em cima, e não com o nome:
                     nome de cliente é longo, e ao lado da seta sobravam 90px no
                     celular, cortando "Brazauto Cajazeiras" no meio. */}
                 <motion.div
                   {...flutuar(0)}
-                  className="w-[148px] rounded-2xl border border-branco/70 bg-cartao/70 p-3.5 shadow-[0_24px_50px_-26px_rgba(10,10,8,0.5)] backdrop-blur-xl sm:w-[220px] sm:p-4"
+                  className="w-full rounded-2xl border border-branco/70 bg-cartao/70 p-3.5 shadow-[0_24px_50px_-26px_rgba(10,10,8,0.5)] backdrop-blur-xl sm:w-[220px] sm:p-4"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <span aria-hidden className="flex items-end gap-[3px] pt-1">
@@ -429,7 +429,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
 
             {/* Bolhas: duas frentes e a de "digitando", que leva às outras.
                 Escondidas no celular estreito, onde cobririam o vídeo. */}
-            <div className="absolute right-0 top-[2%] z-10 flex flex-col items-end gap-2 sm:top-[20%] sm:items-start sm:gap-2.5">
+            <div className="absolute right-0 top-[5%] z-10 flex flex-col items-end gap-2 sm:top-[20%] sm:items-start sm:gap-2.5">
               {frentes.map((s, i) => (
                 <motion.div key={s.slug} {...surgir(1.05 + i * 0.12, 16)}>
                   <motion.span
@@ -473,7 +473,7 @@ export default function Hero({ numeros, vitrine, depoimentos }: Props) {
             {post && (
               <motion.div
                 {...surgir(1.2, 16)}
-                className="absolute bottom-[2%] right-0 z-10 w-[140px] sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:w-[196px]"
+                className="absolute bottom-0 right-0 z-10 w-[calc(50%-0.375rem)] sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:w-[196px]"
               >
                 <motion.div
                   {...flutuar(1.1)}

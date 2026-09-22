@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BotaoVoltar from "@/components/BotaoVoltar";
 import Consentimento from "@/components/Consentimento";
 import JsonLd from "@/components/JsonLd";
 import SmoothScroll from "@/components/motion/SmoothScroll";
@@ -56,7 +57,12 @@ export default function RootLayout({
         <ScrollTopOnNavigate />
         <MotionProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          {/* relative: o "Voltar" se pendura no alto do conteudo sem
+              ocupar espaco no fluxo. */}
+          <main className="relative flex-1">
+            <BotaoVoltar />
+            {children}
+          </main>
           <Footer />
           <WhatsAppButton />
 
