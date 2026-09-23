@@ -3,10 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { navLinks, siteConfig } from "@/lib/site-config";
 import { pararRolagem, retomarRolagem } from "@/lib/scroll";
+
+/** A que altura perguntamos o que está sob o cabeçalho. */
+const ALTURA_DA_AMOSTRA = 38;
 
 type Marca = { src: string; alt: string };
 
@@ -36,24 +39,93 @@ export default function Header({
   //
   // Sobre um trecho claro, o header ganha a própria classe tema-claro, e as
   // cores dele se redefinem sozinhas, do mesmo jeito que as do painel.
-  const medirFundo = useCallback(() => {
-    const debaixo = document
-      .elementsFromPoint(window.innerWidth / 2, 38)
-      .find((el) => !el.closest("header"));
-    setSobreClaro(Boolean(debaixo?.closest(".tema-claro")));
-  }, []);
+  // Quem avisa é o navegador, e não nós a cada quadro.
+  //
+  // Antes isto perguntava, a cada evento de rolagem, qual elemento estava sob
+  // o cabeçalho, com elementsFromPoint. A pergunta é inocente parada e cara
+  // em movimento: para responder, o navegador precisa recalcular o layout na
+  // hora. Medido nesta página, com o layout sujo — que é a condição durante a
+  // rolagem, com o Lenis transformando tudo — cada chamada custava 9ms, mais
+  // da metade do orçamento de um quadro de 60fps, sessenta vezes por segundo.
+  // Era a travada e a tremida que o cliente relatou.
+  //
+  // Um IntersectionObserver responde a mesma coisa de graça: em vez de
+  // perguntar, ele avisa quando um trecho claro cruza a linha do cabeçalho.
+  // A margem negativa encolhe a área de observação até sobrar só uma faixa de
+  // dois pixels na altura em que amostrávamos, e o navegador resolve isso no
+  // compositor, fora da linha principal.
+  useEffect(() => {
+    const claros = new Set<Element>();
+    let observador: IntersectionObserver | null = null;
 
+    function montar() {
+      observador?.disconnect();
+      claros.clear();
+
+      // A faixa vai de ALTURA_DA_AMOSTRA até dois pixels abaixo. O recorte de
+      // baixo depende da altura da janela, então é refeito quando ela muda.
+      const recorteDeBaixo = Math.max(0, window.innerHeight - ALTURA_DA_AMOSTRA - 2);
+
+      observador = new IntersectionObserver(
+        (entradas) => {
+          for (const entrada of entradas) {
+            if (entrada.isIntersecting) claros.add(entrada.target);
+            else claros.delete(entrada.target);
+          }
+          setSobreClaro(claros.size > 0);
+        },
+        { rootMargin: `-${ALTURA_DA_AMOSTRA}px 0px -${recorteDeBaixo}px 0px` }
+      );
+
+      for (const el of document.querySelectorAll(".tema-claro")) {
+        observador.observe(el);
+      }
+
+      // Uma medida direta aqui, alem do observador.
+      //
+      // Ao trocar de pagina o cabecalho nao desmonta: ele guarda a cor da
+      // pagina anterior. O observador sozinho nao corrige isso quando a
+      // pagina nova ainda nao esta montada no quadro em que observamos — sem
+      // alvos ele nunca dispara, e a cor antiga fica. Foi o que aconteceu:
+      // sair da home clara para uma pagina de servico escura deixava o
+      // cabecalho claro sobre fundo escuro.
+      //
+      // Esta chamada custa os mesmos 9ms de antes, mas acontece uma vez por
+      // navegacao, enquanto a pagina troca — e nao sessenta vezes por segundo
+      // enquanto alguem rola. E a diferenca entre o preco e o desperdicio.
+      const debaixo = document
+        .elementsFromPoint(window.innerWidth / 2, ALTURA_DA_AMOSTRA)
+        .find((el) => !el.closest("header"));
+      setSobreClaro(Boolean(debaixo?.closest(".tema-claro")));
+    }
+
+    // Mais de uma vez durante a troca de página, e não só no quadro seguinte.
+    //
+    // Ao navegar, o Next monta a página nova em etapas. Medir no primeiro
+    // quadro pega o layout da página anterior: foi assim que, saindo da home
+    // clara para uma página de serviço escura, o cabeçalho ficava claro sobre
+    // fundo escuro e não se corrigia mais.
+    //
+    // Três medidas espalhadas pelo meio segundo da transição cobrem o caso.
+    // Custam quase nada: a conta só fica cara quando repetida a cada quadro
+    // de rolagem, que é justamente o que saiu daqui.
+    const quadro = requestAnimationFrame(montar);
+    const relogios = [120, 400].map((espera) => setTimeout(montar, espera));
+    window.addEventListener("resize", montar);
+
+    return () => {
+      cancelAnimationFrame(quadro);
+      for (const relogio of relogios) clearTimeout(relogio);
+      window.removeEventListener("resize", montar);
+      observador?.disconnect();
+    };
+  }, [pathname]);
+
+  // A sombra do cabeçalho continua vindo da rolagem, mas isto é só comparar
+  // um número: não toca no layout.
   useMotionValueEvent(scrollY, "change", (valor) => {
     setRolou(valor > 24);
-    medirFundo();
   });
-
-  // Ao chegar numa página, antes de qualquer rolagem. No quadro seguinte, e
-  // não na hora: a página nova ainda está sendo desenhada quando o efeito roda.
-  useEffect(() => {
-    const quadro = requestAnimationFrame(medirFundo);
-    return () => cancelAnimationFrame(quadro);
-  }, [pathname, medirFundo]);
 
   // Com o menu cheio aberto, o que está embaixo é o menu, que é escuro.
   const claroEmCima = sobreClaro && !aberto;
