@@ -100,7 +100,11 @@ export async function ehHeic(arquivo: File) {
 export async function converterHeic(arquivo: File): Promise<File> {
   // A busca da biblioteca acontece aqui dentro: quem nunca enviar um HEIC
   // nunca baixa esses 3 MB.
-  const { heicTo } = await import("heic-to");
+  // A variante "csp" da biblioteca, e nao a padrao: a padrao avalia texto
+  // como JavaScript, e a politica de seguranca do site nao permite isso em
+  // producao. Com a padrao a conversao funcionaria no servidor de
+  // desenvolvimento e falharia no ar — o pior tipo de erro.
+  const { heicTo } = await import("heic-to/csp");
 
   const bitmap = await heicTo({ blob: arquivo, type: "bitmap" });
 

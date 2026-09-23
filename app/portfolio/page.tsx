@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { lerCases } from "@/lib/conteudo";
+import { ehProvisorio } from "@/lib/provisorio";
 import PageHero from "@/components/PageHero";
 import CtaFinal from "@/components/CtaFinal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
@@ -12,7 +13,18 @@ export const metadata: Metadata = {
 };
 
 export default async function PortfolioPage() {
-  const caseStudies = await lerCases();
+  const cases = await lerCases();
+
+  // Só os cases de verdade.
+  //
+  // A home já filtrava, esta página não: com o banco ainda cheio dos
+  // cases de exemplo, o visitante que clicasse em Portfólio encontrava
+  // uma grade de "[Nome do cliente]". É o tipo de detalhe que, sozinho,
+  // derruba a confiança no resto do site — e justamente na página que
+  // existe para provar que o trabalho é real.
+  const caseStudies = cases.filter(
+    (c) => !ehProvisorio(c.client, c.niche, c.summary, c.result)
+  );
 
   return (
     <>
@@ -27,6 +39,16 @@ export default async function PortfolioPage() {
 
       <section className="relative overflow-hidden bg-fundo-alt">
         <div className="mx-auto max-w-6xl px-6 py-12 lg:px-10 lg:py-16">
+          {/* Sem nenhum case real, a página diz isso em uma linha em vez
+              de mostrar uma grade vazia sem explicação. */}
+          {caseStudies.length === 0 && (
+            <p className="max-w-xl leading-relaxed text-tinta/65">
+              Os primeiros cases estão sendo montados e entram aqui em
+              breve. Enquanto isso, o trabalho recente está no trilho da
+              página inicial e no nosso Instagram.
+            </p>
+          )}
+
           <Stagger className="grid gap-6 sm:grid-cols-2">
             {caseStudies.map((item) => (
               <StaggerItem key={item.slug}>

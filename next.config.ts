@@ -108,6 +108,11 @@ function politicaDeConteudo(desenvolvimento: boolean) {
     // Google Maps mantém a porta fechada para todo o resto.
     "frame-src https://www.google.com",
     `script-src 'self' 'unsafe-inline' ${juntar(ANALYTICS.script, PIXEL.script)}${desenvolvimento ? " 'unsafe-eval'" : ""}`,
+    // Sem esta linha os workers caem no script-src, que nao tem blob: — e o
+    // conversor de HEIC do painel, que descompacta a foto do iPhone num
+    // worker, era bloqueado pela politica. So a nossa origem e os blobs que
+    // o nosso proprio codigo cria; nada de fora.
+    "worker-src 'self' blob:",
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${juntar(MIDIA, ANALYTICS.imagem, PIXEL.imagem)}`,
     `media-src 'self' blob: ${MIDIA}`,
