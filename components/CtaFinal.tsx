@@ -58,7 +58,7 @@ export default function CtaFinal({
         <Reveal delay={0.25}>
           <Link
             href="/contato"
-            className="mt-10 inline-block rounded-full bg-destaque px-9 py-4 font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
+            className="mt-10 inline-block rounded-full bg-botao px-9 py-4 font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
           >
             {rotulo}
           </Link>

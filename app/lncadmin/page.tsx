@@ -26,6 +26,16 @@ const SECOES: Array<{
     pronto: true,
   },
   {
+    href: "/lncadmin/textos",
+    // Sem contagem, pelo mesmo motivo das imagens: os campos existem sempre,
+    // e os que ninguém reescreveu não têm linha no banco.
+    tabela: null,
+    rotulo: "Textos do site",
+    descricao:
+      "Toda frase da home e das páginas de serviço: títulos, entregáveis, diferenciais e o FAQ.",
+    pronto: true,
+  },
+  {
     href: "/lncadmin/imagens",
     // Sem contagem: aqui o que importa não é quantas linhas há no banco, e
     // sim que as cinquenta posições existem sempre — as que ninguém trocou

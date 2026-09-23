@@ -6,6 +6,11 @@ import { clientes, type Cliente } from "@/lib/clients";
 import { equipe as equipeEstatica, type Pessoa } from "@/lib/equipe";
 import { blogPosts, type BlogPost } from "@/lib/blog-posts";
 import { imagensPadrao, POR_CHAVE, type Imagens } from "@/lib/imagens";
+import {
+  textosPadrao,
+  POR_CHAVE as CHAVES_DE_TEXTO,
+  type Textos,
+} from "@/lib/textos";
 
 // Leitura do conteúdo editável do site.
 //
@@ -367,6 +372,36 @@ export async function lerDepoimentosVideo(): Promise<DepoimentoVideo[]> {
   }, []);
 }
 
+/* ---------------- Os textos do site ---------------- */
+
+/**
+ * Os textos reescritos pelo painel, com o original como reserva.
+ *
+ * Sem semeadura, como as imagens: o texto que a equipe escreveu vive em
+ * código, e o banco guarda só o que a agência reescreveu. Assim uma correção
+ * de português feita no código chega às frases que ninguém personalizou, em
+ * vez de ficar presa atrás de uma cópia antiga no banco.
+ *
+ * Chave que não está mais no catálogo é ignorada: uma pergunta de FAQ
+ * retirada deixa a linha para trás, e ela não pode virar entrada de um mapa
+ * que alguma página leia sem querer.
+ */
+export async function lerTextos(): Promise<Textos> {
+  const padrao = textosPadrao();
+
+  return lerDoBanco(async () => {
+    const linhas = (await sql!.query(
+      'SELECT chave, valor FROM textos'
+    )) as Array<{ chave: string; valor: string }>;
+
+    const mapa: Textos = { ...padrao };
+    for (const linha of linhas) {
+      if (!CHAVES_DE_TEXTO.has(linha.chave)) continue;
+      mapa[linha.chave] = linha.valor;
+    }
+    return mapa;
+  }, padrao);
+}
 /** Usada pelo painel: garante que as tabelas existem antes de qualquer escrita. */
 export { garantirEsquema };
 

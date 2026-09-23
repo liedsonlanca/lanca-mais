@@ -232,7 +232,7 @@ export default function Consentimento() {
                 <button
                   type="button"
                   onClick={() => decidir(detalhando ? escolha : TUDO)}
-                  className="flex min-h-11 flex-1 items-center justify-center rounded-full bg-destaque px-6 font-medium text-preto transition-opacity duration-300 hover:opacity-90"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-full bg-botao px-6 font-medium text-branco transition-opacity duration-300 hover:opacity-90"
                 >
                   {detalhando ? "Salvar escolha" : "Aceitar"}
                 </button>

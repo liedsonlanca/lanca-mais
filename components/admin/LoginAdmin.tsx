@@ -197,7 +197,7 @@ export default function LoginAdmin() {
         disabled={
           enviando || (naSegunda ? codigo.length < 6 : senha.length === 0)
         }
-        className="mt-6 w-full rounded-full bg-destaque px-7 py-3.5 font-medium text-preto transition-opacity duration-300 disabled:opacity-50"
+        className="mt-6 w-full rounded-full bg-botao px-7 py-3.5 font-medium text-branco transition-opacity duration-300 disabled:opacity-50"
       >
         {enviando ? "Conferindo" : naSegunda ? "Entrar" : "Continuar"}
       </button>

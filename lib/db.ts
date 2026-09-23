@@ -88,6 +88,18 @@ const TABELAS = [
      criado_em TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
 
+  // Os textos do site reescritos pelo painel.
+  //
+  // Mesmo desenho da tabela de imagens: guarda so o que foi reescrito. O
+  // texto original vive em codigo, e a chave e o caminho dele dentro da
+  // estrutura — ver lib/textos.ts. Linha ausente quer dizer "ninguem mexeu",
+  // e restaurar o original e apagar a linha.
+  `CREATE TABLE IF NOT EXISTS textos (
+     chave         TEXT PRIMARY KEY,
+     valor         TEXT NOT NULL,
+     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+
   `CREATE TABLE IF NOT EXISTS vitrine (
      id         SERIAL PRIMARY KEY,
      src        TEXT NOT NULL,

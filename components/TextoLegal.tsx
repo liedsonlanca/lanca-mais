@@ -54,7 +54,7 @@ export async function PaginaLegal({
                 href={`https://wa.me/${siteConfig.whatsappNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-h-11 items-center rounded-full bg-destaque px-5 text-sm font-medium text-preto transition-opacity duration-300 hover:opacity-90"
+                className="flex min-h-11 items-center rounded-full bg-botao px-5 text-sm font-medium text-branco transition-opacity duration-300 hover:opacity-90"
               >
                 Falar no WhatsApp
               </a>

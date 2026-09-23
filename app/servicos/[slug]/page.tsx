@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { services } from "@/lib/site-config";
-import { servicePages } from "@/lib/service-pages";
+import { lerPaginaDeServico, lerServico } from "@/lib/conteudo-textos";
 import SectionHeading from "@/components/SectionHeading";
 import CtaFinal from "@/components/CtaFinal";
 import ServiceFaq from "@/components/ServiceFaq";
@@ -39,8 +39,13 @@ export default async function ServicoPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
-  const page = servicePages[slug];
+
+  // O serviço e a página dele vêm com o texto do painel já aplicado; a
+  // forma é a mesma de antes, então o resto do arquivo não mudou.
+  const [service, page] = await Promise.all([
+    lerServico(slug),
+    lerPaginaDeServico(slug),
+  ]);
   if (!service || !page) notFound();
 
   // As cinco fotos do leque deste serviço. Vêm do painel, com a sessão de
@@ -113,7 +118,7 @@ export default async function ServicoPage({
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <Link
                     href="/contato"
-                    className="rounded-full bg-destaque px-7 py-3.5 text-center font-medium text-preto shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
+                    className="rounded-full bg-botao px-7 py-3.5 text-center font-medium text-branco shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
                   >
                     {page.ctaLabel}
                   </Link>

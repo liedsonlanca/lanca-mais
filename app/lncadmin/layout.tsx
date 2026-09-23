@@ -26,6 +26,7 @@ const SECOES = [
   { href: "/lncadmin/depoimentos", rotulo: "Depoimentos" },
   { href: "/lncadmin/depoimentos-video", rotulo: "Depoimentos em vídeo" },
   { href: "/lncadmin/imagens", rotulo: "Imagens do site" },
+  { href: "/lncadmin/textos", rotulo: "Textos do site" },
   { href: "/lncadmin/equipe", rotulo: "Equipe" },
   { href: "/lncadmin/cases", rotulo: "Cases" },
   { href: "/lncadmin/logos", rotulo: "Logos" },

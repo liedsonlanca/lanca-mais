@@ -26,7 +26,7 @@ import { nichos, services } from "@/lib/site-config";
 //   - nota com estrelas: não existe nota; o depoimento aparece sozinho quando
 //     houver um real, e sem estrelas;
 //   - bolhas de conversa de cliente: viram as frentes de serviço;
-//   - card de produto com preço: vira o card "Nossos posts", que folheia as
+//   - card de produto com preço: vira o card "Nossos cards", que folheia as
 //     peças estáticas da vitrine e leva à página de serviços;
 //   - logos de clientes: viram os nichos, que a agência pode afirmar.
 // O card de vidro diz de qual cliente é o vídeo que está passando.
@@ -484,7 +484,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-[15px] font-bold leading-tight text-tinta">
-                        Nossos posts
+                        Nossos cards
                       </p>
                       {/* O nome do post que está na vez: a Legenda do painel,
                           ou a Descrição da imagem quando não houver legenda.

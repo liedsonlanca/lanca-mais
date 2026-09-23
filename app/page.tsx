@@ -1,6 +1,10 @@
 import Image from "next/image";
-import { services, SERVICOS_EM_DESTAQUE } from "@/lib/site-config";
-import { sintomas, metodo, entregaveis } from "@/lib/home";
+import { SERVICOS_EM_DESTAQUE, type Service } from "@/lib/site-config";
+import {
+  lerTextosDaHome,
+  lerPaginasDeServico,
+  lerServicos,
+} from "@/lib/conteudo-textos";
 import {
   lerVitrine,
   lerDepoimentos,
@@ -10,7 +14,7 @@ import {
   lerDepoimentosVideo,
 } from "@/lib/conteudo";
 import { imagem } from "@/lib/imagens";
-import { servicePages } from "@/lib/service-pages";
+
 import { ehProvisorio } from "@/lib/provisorio";
 import Hero from "@/components/Hero";
 import WorkShowcase from "@/components/WorkShowcase";
@@ -118,15 +122,31 @@ function Miolo({
 export default async function Home() {
   // Conteúdo editável pelo painel. Sem banco configurado cada leitura devolve
   // o conteúdo estático de lib/, então a home nunca fica vazia.
-  const [vitrine, depoimentos, cases, numeros, imagens, videos] =
-    await Promise.all([
-      lerVitrine(),
-      lerDepoimentos(),
-      lerCases(),
-      lerNumeros(),
-      lerImagens(),
-      lerDepoimentosVideo(),
-    ]);
+  const [
+    vitrine,
+    depoimentos,
+    cases,
+    numeros,
+    imagens,
+    videos,
+    copy,
+    servicePages,
+    services,
+  ] = await Promise.all([
+    lerVitrine(),
+    lerDepoimentos(),
+    lerCases(),
+    lerNumeros(),
+    lerImagens(),
+    lerDepoimentosVideo(),
+    lerTextosDaHome(),
+    lerPaginasDeServico(),
+    lerServicos(),
+  ]);
+
+  // Os textos da home, já com o que o painel reescreveu. Os nomes curtos
+  // mantêm o JSX abaixo igual ao que era quando eles vinham de lib/home.
+  const { sintomas, metodo, entregaveis } = copy;
 
   // As fotos dos três cards, por slug. O card monta a partir daqui em vez de
   // importar uma lista fixa: assim a troca feita no painel chega sem deploy.
@@ -143,7 +163,7 @@ export default async function Home() {
 
   const destaques = SERVICOS_EM_DESTAQUE.map((slug) =>
     services.find((s) => s.slug === slug)
-  ).filter((s): s is (typeof services)[number] => Boolean(s));
+  ).filter((s): s is Service => Boolean(s));
   const outros = services.filter((s) => !SERVICOS_EM_DESTAQUE.includes(s.slug));
 
   // Prova social só entra verdadeira. Os provisórios têm colchetes.

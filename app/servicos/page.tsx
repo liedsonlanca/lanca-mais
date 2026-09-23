@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { services } from "@/lib/site-config";
+import { lerServicos } from "@/lib/conteudo-textos";
 import { lerNumeros, lerVitrine } from "@/lib/conteudo";
 import ArcoDeFotos, { type FotoDoArco } from "@/components/ArcoDeFotos";
 import CtaFinal from "@/components/CtaFinal";
@@ -15,7 +15,12 @@ export const metadata: Metadata = {
 
 export default async function ServicosPage() {
   // Tudo aqui vem do painel; sem banco, cai no conteúdo dos arquivos.
-  const [numeros, vitrine] = await Promise.all([lerNumeros(), lerVitrine()]);
+  const [numeros, vitrine, services] = await Promise.all([
+    lerNumeros(),
+    lerVitrine(),
+    // Os nomes e resumos vêm com o texto do painel aplicado.
+    lerServicos(),
+  ]);
 
   // As peças que abrem o arco são as do trilho de trabalho: vídeos,
   // carrosséis, estáticos, o que estiver cadastrado. Antes eram retratos da

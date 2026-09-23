@@ -110,7 +110,7 @@ export default async function AdminEquipe() {
 
         <button
           type="submit"
-          className={`${botao} mt-5 bg-destaque text-preto hover:bg-salmon-escuro`}
+          className={`${botao} mt-5 bg-botao text-branco hover:bg-salmon-escuro`}
         >
           Acrescentar
         </button>

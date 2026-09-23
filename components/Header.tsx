@@ -343,7 +343,7 @@ export default function Header({
                 <Link
                   href="/contato"
                   onClick={() => setAberto(false)}
-                  className="block rounded-full bg-destaque px-7 py-4 text-center font-medium text-preto shadow-[0_0_40px_-8px_var(--color-salmon)]"
+                  className="block rounded-full bg-botao px-7 py-4 text-center font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)]"
                 >
                   Pedir orçamento
                 </Link>

@@ -140,7 +140,7 @@ export default async function AdminDepoimentos() {
 
         <button
           type="submit"
-          className={`${botao} mt-5 bg-destaque text-preto hover:bg-salmon-escuro`}
+          className={`${botao} mt-5 bg-botao text-branco hover:bg-salmon-escuro`}
         >
           Adicionar
         </button>
