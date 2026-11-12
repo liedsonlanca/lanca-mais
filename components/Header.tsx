@@ -252,14 +252,21 @@ export default function Header({
 
           <div className="flex items-center gap-4">
             <Link
-              href="/contato"
+              // O único pedido do site, e por isso o único botão fixo.
+              //
+              // Era "Pedir orçamento". Dois pedidos competindo na mesma tela
+              // dividem a atenção e nenhum ganha: quem ainda está decidindo
+              // não pede orçamento, e quem já decidiu acha o WhatsApp sozinho.
+              // O diagnóstico é o degrau que serve aos dois — é curto, não
+              // compromete, e termina com a conversa marcada.
+              href="/diagnostico"
               // Tinta sobre fundo, como o botão preto da referência. Como o
               // header troca de tema sozinho, o mesmo botão sai preto sobre o
               // painel claro da home e claro sobre as seções escuras, sempre
               // com o contraste máximo do tema.
               className="group hidden min-h-11 items-center gap-2 rounded-full bg-tinta px-5 text-sm font-medium text-fundo transition-transform duration-300 hover:-translate-y-0.5 sm:inline-flex"
             >
-              Pedir orçamento
+              Fazer diagnóstico
               <svg
                 aria-hidden
                 viewBox="0 0 24 24"
@@ -413,11 +420,11 @@ export default function Header({
                 className="mt-auto pt-12"
               >
                 <Link
-                  href="/contato"
+                  href="/diagnostico"
                   onClick={() => setAberto(false)}
                   className="block rounded-full bg-botao px-7 py-4 text-center font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)]"
                 >
-                  Pedir orçamento
+                  Fazer diagnóstico
                 </Link>
 
                 <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-tinta/55">

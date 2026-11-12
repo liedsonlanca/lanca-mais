@@ -105,8 +105,6 @@ export default async function PortfolioPage() {
         destaque="case de sucesso?"
         realce="sucesso?"
         lead="Receba um diagnóstico gratuito da presença digital da sua marca, em 2 minutos."
-        rotulo="Receber um diagnóstico"
-        href="/diagnostico"
       />
     </>
   );

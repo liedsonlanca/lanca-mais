@@ -117,7 +117,7 @@ export default async function ServicoPage({
 
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <Link
-                    href="/contato"
+                    href="/diagnostico"
                     className="rounded-full bg-botao px-7 py-3.5 text-center font-medium text-branco shadow-[0_0_32px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_48px_-6px_var(--color-salmon)]"
                   >
                     {page.ctaLabel}

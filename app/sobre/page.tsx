@@ -164,7 +164,6 @@ export default async function SobrePage() {
         destaque="posicionamento da sua marca?"
         realce="posicionamento"
         lead="Você acabou de conhecer quem vai cuidar dela. O próximo passo é uma conversa, sem compromisso."
-        rotulo="Falar com a LANÇA+"
       />
     </>
   );

@@ -10,8 +10,8 @@ type Props = {
   realce?: string;
   lead?: string;
   rotulo?: string;
-  /** Para onde o botão leva. O padrão é o orçamento; as telas que
-   *  oferecem o diagnóstico apontam para ele. */
+  /** Para onde o botão leva. O padrão é o diagnóstico; quem quiser
+   *  mandar para outro lugar diz aqui. */
   href?: string;
 };
 
@@ -40,8 +40,11 @@ export default function CtaFinal({
   destaque,
   realce,
   lead,
-  rotulo = "Solicitar orçamento",
-  href = "/contato",
+  // O diagnóstico é o pedido padrão de toda tela que termina neste bloco.
+  // Era o orçamento, que pede muito de quem ainda está decidindo; este é
+  // curto, gratuito e não compromete. Quem já decidiu tem o WhatsApp.
+  rotulo = "Receber um diagnóstico",
+  href = "/diagnostico",
 }: Props) {
   return (
     <section className="relative overflow-hidden bg-fundo">

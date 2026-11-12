@@ -44,7 +44,7 @@ export default async function ServicosPage() {
           { texto: "uma marca por inteiro.", acento: "inteiro." },
         ]}
         lead="Contrate uma ou várias. O que não muda é o padrão e o alinhamento entre elas."
-        botao={{ href: "/contato", texto: "Falar com a equipe" }}
+        botao={{ href: "/diagnostico", texto: "Receber um diagnóstico" }}
         fotos={fotosDoArco}
         numeros={numeros}
       />

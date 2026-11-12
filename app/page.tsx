@@ -575,18 +575,15 @@ export default async function Home() {
             ponto de partida que faz sentido para ela.
           </p>
 
-          {/* Dois degraus, e não um.
+          {/* Um pedido só.
 
-              O site terminava só em "Pedir orçamento", que é um pedido
-              alto para quem chegou aqui ainda decidindo. O diagnóstico é
-              o degrau de baixo: gratuito, curto e sem compromisso de
-              compra. Quem já decidiu continua tendo o orçamento ao lado,
-              agora como segunda opção em vez de única porta. */}
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              Chegou a ter dois botões aqui, com "Pedir orçamento" ao lado.
+              Duas portas na mesma tela dividem a atenção e nenhuma ganha:
+              quem ainda está decidindo não pede orçamento, e quem já
+              decidiu encontra o WhatsApp sem precisar de botão. Ficou o
+              degrau que serve aos dois. */}
+          <div className="mt-9 flex justify-center">
             <Botao href="/diagnostico">Receber um diagnóstico</Botao>
-            <Botao href="/contato" variante="sobre-foto">
-              Pedir orçamento
-            </Botao>
           </div>
 
           <p className="mt-5 text-sm text-bege/50">
