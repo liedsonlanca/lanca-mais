@@ -329,14 +329,34 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
               largura, o vídeo sai por cima dele, o card de vidro cruza a borda
               esquerda a 24% da altura, as bolhas cruzam a direita a 20% e o
               card de serviço a 46%. */}
-          <div className="relative mx-auto h-[560px] w-full max-w-[420px] sm:max-w-[520px] lg:h-[600px] lg:max-w-none">
+          {/* Duas composições, um só conjunto de peças.
+
+              Do tablet para cima é a colagem da referência: cada peça
+              posicionada em cima da outra, com o vídeo saindo do bloco
+              salmão e os cards cruzando as bordas.
+
+              No celular isso não cabe. Cinco camadas sobrepostas em 390
+              pixels de largura viravam colisão: as bolhas das frentes
+              saíam pela direita, os dois cards se espremiam em metade da
+              largura cada e nada tinha hierarquia. Era bonito na tela
+              grande e bagunçado no telefone.
+
+              Então no celular vira pilha: o vídeo primeiro, a legenda de
+              quem é embaixo, as frentes no pé. Um assunto de cada vez.
+
+              Os dois invólucros abaixo existem só para o celular. Em
+              sm:contents eles somem do layout, e as peças voltam a se
+              posicionar contra este contêiner como sempre fizeram — sem
+              duplicar nenhuma delas no JSX. */}
+          <div className="mx-auto flex w-full max-w-[420px] flex-col gap-4 sm:relative sm:block sm:h-[560px] sm:max-w-[520px] lg:h-[600px] lg:max-w-none">
+            <div className="relative aspect-[4/5] sm:contents">
             {/* Bloco salmão. Começa mais baixo que o vídeo, e é isso que faz o
                 vídeo sair por cima dele, como na referência. */}
             <motion.div
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.25, ease: FACIL }}
-              className="absolute bottom-[40%] left-[4%] right-[4%] top-[4%] rounded-[26px] bg-salmon sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
+              className="absolute inset-x-0 bottom-[6%] top-[6%] rounded-[26px] bg-salmon sm:inset-x-auto sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
             >
               {pecas.length === 0 && (
                 <span
@@ -360,11 +380,18 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4, ease: FACIL }}
-                className="absolute left-1/2 top-0 aspect-[9/16] h-[56%] -translate-x-1/2 overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:h-[96%] sm:translate-x-0"
+                className="absolute left-1/2 top-1/2 aspect-[9/16] h-[94%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:top-0 sm:h-[96%] sm:translate-x-0 sm:translate-y-0"
               >
                 <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
               </motion.div>
             )}
+
+            </div>
+
+            {/* As informações. No celular descem em fila sob o vídeo; do
+                tablet para cima este invólucro some e elas voltam a flutuar
+                sobre a colagem. */}
+            <div className="flex flex-col gap-3 sm:contents">
 
             {/* Card de vidro: de quem é o vídeo que está passando. */}
             {atual && (
@@ -372,7 +399,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
               // cobria metade do vídeo, e o miolo do vídeo é onde está o assunto.
               <motion.div
                 {...surgir(0.9, -16)}
-                className="absolute bottom-0 left-0 z-10 w-[calc(50%-0.375rem)] sm:bottom-auto sm:top-[24%] sm:w-auto"
+                className="z-10 w-full sm:absolute sm:bottom-auto sm:left-0 sm:top-[24%] sm:w-auto"
               >
                 {/* A seta divide a linha com o ícone, em cima, e não com o nome:
                     nome de cliente é longo, e ao lado da seta sobravam 90px no
@@ -430,8 +457,11 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
             )}
 
             {/* Bolhas: duas frentes e a de "digitando", que leva às outras.
-                Escondidas no celular estreito, onde cobririam o vídeo. */}
-            <div className="absolute right-0 top-[5%] z-10 flex flex-col items-end gap-2 sm:top-[20%] sm:items-start sm:gap-2.5">
+
+                No celular viram uma fila deitada sob a legenda. Em coluna,
+                encostadas à direita, elas saíam pela borda da tela e
+                cobriam o vídeo — era a peça que mais sujava a composição. */}
+            <div className="z-10 flex flex-wrap items-center gap-2 sm:absolute sm:right-0 sm:top-[20%] sm:flex-col sm:flex-nowrap sm:items-start sm:gap-2.5">
               {frentes.map((s, i) => (
                 <motion.div key={s.slug} {...surgir(1.05 + i * 0.12, 16)}>
                   <motion.span
@@ -475,7 +505,11 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
             {post && (
               <motion.div
                 {...surgir(1.2, 16)}
-                className="absolute bottom-0 right-0 z-10 w-[calc(50%-0.375rem)] sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:w-[196px]"
+                // Fora do celular: dois mostruários girando na mesma tela de
+                // telefone competem entre si, e o trilho de "Nosso trabalho"
+                // logo abaixo já mostra as peças. Na tela grande ele cabe e
+                // compõe.
+                className="hidden sm:absolute sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:block sm:w-[196px]"
               >
                 <motion.div
                   {...flutuar(1.1)}
@@ -549,6 +583,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                 </motion.div>
               </motion.div>
             )}
+            </div>
           </div>
         </div>
 
