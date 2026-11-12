@@ -107,6 +107,38 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
   const aoTrocar = useCallback((proximo: number) => setIndice(proximo), []);
   const atual = pecas[indice];
 
+  // A roda de peças: onde cada uma está, em relação à que está passando.
+  //
+  // A distância é com sinal e pelo caminho mais curto do anel: 0 é a do
+  // meio, -1 a que acabou de sair pela esquerda, +1 a que espera à direita.
+  // É esse par que define o sentido do giro — a seguinte sobe da direita
+  // para o meio, e a do meio desce para a esquerda.
+  //
+  // Nada entra nem sai de cena. Isto aqui já foi um <AnimatePresence> com
+  // três cartões, e não funcionava: o motion segurava cada cartão que saía
+  // e nunca o removia, então as seis peças iam se empilhando na borda
+  // esquerda, três delas opacas, tapando o lugar da vizinha. O conserto não
+  // foi insistir na saída, foi não ter saída nenhuma.
+  //
+  // As peças a partir da distância 2 ficam montadas no mesmo lugar da
+  // vizinha, porém invisíveis. Assim a que chega não aparece do nada: ela
+  // já estava ali, parada, e só acende. E a que sai apaga sem sair do
+  // lugar. O que o `layout` anima é só o percurso de quem muda de slot.
+  //
+  // Fica montado o que está a duas casas de distância, e não a lista toda:
+  // com seis peças dá no mesmo, mas a vitrine cresce com o uso do painel.
+  const aoRedor = useMemo(() => {
+    const n = pecas.length;
+    if (n === 0) return [];
+    return pecas
+      .map((peca, i) => {
+        let d = (i - indice + n) % n;
+        if (d > n / 2) d -= n;
+        return { peca, d, chave: peca.src };
+      })
+      .filter(({ d }) => Math.abs(d) <= 2);
+  }, [pecas, indice]);
+
   // Os dois textos do card de vidro, vindos dos dois campos do painel.
   //
   // Legenda é o nome da peça ("Forte Energy"); Descrição da imagem é o que
@@ -349,49 +381,114 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
               posicionar contra este contêiner como sempre fizeram — sem
               duplicar nenhuma delas no JSX. */}
           <div className="mx-auto flex w-full max-w-[420px] flex-col gap-4 sm:relative sm:block sm:h-[560px] sm:max-w-[520px] lg:h-[600px] lg:max-w-none">
-            <div className="relative aspect-[4/5] sm:contents">
-            {/* Bloco salmão. Começa mais baixo que o vídeo, e é isso que faz o
-                vídeo sair por cima dele, como na referência. */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.25, ease: FACIL }}
-              className="absolute inset-x-0 bottom-[6%] top-[6%] rounded-[26px] bg-salmon sm:inset-x-auto sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
-            >
-              {pecas.length === 0 && (
+            {/* O recorte existe só no celular.
+
+                Os vizinhos avançam para fora da caixa de propósito, para
+                sobrar só a tira de cada lado. Sem recorte eles seguiam até a
+                borda da tela e o conjunto deixava de ter forma: a composição
+                virava uma faixa de imagens correndo de ponta a ponta.
+
+                Do tablet para cima o invólucro some (sm:contents) e o recorte
+                vai junto — lá os cards precisam cruzar as bordas. */}
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[26px] sm:contents">
+            {/* O bloco salmão, só quando não há peça nenhuma.
+
+                Ele existia para preencher o espaço em volta do vídeo. Com
+                os vizinhos ocupando as laterais, passou a aparecer apenas
+                como sobra de cor nas bordas — e cor sobrando sem função é
+                o que faz uma composição parecer montada no susto.
+
+                Continua de pé para o dia em que a vitrine estiver vazia:
+                aí ele segura o lugar com o sinal da marca, em vez de
+                deixar um buraco na abertura. */}
+            {pecas.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.25, ease: FACIL }}
+                className="absolute inset-x-0 bottom-[6%] top-[6%] rounded-[26px] bg-salmon sm:inset-x-auto sm:bottom-[2%] sm:left-[9%] sm:right-[27%] sm:top-[9%]"
+              >
                 <span
                   aria-hidden
                   className="absolute inset-0 flex items-center justify-center font-heading text-[12rem] font-bold leading-none text-preto/15"
                 >
                   +
                 </span>
-              )}
-            </motion.div>
-
-            {/* Moldura em 9:16 exato, que é como a agência exporta os vídeos.
-                A altura manda e a largura sai da proporção: antes a largura era
-                uma fatia da coluna, a proporção variava com a tela, e no celular
-                ela ficava em 0,41, cortando 27% das laterais de cada vídeo.
-
-                No celular fica centralizada e um pouco mais baixa, para o bloco
-                salmão aparecer dos lados, como na referência. */}
-            {pecas.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.4, ease: FACIL }}
-                className="absolute left-1/2 top-1/2 aspect-[9/16] h-[94%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[22px] bg-preto shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:left-[17%] sm:top-0 sm:h-[96%] sm:translate-x-0 sm:translate-y-0"
-              >
-                <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
               </motion.div>
             )}
 
+            {/* O carrossel: os mesmos cartões trocando de lugar.
+
+                Não é o do meio que troca de conteúdo — são os mesmos
+                elementos andando de posição. O do meio desce para a
+                esquerda, o da direita sobe para o meio, e a seguinte toma o
+                lugar vago à direita. Por isso cada cartão é identificado
+                pela peça, e nunca pela posição: assim o React reaproveita o
+                mesmo elemento quando ele muda de lugar, e há o que animar.
+
+                Quem anima é o `layout` do motion: ele mede a caixa antes e
+                depois e percorre a diferença. É por isso que as posições
+                aqui são left/right/top e nunca translate — transform do CSS
+                briga com o transform que o próprio motion usa para o
+                percurso, e o cartão chega torto.
+
+                As de fora são imagem parada e desfocada. Três <video>
+                tocando ao mesmo tempo seria triplicar o dado de quem abre o
+                site no celular para enfeitar duas tiras de 50 pixels — e a
+                capa já é o primeiro quadro do vídeo. */}
+            {aoRedor.map(({ peca, d, chave }) => (
+              <motion.div
+                key={chave}
+                layout
+                aria-hidden={d !== 0}
+                transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+                /* A opacidade é do CSS, e não do motion.
+
+                   Com ela no `animate`, o motion escrevia `opacity: 0` em
+                   todos os cartões e nunca voltava atrás: a abertura ficava
+                   invisível depois da primeira volta. Ele continua cuidando
+                   do percurso, que é o que o `layout` sabe fazer e o CSS
+                   não; o acender e o apagar viram uma transição simples,
+                   que não depende de ciclo de animação nenhum e já vem
+                   certa do servidor. */
+                className={`absolute overflow-hidden rounded-[22px] bg-preto transition-opacity duration-500 ${
+                  d === 0
+                    ? "left-[17%] top-[3%] aspect-[9/16] h-[94%] shadow-[0_40px_80px_-30px_rgba(10,10,8,0.55)] sm:top-0 sm:h-[96%]"
+                    : d < 0
+                      ? "left-0 top-[10%] aspect-[9/16] h-[80%] sm:top-[9%] sm:h-[82%]"
+                      : "right-0 top-[10%] aspect-[9/16] h-[80%] sm:top-[9%] sm:h-[82%]"
+                } ${
+                  d === 0
+                    ? "z-[2] opacity-100"
+                    : Math.abs(d) === 1
+                      ? "z-[1] opacity-100"
+                      : "z-0 opacity-0"
+                }`}
+              >
+                {d === 0 ? (
+                  <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
+                ) : (
+                  <Image
+                    src={peca.src}
+                    alt=""
+                    fill
+                    sizes="220px"
+                    className="scale-110 object-cover blur-[6px] brightness-75"
+                  />
+                )}
+              </motion.div>
+            ))}
+
             </div>
 
-            {/* As informações. No celular descem em fila sob o vídeo; do
+            {/* As informações. No celular sobem por cima do pé do vídeo; do
                 tablet para cima este invólucro some e elas voltam a flutuar
-                sobre a colagem. */}
-            <div className="flex flex-col gap-3 sm:contents">
+                sobre a colagem.
+
+                A margem negativa é o que cria a sobreposição: encostada
+                abaixo, a legenda parecia um bloco solto depois da imagem;
+                montada em cima dela, as duas viram uma peça só. */}
+            <div className="-mt-20 flex flex-col gap-3 sm:mt-0 sm:contents">
 
             {/* Card de vidro: de quem é o vídeo que está passando. */}
             {atual && (
@@ -399,29 +496,39 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
               // cobria metade do vídeo, e o miolo do vídeo é onde está o assunto.
               <motion.div
                 {...surgir(0.9, -16)}
-                className="z-10 w-full sm:absolute sm:bottom-auto sm:left-0 sm:top-[24%] sm:w-auto"
+                className="relative z-10 w-full sm:absolute sm:bottom-auto sm:left-0 sm:top-[24%] sm:w-auto"
               >
-                {/* A seta divide a linha com o ícone, em cima, e não com o nome:
-                    nome de cliente é longo, e ao lado da seta sobravam 90px no
-                    celular, cortando "Brazauto Cajazeiras" no meio. */}
+                {/* Duas montagens do mesmo card.
+
+                    No celular é uma linha só: barrinhas, textos e seta lado
+                    a lado. Com o ícone numa linha própria em cima, o card
+                    ficava alto demais para um lugar onde ele monta por cima
+                    do vídeo — e a altura ali é tudo.
+
+                    Do tablet para cima volta ao desenho de antes: ícone e
+                    seta em cima, textos embaixo. Ali o card é estreito, e
+                    nome de cliente ao lado da seta sobrava 90px e cortava
+                    "Brazauto Cajazeiras" no meio.
+
+                    A virada é por ordem e quebra, sem repetir o conteúdo:
+                    em sm o conjunto passa a quebrar linha, a seta recebe
+                    ml-auto e os textos tomam a largura toda, caindo para a
+                    segunda linha. */}
                 <motion.div
                   {...flutuar(0)}
                   className="w-full rounded-2xl border border-branco/70 bg-cartao/70 p-3.5 shadow-[0_24px_50px_-26px_rgba(10,10,8,0.5)] backdrop-blur-xl sm:w-[220px] sm:p-4"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <span aria-hidden className="flex items-end gap-[3px] pt-1">
+                  <div className="flex items-center gap-3 sm:flex-wrap sm:items-start sm:gap-0">
+                    <span
+                      aria-hidden
+                      className="flex shrink-0 items-end gap-[3px] sm:order-1 sm:pt-1"
+                    >
                       <span className="h-2.5 w-[5px] rounded-sm bg-salmon/55" />
                       <span className="h-4 w-[5px] rounded-sm bg-salmon/75" />
                       <span className="h-6 w-[5px] rounded-sm bg-salmon" />
                     </span>
-                    <Link
-                      href="/#nosso-trabalho"
-                      aria-label="Ver todo o trabalho"
-                      className="-mr-1.5 -mt-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-tinta/15 text-tinta transition-colors duration-500 hover:bg-tinta hover:text-fundo"
-                    >
-                      <SetaDiagonal />
-                    </Link>
-                  </div>
+
+                    <div className="min-w-0 flex-1 sm:order-3 sm:w-full sm:flex-none">
                   {/* Três degraus, e cada um vem de um lugar:
 
                         Agora passando  ... o estado, dado pelo tipo da peça
@@ -437,31 +544,43 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                       legenda, senão o card repetiria a mesma frase duas vezes
                       em corpos diferentes. Campo vazio chega como texto vazio,
                       e não como ausente, por isso os trim(). */}
-                  <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-tinta/50">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-tinta/50 sm:mt-3">
                     {atual.tipo === "video" ? "Agora passando" : "Do nosso trabalho"}
                   </p>
 
-                  {tituloDaPeca && (
-                    <p className="mt-1.5 line-clamp-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-tinta">
-                      {tituloDaPeca}
-                    </p>
-                  )}
+                      {tituloDaPeca && (
+                        <p className="mt-1 line-clamp-2 text-[17px] font-bold leading-tight tracking-[-0.01em] text-tinta sm:mt-1.5">
+                          {tituloDaPeca}
+                        </p>
+                      )}
 
-                  {descricaoDaPeca && (
-                    <p className="mt-1.5 line-clamp-2 text-xs leading-snug text-tinta/60">
-                      {descricaoDaPeca}
-                    </p>
-                  )}
+                      {descricaoDaPeca && (
+                        <p className="mt-1 line-clamp-2 text-xs leading-snug text-tinta/60 sm:mt-1.5">
+                          {descricaoDaPeca}
+                        </p>
+                      )}
+                    </div>
+
+                    <Link
+                      href="/#nosso-trabalho"
+                      aria-label="Ver todo o trabalho"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-tinta/15 text-tinta transition-colors duration-500 hover:bg-tinta hover:text-fundo sm:-mr-1.5 sm:-mt-1.5 sm:order-2 sm:ml-auto"
+                    >
+                      <SetaDiagonal />
+                    </Link>
+                  </div>
                 </motion.div>
               </motion.div>
             )}
 
             {/* Bolhas: duas frentes e a de "digitando", que leva às outras.
 
-                No celular viram uma fila deitada sob a legenda. Em coluna,
-                encostadas à direita, elas saíam pela borda da tela e
-                cobriam o vídeo — era a peça que mais sujava a composição. */}
-            <div className="z-10 flex flex-wrap items-center gap-2 sm:absolute sm:right-0 sm:top-[20%] sm:flex-col sm:flex-nowrap sm:items-start sm:gap-2.5">
+                Fora do celular. Em coluna encostadas à direita elas saíam
+                pela borda e cobriam o vídeo; deitadas sob a legenda,
+                quebravam em duas linhas e só acrescentavam ruído a uma
+                abertura que já diz o que precisa. As oito frentes estão
+                logo abaixo, nos cards de serviço. */}
+            <div className="hidden sm:absolute sm:right-0 sm:top-[20%] sm:z-10 sm:flex sm:flex-col sm:items-start sm:gap-2.5">
               {frentes.map((s, i) => (
                 <motion.div key={s.slug} {...surgir(1.05 + i * 0.12, 16)}>
                   <motion.span
@@ -509,7 +628,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                 // telefone competem entre si, e o trilho de "Nosso trabalho"
                 // logo abaixo já mostra as peças. Na tela grande ele cabe e
                 // compõe.
-                className="hidden sm:absolute sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:block sm:w-[196px]"
+                className="hidden sm:absolute sm:bottom-auto sm:right-[2%] sm:top-[46%] sm:z-10 sm:block sm:w-[196px]"
               >
                 <motion.div
                   {...flutuar(1.1)}

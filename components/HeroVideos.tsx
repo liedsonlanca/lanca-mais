@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { type PecaVitrine } from "@/lib/showcase";
 
 // Os vídeos da abertura da home.
@@ -132,16 +132,15 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
         : `${atual.video}#t=0.1`
       : null;
 
+  // Sem animação aqui dentro.
+  //
+  // Este componente já esmaeceu e já deslizou de uma peça para a outra.
+  // Agora quem se move é o carrossel da abertura, que leva o cartão
+  // inteiro de uma posição para a outra — e este player viaja junto,
+  // dentro dele. Animar também aqui seria movimento em cima de
+  // movimento, e a peça chegaria torta no fim do percurso.
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
-      <motion.div
-        key={indice}
-        initial={{ opacity: 0, scale: 1.04 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-0"
-      >
+    <div className="absolute inset-0">
         {enderecoVideo ? (
           <video
             ref={ref}
@@ -173,7 +172,6 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
             className="object-cover"
           />
         )}
-      </motion.div>
-    </AnimatePresence>
+    </div>
   );
 }
