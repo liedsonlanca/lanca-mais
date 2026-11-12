@@ -297,6 +297,40 @@ body:has(.pagina-legal-fechada) footer {
   animation: marquee 38s linear infinite;
 }
 
+/* A entrada do cabeçalho.
+
+   Era uma animação do motion, em JavaScript, e isso tinha um custo que
+   só aparecia no ar: o motion escreve o estado inicial no HTML, então a
+   página chegava ao navegador com style="opacity:0" no cabeçalho. O menu
+   só existia depois que o JavaScript baixasse e hidratasse — e enquanto
+   isso não acontecia, não havia menu nenhum. Numa conexão ruim, isso é
+   um site sem navegação; com o JavaScript bloqueado, é para sempre.
+
+   Em CSS a animação roda sozinha, sem esperar nada, e o cabeçalho existe
+   no HTML desde o primeiro byte. */
+@keyframes entrada-do-cabecalho {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.entrada-do-cabecalho {
+  animation: entrada-do-cabecalho 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s
+    both;
+}
+
+/* Quem pede menos movimento recebe o cabeçalho pronto, sem entrada. */
+@media (prefers-reduced-motion: reduce) {
+  .entrada-do-cabecalho {
+    animation: none;
+  }
+}
+
 .animate-marquee:hover {
   animation-play-state: paused;
 }

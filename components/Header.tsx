@@ -177,11 +177,17 @@ export default function Header({
 
   return (
     <>
-      <motion.header
-        initial={{ y: -24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-        className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
+      {/* <header> comum, e não motion.header.
+
+          O motion escreve o estado inicial no HTML, então a página chegava
+          ao navegador com style="opacity:0" aqui. O menu só passava a
+          existir depois que o JavaScript baixasse e hidratasse: numa
+          conexão ruim, o site ficava sem navegação por segundos; com o
+          JavaScript bloqueado, para sempre.
+
+          A entrada virou animação de CSS, que roda sem esperar nada. */}
+      <header
+        className={`entrada-do-cabecalho fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
           claroEmCima ? "tema-claro" : ""
         } ${
           rolou || aberto
@@ -301,7 +307,7 @@ export default function Header({
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* Menu em tela cheia.
           Antes era uma lista de texto grande solta no branco, sem nada que
