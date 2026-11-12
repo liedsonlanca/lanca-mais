@@ -100,18 +100,24 @@ export function Botao({
 }: {
   href: string;
   children: React.ReactNode;
-  variante?: "cheio" | "vazado" | "contraste";
+  variante?: "cheio" | "vazado" | "contraste" | "sobre-foto";
 }) {
   const fundo = {
     cheio: "bg-botao text-branco",
     vazado: "border border-tinta/25 text-tinta hover:border-tinta",
     contraste: "bg-preto text-bege",
+    // sobre-foto: o secundário do fecho, que pousa sobre a foto
+    // escurecida. As cores ali são fixas, e não do tema — um painel que
+    // caia claro na alternância deixaria text-tinta invisível sobre o
+    // véu preto.
+    "sobre-foto": "border border-bege/35 text-bege hover:border-bege",
   }[variante];
 
   const disco = {
     cheio: "bg-preto text-branco",
     vazado: "bg-tinta/10 text-tinta",
     contraste: "bg-salmon text-preto",
+    "sobre-foto": "bg-bege/15 text-bege",
   }[variante];
 
   return (

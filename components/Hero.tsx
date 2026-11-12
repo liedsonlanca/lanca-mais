@@ -592,12 +592,15 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
           </div>
 
           <div className="flex shrink-0 items-center justify-between gap-4 lg:justify-end">
-            <p className="max-w-[190px] text-[13px] leading-snug text-tinta/60">
-              Sua marca pode ser a próxima a mudar de patamar.
+            {/* A primeira tela também precisa oferecer o degrau de baixo:
+                quem nunca rola não chega ao diagnóstico que está no meio
+                da página. O orçamento continua no menu, sempre à vista. */}
+            <p className="max-w-[210px] text-[13px] leading-snug text-tinta/60">
+              Diagnóstico gratuito da sua marca, em 2 minutos.
             </p>
             <Link
-              href="/contato"
-              aria-label="Falar com a LANÇA+"
+              href="/diagnostico"
+              aria-label="Fazer o diagnóstico gratuito"
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-tinta text-fundo transition-transform duration-500 hover:rotate-45"
             >
               <SetaDiagonal />

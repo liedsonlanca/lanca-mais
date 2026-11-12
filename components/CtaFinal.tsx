@@ -10,6 +10,9 @@ type Props = {
   realce?: string;
   lead?: string;
   rotulo?: string;
+  /** Para onde o botão leva. O padrão é o orçamento; as telas que
+   *  oferecem o diagnóstico apontam para ele. */
+  href?: string;
 };
 
 // Colore só a palavra-chave dentro da linha, como fazem os títulos de seção.
@@ -38,6 +41,7 @@ export default function CtaFinal({
   realce,
   lead,
   rotulo = "Solicitar orçamento",
+  href = "/contato",
 }: Props) {
   return (
     <section className="relative overflow-hidden bg-fundo">
@@ -57,7 +61,7 @@ export default function CtaFinal({
 
         <Reveal delay={0.25}>
           <Link
-            href="/contato"
+            href={href}
             className="mt-10 inline-block rounded-full bg-botao px-9 py-4 font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)] transition-all duration-500 hover:shadow-[0_0_64px_-4px_var(--color-salmon)]"
           >
             {rotulo}

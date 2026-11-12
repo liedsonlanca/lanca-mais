@@ -256,8 +256,25 @@ export default async function Home() {
               <span className="text-destaque">resolvendo isso.</span>
             </p>
 
+            {/* O melhor lugar do site para este botão.
+
+                Ele fica logo depois dos três sintomas, no instante em que
+                a pessoa acabou de se reconhecer no problema. O texto já
+                prometia diagnóstico desde sempre; o que faltava era o
+                diagnóstico existir. Até aqui ele entregava um formulário
+                de contato, que é outra coisa e pede muito mais de quem
+                ainda não decidiu nada. */}
             <div className="shrink-0">
-              <Botao href="/contato">Receber um diagnóstico</Botao>
+              <Botao href="/diagnostico">Receber um diagnóstico</Botao>
+
+              {/* As três objeções que travam o clique, respondidas antes
+                  de serem feitas: quanto custa, quanto demora e no que
+                  dá. A última é a que mais importa — quem sabe que vai
+                  marcar uma conversa chega disposto a conversar, e esse
+                  é o lead que vale. */}
+              <p className="mt-3 max-w-[22rem] text-sm leading-snug text-tinta/55">
+                Gratuito, leva 2 minutos e termina com um horário marcado.
+              </p>
             </div>
           </div>
         </Miolo>
@@ -558,9 +575,23 @@ export default async function Home() {
             ponto de partida que faz sentido para ela.
           </p>
 
-          <div className="mt-9 flex justify-center">
-            <Botao href="/contato">Pedir orçamento</Botao>
+          {/* Dois degraus, e não um.
+
+              O site terminava só em "Pedir orçamento", que é um pedido
+              alto para quem chegou aqui ainda decidindo. O diagnóstico é
+              o degrau de baixo: gratuito, curto e sem compromisso de
+              compra. Quem já decidiu continua tendo o orçamento ao lado,
+              agora como segunda opção em vez de única porta. */}
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Botao href="/diagnostico">Receber um diagnóstico</Botao>
+            <Botao href="/contato" variante="sobre-foto">
+              Pedir orçamento
+            </Botao>
           </div>
+
+          <p className="mt-5 text-sm text-bege/50">
+            O diagnóstico é gratuito e leva 2 minutos.
+          </p>
         </div>
       </div>
     </Painel>
