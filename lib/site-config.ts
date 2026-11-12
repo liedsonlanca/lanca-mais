@@ -38,6 +38,7 @@ export const navLinks = [
   { href: "/portfolio", label: "Portfólio" },
   { href: "/sobre", label: "Sobre" },
   ...(BLOG_ATIVO ? [{ href: "/blog", label: "Blog" }] : []),
+  { href: "/diagnostico", label: "Diagnóstico" },
   { href: "/contato", label: "Contato" },
 ];
 

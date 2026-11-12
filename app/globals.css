@@ -180,6 +180,22 @@ body:has(.pagina-em-breve) .botao-whatsapp {
   display: none;
 }
 
+/* Página imersiva: o conteúdo ocupa a tela e a moldura do site sai.
+
+   Usada no diagnóstico, que é um fluxo de catorze passos vindo do CRM e traz
+   o próprio logo e a própria barra de progresso. Com o cabeçalho do site por
+   cima apareciam dois LANÇA+ a cem pixels um do outro, e o botão do WhatsApp
+   boiava sobre o formulário.
+
+   Tirar a navegação numa tela de conversão não é perda: é o mesmo motivo
+   pelo qual um checkout esconde o menu. Quem precisa sair tem o botão de
+   voltar da própria página. */
+body:has(.pagina-imersiva) header,
+body:has(.pagina-imersiva) footer,
+body:has(.pagina-imersiva) .botao-whatsapp {
+  display: none;
+}
+
 /* O botão do WhatsApp é z-50 para flutuar sobre o conteúdo, e o menu em tela
    cheia é z-40 (abaixo do header, que precisa manter o botão de fechar
    acessível). Sem isto o botão fica boiando sobre o menu aberto. */

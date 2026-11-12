@@ -18,7 +18,7 @@ import type { NextConfig } from "next";
 //   base-uri     impede injetar <base> e sequestrar todo link relativo;
 //   form-action  impede que um formulário da página poste em site de fora;
 //   object-src   mata <object> e <embed>, que são plugins e não têm uso aqui;
-//   frame-src    só o mapa do rodapé pode ser embutido, mais nada;
+//   frame-src    só o mapa do rodapé e o diagnóstico do CRM, mais nada;
 //   img/media    prendem imagem e vídeo ao próprio site e ao Blob da Vercel;
 //   connect-src  limita para onde a página pode falar, então dado roubado não
 //                tem para onde ir.
@@ -106,7 +106,9 @@ function politicaDeConteudo(desenvolvimento: boolean) {
     "frame-ancestors 'none'",
     // O único iframe do site é o mapa do rodapé. Liberar a origem exata do
     // Google Maps mantém a porta fechada para todo o resto.
-    "frame-src https://www.google.com",
+    // Dois embutidos, e mais nada: o mapa do rodapé e o diagnóstico, que
+    // mora no CRM da agência e aparece dentro de /diagnostico.
+    "frame-src https://www.google.com https://cliente.lancamais.com",
     `script-src 'self' 'unsafe-inline' ${juntar(ANALYTICS.script, PIXEL.script)}${desenvolvimento ? " 'unsafe-eval'" : ""}`,
     // Sem esta linha os workers caem no script-src, que nao tem blob: — e o
     // conversor de HEIC do painel, que descompacta a foto do iPhone num

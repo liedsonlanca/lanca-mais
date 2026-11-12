@@ -16,8 +16,8 @@ import { useSyncExternalStore } from "react";
 // com o conteúdo. Mora no vão que o topo das páginas internas já deixa vazio
 // por causa do menu fixo, então não empurra nada para baixo.
 
-/** Onde o botão não aparece. */
-const SEM_VOLTAR = ["/", "/em-breve", "/manutencao"];
+/** Onde o botão não aparece. O diagnóstico tem a própria faixa de saída. */
+const SEM_VOLTAR = ["/", "/em-breve", "/manutencao", "/diagnostico"];
 
 function Seta() {
   return (
