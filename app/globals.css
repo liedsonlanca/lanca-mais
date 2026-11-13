@@ -180,19 +180,24 @@ body:has(.pagina-em-breve) .botao-whatsapp {
   display: none;
 }
 
-/* Página imersiva: o conteúdo ocupa a tela e a moldura do site sai.
+/* Aqui havia a regra da "página imersiva", que escondia cabeçalho, rodapé e o
+   botão do WhatsApp.
 
-   Usada no diagnóstico, que é um fluxo de catorze passos vindo do CRM e traz
-   o próprio logo e a própria barra de progresso. Com o cabeçalho do site por
-   cima apareciam dois LANÇA+ a cem pixels um do outro, e o botão do WhatsApp
-   boiava sobre o formulário.
+   Existia por causa do diagnóstico: o fluxo vem do CRM e traz o próprio logo,
+   e com o do site por cima apareciam dois LANÇA+ a cem pixels um do outro.
+   Esconder tudo resolvia a duplicata e cobrava caro por isso — quem chegava
+   ali por um anúncio via uma tela sem navegação nenhuma.
 
-   Tirar a navegação numa tela de conversão não é perda: é o mesmo motivo
-   pelo qual um checkout esconde o menu. Quem precisa sair tem o botão de
-   voltar da própria página. */
-body:has(.pagina-imersiva) header,
-body:has(.pagina-imersiva) footer,
-body:has(.pagina-imersiva) .botao-whatsapp {
+   O conserto passou a ser estreito, e feito no componente: só o logo sai do
+   cabeçalho naquela página (noDiagnostico, em components/Header.tsx). Com
+   isso nenhuma página precisa mais esconder a moldura do site.
+
+   Do antigo bloco sobrou só isto. O botão flutuante do WhatsApp continua
+   fora do diagnóstico, e por um motivo que não mudou: ele boia sobre o
+   conteúdo, e num formulário de catorze passos acaba em cima do botão de
+   avançar. O cabeçalho e o rodapé entregam o WhatsApp a quem quiser, sem
+   ficar por cima de nada. */
+body:has(.sem-botao-flutuante) .botao-whatsapp {
   display: none;
 }
 

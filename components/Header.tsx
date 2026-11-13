@@ -148,6 +148,17 @@ export default function Header({
   // Com o menu cheio aberto, o que está embaixo é o menu, que é escuro.
   const claroEmCima = sobreClaro && !aberto;
 
+  // A página do diagnóstico pede um cabeçalho reduzido.
+  //
+  // Ela embute o fluxo do CRM, que traz o próprio logo. Com o logo daqui por
+  // cima, apareciam dois LANÇA+ a cem pixels um do outro — foi por isso que a
+  // página começou escondendo o cabeçalho inteiro. Escondendo só o logo, a
+  // navegação volta e a duplicata não.
+  //
+  // O botão também sai: ele leva para esta mesma página, e botão que leva para
+  // onde a pessoa já está é um beco com aparência de saída.
+  const noDiagnostico = pathname === "/diagnostico";
+
   // Fecha o menu ao trocar de página.
   //
   // Ajuste durante a renderização, e não num efeito. Num efeito, o React
@@ -218,6 +229,13 @@ export default function Header({
               As duas medidas moram em caixas diferentes de propósito: os logos
               usam `fill`, então esticar a caixa do link esticaria o logo
               junto. A caixa interna preserva o tamanho desenhado. */}
+          {/* No lugar do logo, um espaço do mesmo tamanho.
+              A linha é justify-between: com um filho a menos, a navegação
+              escorregaria para a esquerda e o cabeçalho mudaria de desenho
+              nesta página só. O vão mantém o arranjo de pé. */}
+          {noDiagnostico ? (
+            <span aria-hidden className="h-11 w-[110px] shrink-0" />
+          ) : (
           <Link
             href="/"
             aria-label="LANÇA+, página inicial"
@@ -248,6 +266,7 @@ export default function Header({
               />
             </span>
           </Link>
+          )}
 
           <nav className="hidden items-center gap-9 lg:flex">
             {navLinks.map((link) => {
@@ -275,6 +294,7 @@ export default function Header({
           </nav>
 
           <div className="flex items-center gap-4">
+            {!noDiagnostico && (
             <Link
               // O único pedido do site, e por isso o único botão fixo.
               //
@@ -304,6 +324,7 @@ export default function Header({
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </Link>
+            )}
 
             <button
               type="button"
@@ -443,15 +464,24 @@ export default function Header({
                 transition={{ duration: 0.6, delay: 0.46, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-auto pt-12"
               >
-                <Link
-                  href="/diagnostico"
-                  onClick={() => setAberto(false)}
-                  className="block rounded-full bg-botao px-7 py-4 text-center font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)]"
-                >
-                  Fazer diagnóstico
-                </Link>
+                {/* O mesmo motivo do botão do topo: nesta página ele levaria
+                    para ela mesma. Os canais abaixo ficam, porque continuam
+                    levando para outro lugar. */}
+                {!noDiagnostico && (
+                  <Link
+                    href="/diagnostico"
+                    onClick={() => setAberto(false)}
+                    className="block rounded-full bg-botao px-7 py-4 text-center font-medium text-branco shadow-[0_0_40px_-8px_var(--color-salmon)]"
+                  >
+                    Fazer diagnóstico
+                  </Link>
+                )}
 
-                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-tinta/55">
+                <div
+                  className={`flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-tinta/55 ${
+                    noDiagnostico ? "" : "mt-6"
+                  }`}
+                >
                   <a
                     href={`https://wa.me/${siteConfig.whatsappNumber}`}
                     target="_blank"

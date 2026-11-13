@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 
 // O diagnóstico, dentro do site.
@@ -16,35 +15,46 @@ import type { Metadata } from "next";
 // frame-src em next.config.ts. É o segundo embutido que o site aceita, ao lado
 // do mapa do rodapé, e os dois são de origem conhecida.
 //
-// ---------- Por que a moldura do site sai daqui ----------
+// ---------- Por que o cabeçalho voltou ----------
 //
-// O fluxo traz o próprio logo e a própria barra de progresso. Com o cabeçalho
-// do site por cima, apareciam dois LANÇA+ a cem pixels um do outro, com o
-// botão de voltar espremido entre eles, e o botão do WhatsApp boiava sobre o
-// formulário. Lido de fora, parecia defeito.
+// Esta página já foi imersiva: escondia cabeçalho, rodapé e o botão do
+// WhatsApp, e punha no lugar uma faixa fina com "Voltar ao site". Existia por
+// um motivo real — o fluxo traz o próprio logo, e com o do site por cima
+// apareciam dois LANÇA+ a cem pixels um do outro, com o botão de voltar
+// espremido entre eles.
 //
-// Então a página é imersiva: o fluxo recebe a tela, e no lugar do cabeçalho
-// fica só a faixa fina daqui, com a saída. Esconder a navegação numa tela de
-// conversão é o mesmo que um checkout faz — e por isso a faixa existe, para
-// que sair continue sendo uma escolha, e não um beco.
+// O preço disso era alto: quem chegava aqui por um anúncio ou por um link
+// solto caía numa tela sem navegação nenhuma, sem saber que havia um site em
+// volta. Uma faixa com "Voltar" é menos que um menu — diz que existe uma
+// saída, e não o que há do outro lado dela.
 //
-// O conserto definitivo é do outro lado: se o CRM aceitar um parâmetro que
-// esconda o logo dele quando a página for embutida, o cabeçalho do site pode
-// voltar e os dois conviverem.
+// O conserto certo era mais estreito do que esconder tudo: o cabeçalho ficou,
+// e só o logo saiu dele (ver noDiagnostico em components/Header.tsx). A
+// duplicata some, a navegação volta, e o rodapé abaixo entrega os canais a
+// quem rolar. O botão de "Fazer diagnóstico" também sai, porque levaria para
+// esta mesma página.
 //
-// ---------- Por que ocupa toda a altura ----------
+// ---------- Por que o fluxo ocupa a tela toda menos o cabeçalho ----------
 //
 // Formulário de catorze passos dentro de uma caixinha com rolagem própria é o
 // jeito mais confiável de fazer alguém desistir no meio. Aqui cada passo cabe
-// sem rolar.
+// sem rolar, e quem quiser o rodapé rola a página, não o fluxo.
 //
 // svh, e não vh: no celular a barra do navegador entra e sai, e vh conta a
 // tela sem ela — o que deixaria o pé do fluxo escondido atrás da barra.
+//
+// A reserva do cabeçalho é a mesma medida nos dois lugares, por isso mora numa
+// constante só: se o cabeçalho mudar de altura, muda aqui e o fluxo acompanha.
 
 const ENDERECO = "https://cliente.lancamais.com/flow/diagnostico";
 
-/** Altura da faixa de saída. O resto da tela é do fluxo. */
-const FAIXA = 48;
+/**
+ * Quanto o cabeçalho fixo ocupa no topo.
+ *
+ * Medido no cabeçalho montado: 85px. Arredondado para cima, porque sobrar dois
+ * pixels não aparece e faltar dois corta a borda do primeiro passo do fluxo.
+ */
+const CABECALHO = "88px";
 
 export const metadata: Metadata = {
   title: "Diagnóstico",
@@ -55,37 +65,15 @@ export const metadata: Metadata = {
 
 export default function DiagnosticoPage() {
   return (
-    <div className="pagina-imersiva flex h-[100svh] flex-col bg-abismo">
-      {/* A faixa de saída. Texto, e não logo: um segundo LANÇA+ aqui traria
-          de volta exatamente o problema que esta página resolve. */}
-      <div
-        className="flex shrink-0 items-center px-6 lg:px-10"
-        style={{ height: FAIXA }}
-      >
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-2.5 text-sm font-medium text-bege/70 transition-colors duration-500 hover:text-bege"
-        >
-          <svg
-            aria-hidden
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-4 w-4 transition-transform duration-500 group-hover:-translate-x-1"
-          >
-            <path d="M19 12H5M11 18l-6-6 6-6" />
-          </svg>
-          Voltar ao site
-        </Link>
-      </div>
-
+    <div
+      className="sem-botao-flutuante bg-abismo"
+      style={{ paddingTop: CABECALHO }}
+    >
       <iframe
         src={ENDERECO}
         title="Diagnóstico LANÇA+"
-        className="block w-full flex-1 border-0"
+        className="block w-full border-0"
+        style={{ height: `calc(100svh - ${CABECALHO})` }}
       />
     </div>
   );
