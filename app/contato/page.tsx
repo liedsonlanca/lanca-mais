@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import PageHero from "@/components/PageHero";
 import CtaFinal from "@/components/CtaFinal";
+import FormularioOrcamento from "@/components/FormularioOrcamento";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 import { linkDoMapa } from "@/components/FooterMap";
@@ -9,19 +10,21 @@ import { siteConfig } from "@/lib/site-config";
 
 // Onde falar com a LANÇA+.
 //
-// ---------- Por que não há mais formulário ----------
+// ---------- Por que os canais vêm antes do formulário ----------
 //
-// Havia um, e ele não mandava nada para lugar nenhum: montava uma mensagem
-// com o que a pessoa digitara e abria o WhatsApp com esse texto pronto. Ou
-// seja, era o WhatsApp com quatro campos na frente.
+// Houve aqui um formulário que foi removido, e com razão: montava uma
+// mensagem e abria o WhatsApp, ou seja, era o WhatsApp com quatro campos
+// na frente. Quem chega já decidido a falar não deve pagar pedágio numa
+// porta que deveria estar aberta.
 //
-// Quem chega aqui já decidiu falar. Pedir nome, empresa, serviço e mensagem
-// antes de deixar isso acontecer é cobrar pedágio numa porta que deveria
-// estar aberta. Agora os canais são o conteúdo da página, e cada um abre no
-// lugar certo com um toque.
+// O que voltou não é aquilo. Os canais continuam sendo a primeira coisa da
+// página, cada um abrindo no lugar certo com um toque. O pedido de
+// orçamento vem depois deles, como segunda porta para quem quer passar por
+// ela — e porque orçamento, ao contrário de "oi", precisa de contexto para
+// ser respondido de primeira.
 //
-// Quem ainda não decidiu tem o diagnóstico, que é o pedido do site inteiro e
-// fecha esta página também.
+// Quem ainda não decidiu tem o diagnóstico, que é o pedido do site inteiro
+// e fecha esta página também.
 //
 // ---------- Por que o WhatsApp é maior que os outros ----------
 //
@@ -213,6 +216,12 @@ export default function ContatoPage() {
                 </span>
               </span>
             </a>
+          </Reveal>
+
+          {/* A segunda porta: mais larga, e opcional. Fica depois dos
+              canais de propósito — ver o comentário do topo. */}
+          <Reveal delay={0.25}>
+            <FormularioOrcamento />
           </Reveal>
         </div>
       </section>

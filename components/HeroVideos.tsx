@@ -109,6 +109,24 @@ export default function HeroVideos({ pecas, indice, aoTrocar }: Props) {
     avancar();
   }
 
+  // A peça que chega ao centro começa do zero.
+  //
+  // Ela já estava tocando na lateral, desfocada, e entraria no meio pelo
+  // ponto em que parou — a pessoa veria o fim de uma peça que nunca viu
+  // começar, que é exatamente o problema que os cinco segundos de corte
+  // vieram resolver no trilho inteiro.
+  //
+  // Na prática o elemento já nasce em zero, porque o cartão troca de
+  // componente ao mudar de posição e o <video> é outro. Isto aqui é para
+  // não depender disso: se um dia o React reaproveitar o elemento, o
+  // reinício continua garantido, e o custo de garantir é uma linha.
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    v.currentTime = 0;
+    if (!parado) v.play().catch(() => {});
+  }, [indice, parado]);
+
   // Aba escondida não precisa tocar: pausa, e volta quando a pessoa voltar.
   useEffect(() => {
     function aoMudarVisibilidade() {

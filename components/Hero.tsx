@@ -91,6 +91,93 @@ function SetaDiagonal({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
+/**
+ * A capa de um cartão lateral do carrossel.
+ *
+ * Era um <Image src={peca.src}> direto, e isso partia do princípio de que
+ * toda peça tem capa. Em produção nenhuma tinha: os <img> saíam com src
+ * vazio e naturalWidth 0, e o que sobrava era o bg-preto do cartão — três
+ * retângulos pretos nas laterais da abertura. O do meio aparecia porque toca
+ * o vídeo, e não a capa, e foi por isso que o defeito passou batido.
+ *
+ * Sem capa, a lateral mostra o primeiro quadro do próprio vídeo. É
+ * `preload="metadata"`, e não o arquivo inteiro: o navegador baixa só o
+ * cabeçalho e o começo, o bastante para pintar um quadro. Custa muito menos
+ * que tocar, e entrega a coisa certa em vez de um buraco.
+ *
+ * Quando houver capa cadastrada no painel, ela volta a ser usada e isto
+ * aqui não custa nada.
+ */
+function CapaDaVizinha({
+  peca,
+  parado,
+}: {
+  peca: PecaVitrine;
+  parado: boolean;
+}) {
+  const pintura =
+    "absolute inset-0 h-full w-full scale-110 object-cover blur-[6px] brightness-75";
+
+  // Capa cadastrada no painel ganha de tudo: é um arquivo pequeno, e já é
+  // exatamente o quadro que a agência escolheu mostrar.
+  if (peca.src) {
+    return (
+      <Image
+        src={peca.src}
+        alt=""
+        fill
+        sizes="220px"
+        className="scale-110 object-cover blur-[6px] brightness-75"
+      />
+    );
+  }
+
+  if (!peca.video) return null;
+
+  // Sem capa, é o próprio vídeo que aparece aqui.
+  //
+  // Quem pediu menos movimento vê um quadro parado, e só o cabeçalho do
+  // arquivo é baixado. O #t=0.1 existe porque muito vídeo abre com um
+  // quadro preto — que era justamente o sintoma que este componente veio
+  // consertar.
+  if (parado) {
+    return (
+      <video
+        src={`${peca.video}#t=0.1`}
+        muted
+        playsInline
+        preload="metadata"
+        aria-hidden
+        tabIndex={-1}
+        className={pintura}
+      />
+    );
+  }
+
+  // Tocando, em laço e sem som.
+  //
+  // Custa três vídeos no ar ao mesmo tempo, e o custo é real: triplica o
+  // dado de quem abre o site num celular com pacote. Foi uma escolha do
+  // cliente, de propósito, para que a abertura tenha movimento nos três
+  // cartões e não só no do meio.
+  //
+  // Em laço porque uma lateral que termina e congela volta a ser o
+  // retângulo parado que estávamos consertando.
+  return (
+    <video
+      src={peca.video}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden
+      tabIndex={-1}
+      className={pintura}
+    />
+  );
+}
+
 export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
   const reduzir = useReducedMotion();
 
@@ -468,13 +555,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                 {d === 0 ? (
                   <HeroVideos pecas={pecas} indice={indice} aoTrocar={aoTrocar} />
                 ) : (
-                  <Image
-                    src={peca.src}
-                    alt=""
-                    fill
-                    sizes="220px"
-                    className="scale-110 object-cover blur-[6px] brightness-75"
-                  />
+                  <CapaDaVizinha peca={peca} parado={Boolean(reduzir)} />
                 )}
               </motion.div>
             ))}
