@@ -10,18 +10,22 @@ import { siteConfig } from "@/lib/site-config";
 
 // Onde falar com a LANÇA+.
 //
-// ---------- Por que os canais vêm antes do formulário ----------
+// ---------- O formulário que voltou, e por que não é o antigo ----------
 //
 // Houve aqui um formulário que foi removido, e com razão: montava uma
 // mensagem e abria o WhatsApp, ou seja, era o WhatsApp com quatro campos
-// na frente. Quem chega já decidido a falar não deve pagar pedágio numa
-// porta que deveria estar aberta.
+// na frente. Pedia nome, empresa e serviço para fazer o que um toque no
+// botão verde já fazia.
 //
-// O que voltou não é aquilo. Os canais continuam sendo a primeira coisa da
-// página, cada um abrindo no lugar certo com um toque. O pedido de
-// orçamento vem depois deles, como segunda porta para quem quer passar por
-// ela — e porque orçamento, ao contrário de "oi", precisa de contexto para
-// ser respondido de primeira.
+// O que voltou não é aquilo: o pedido vai para o CRM da agência, pela rota
+// em app/api/orcamento. Ele existe porque orçamento, ao contrário de "oi",
+// precisa de contexto para ser respondido de primeira — e o que a pessoa
+// escreve aqui poupa a ela as três perguntas que viriam depois.
+//
+// Ele abre a página, acima dos canais. Ficava embaixo, e subiu a pedido do
+// cliente. O custo existe e está assumido: quem chega decidido a falar
+// passa por ele antes de achar o WhatsApp. O que compensa é que os canais
+// vêm logo abaixo, sem rolagem, e o próprio texto do formulário diz isso.
 //
 // Quem ainda não decidiu tem o diagnóstico, que é o pedido do site inteiro
 // e fecha esta página também.
@@ -131,9 +135,20 @@ export default function ContatoPage() {
 
       <section className="relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-5xl px-6 py-12 lg:px-10 lg:py-16">
+          {/* O pedido de orçamento abre a página.
+
+              Ele ficava embaixo dos canais, e subiu a pedido. A troca é
+              real: quem chega decidido a falar agora passa por ele antes de
+              achar o WhatsApp, e em compensação quem chega para pedir preço
+              encontra o formulário sem rolar. Os canais seguem logo abaixo,
+              e o próprio texto do formulário aponta para eles. */}
+          <Reveal>
+            <FormularioOrcamento />
+          </Reveal>
+
           {/* O WhatsApp ocupa a linha inteira; os outros dividem a de baixo.
               A hierarquia é a do atendimento real, não a do alfabeto. */}
-          <Stagger className="grid gap-4 sm:grid-cols-2">
+          <Stagger className="mt-4 grid gap-4 sm:grid-cols-2">
             {CANAIS.map((canal) => (
               <StaggerItem
                 key={canal.nome}
@@ -216,12 +231,6 @@ export default function ContatoPage() {
                 </span>
               </span>
             </a>
-          </Reveal>
-
-          {/* A segunda porta: mais larga, e opcional. Fica depois dos
-              canais de propósito — ver o comentário do topo. */}
-          <Reveal delay={0.25}>
-            <FormularioOrcamento />
           </Reveal>
         </div>
       </section>

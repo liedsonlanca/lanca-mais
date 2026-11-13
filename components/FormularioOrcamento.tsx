@@ -137,7 +137,7 @@ export default function FormularioOrcamento() {
   // a mandar de novo, e o CRM ganha o mesmo lead duas vezes.
   if (desfecho) {
     return (
-      <div className="mt-4 rounded-3xl border border-salmon/40 bg-cartao p-8 text-center lg:p-10">
+      <div className="rounded-3xl border border-salmon/40 bg-cartao p-8 text-center lg:p-10">
         <h2 className="font-heading text-xl font-semibold tracking-[-0.02em] text-tinta lg:text-2xl">
           Recebemos seu pedido.
         </h2>
@@ -151,13 +151,14 @@ export default function FormularioOrcamento() {
   }
 
   return (
-    <div className="mt-4 rounded-3xl border border-contorno bg-cartao p-6 lg:p-8">
+    <div className="rounded-3xl border border-contorno bg-cartao p-6 lg:p-8">
       <h2 className="font-heading text-xl font-semibold leading-tight tracking-[-0.02em] text-tinta lg:text-2xl">
-        Prefere já mandar os detalhes?
+        Peça um orçamento.
       </h2>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-tinta/60">
-        Orçamento precisa de contexto. Responda isto e a conversa já começa com
-        o essencial na mão, em vez de três perguntas antes da primeira resposta.
+        Conte o essencial e a conversa já começa com contexto, em vez de três
+        perguntas antes da primeira resposta. Prefere falar direto? Os canais
+        estão logo abaixo.
       </p>
 
       <form onSubmit={enviar} noValidate className="mt-7 grid gap-5">

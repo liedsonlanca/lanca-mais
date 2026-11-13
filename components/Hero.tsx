@@ -311,27 +311,19 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
         <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-5 pb-10 pt-28 sm:px-8 lg:grid-cols-[1fr_1.05fr] lg:gap-6 lg:px-12 lg:pb-8 lg:pt-28">
           {/* ---------- Texto ---------- */}
           <div>
-            <motion.span
-              {...entrada(0.05)}
-              className="inline-flex items-center gap-2.5 rounded-full bg-cartao py-2 pl-2.5 pr-4 text-[13px] text-tinta/75 shadow-[var(--sombra-cartao)]"
-            >
-              <span
-                aria-hidden
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-salmon/15"
-              >
-                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-salmon" fill="currentColor">
-                  <rect x="2" y="9" width="2.6" height="5" rx="1" />
-                  <rect x="6.7" y="5.5" width="2.6" height="8.5" rx="1" />
-                  <rect x="11.4" y="2" width="2.6" height="12" rx="1" />
-                </svg>
-              </span>
-              Agência de marketing completa
-            </motion.span>
+            {/* Aqui havia um selo "Agência de marketing completa".
 
+                Saiu a pedido. Ele dizia em letra miúda, acima do logo, o que a
+                frase-problema logo abaixo já diz com mais força — e tirava do
+                logo o primeiro lugar na página, que é dele.
+
+                A frase continua na imagem de compartilhamento e na página de
+                pré-lançamento: ali ela apresenta a agência a quem ainda não
+                sabe o que a LANÇA+ faz, e não disputa espaço com nada. */}
             {/* A marca e a frase-problema são um título só. O leitor de tela
                 ouve "LANÇA+. Sua marca tem qualidade..." em sequência, pelo
                 alt do logo, e o Google lê a marca junto da proposta. */}
-            <h1 className="mt-7">
+            <h1>
               <motion.span {...entrada(0.15)} className="block">
                 {/* O logo de verdade, em alta (2855px de largura), e não o nome
                     digitado: é a marca que a agência usa em tudo. Entra inteiro

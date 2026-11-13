@@ -16,8 +16,17 @@ import { imagem } from "@/lib/imagens";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  // O título da marca não leva separador.
+  //
+  // Era "LANÇA+ | Agência de Marketing", e na aba do navegador aquele traço
+  // colado no nome parecia um cursor perdido, e não pontuação. Sem ele, o
+  // nome e o que a empresa faz se leem como uma coisa só.
+  //
+  // O template das outras páginas mantém o traço de propósito: ali ele
+  // separa duas coisas diferentes ("Contato | LANÇA+"), e tirá-lo deixaria
+  // "Contato LANÇA+", que é pior do que o problema que se queria resolver.
   title: {
-    default: `${siteConfig.name} | Agência de Marketing`,
+    default: `${siteConfig.name} Agência de Marketing`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -29,12 +38,12 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: "/",
     siteName: siteConfig.name,
-    title: `${siteConfig.name} | Agência de Marketing`,
+    title: `${siteConfig.name} Agência de Marketing`,
     description: siteConfig.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} | Agência de Marketing`,
+    title: `${siteConfig.name} Agência de Marketing`,
     description: siteConfig.description,
   },
   robots: {
