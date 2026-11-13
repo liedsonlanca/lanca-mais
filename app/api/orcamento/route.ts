@@ -29,6 +29,7 @@ import { NextResponse } from "next/server";
 type Pedido = {
   nome: string;
   whatsapp: string;
+  email: string;
   servico: string;
   mensagem: string;
 };
@@ -85,13 +86,30 @@ export async function POST(requisicao: Request) {
   const pedido: Pedido = {
     nome: texto(corpo.nome, 120),
     whatsapp: texto(corpo.whatsapp, 20).replace(/\D/g, ""),
+    email: texto(corpo.email, 160),
     servico: texto(corpo.servico, 120),
     mensagem: texto(corpo.mensagem, 2000),
   };
 
-  // O nome é o que o webhook exige para criar o lead; o telefone é o que
-  // permite responder. Sem os dois, não há pedido.
-  if (!pedido.nome || pedido.whatsapp.length < 10) {
+  // Todos os campos são exigidos, a pedido do cliente.
+  //
+  // O servidor repete a checagem que o formulário já faz, e não confia nela:
+  // esta rota é um endereço público, e qualquer um pode chamá-la sem passar
+  // pela página. Validação no navegador é conveniência para quem preenche;
+  // validação aqui é a que vale.
+  //
+  // O e-mail é checado de leve — arroba, ponto depois, sem espaço. Expressão
+  // rigorosa recusa endereço válido, e recusar o e-mail certo de um cliente
+  // é pior do que aceitar um errado, que só volta como mensagem que não
+  // chega.
+  const faltando =
+    !pedido.nome ||
+    pedido.whatsapp.length < 10 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(pedido.email) ||
+    !pedido.servico ||
+    !pedido.mensagem;
+
+  if (faltando) {
     return NextResponse.json({ ok: false, motivo: "campos" }, { status: 400 });
   }
 

@@ -77,7 +77,25 @@ export default function Header({
         { rootMargin: `-${ALTURA_DA_AMOSTRA}px 0px -${recorteDeBaixo}px 0px` }
       );
 
+      // O próprio cabeçalho fica de fora, e isto não é detalhe.
+      //
+      // Quando ele está sobre um trecho claro, ele mesmo ganha a classe
+      // tema-claro — e entrava na busca junto com os trechos da página. A
+      // partir daí o observador o via cruzando a própria linha de amostra e
+      // confirmava que havia claro ali, o que o mantinha claro, o que o
+      // mantinha na lista. Uma vez claro, claro para sempre.
+      //
+      // Dava exatamente o defeito relatado: carregar uma página escura
+      // direto funcionava, porque o cabeçalho ainda não era claro e não havia
+      // o que observar; mas sair da home, cuja abertura é clara, para
+      // qualquer página escura deixava o menu preto sobre fundo preto. A
+      // medida direta logo abaixo acertava o valor, e o observador o desfazia
+      // no quadro seguinte.
+      //
+      // A medida direta já ignorava o cabeçalho pelo mesmo motivo; faltava
+      // ensinar o observador a fazer o mesmo.
       for (const el of document.querySelectorAll(".tema-claro")) {
+        if (el.closest("header")) continue;
         observador.observe(el);
       }
 

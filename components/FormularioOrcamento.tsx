@@ -32,10 +32,27 @@ import { services, siteConfig } from "@/lib/site-config";
 // Quando houver chave da API do CRM, este é o ponto em que o pedido passa a
 // virar card no pipeline também, sem mudar nada do que a pessoa vê.
 
-/** Quando a pessoa ainda não sabe o que pedir, isso também é uma resposta. */
+/**
+ * Quando a pessoa ainda não sabe o que pedir, isso também é uma resposta —
+ * e continua na lista, como opção escolhível.
+ *
+ * O que mudou é que ela deixou de ser o valor inicial. Com o campo
+ * obrigatório, deixar "Ainda não sei" pré-selecionado faria todo mundo
+ * passar reto e mandar isso sem querer, e a agência receberia um pedido
+ * de orçamento sem saber do quê.
+ */
 const INDECISO = "Ainda não sei";
 
-type Erros = { nome?: string; whatsapp?: string };
+/** O valor vazio do select, que força uma escolha de verdade. */
+const NADA_ESCOLHIDO = "";
+
+type Erros = {
+  nome?: string;
+  whatsapp?: string;
+  email?: string;
+  servico?: string;
+  mensagem?: string;
+};
 
 /** O número brasileiro como se lê, montado enquanto digita. */
 function mascarar(valor: string) {
@@ -49,7 +66,8 @@ function mascarar(valor: string) {
 export default function FormularioOrcamento() {
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
-  const [servico, setServico] = useState(INDECISO);
+  const [email, setEmail] = useState("");
+  const [servico, setServico] = useState(NADA_ESCOLHIDO);
   const [mensagem, setMensagem] = useState("");
   const [erros, setErros] = useState<Erros>({});
   const [enviando, setEnviando] = useState(false);
@@ -59,14 +77,40 @@ export default function FormularioOrcamento() {
 
   const refNome = useRef<HTMLInputElement>(null);
   const refZap = useRef<HTMLInputElement>(null);
+  const refEmail = useRef<HTMLInputElement>(null);
+  const refServico = useRef<HTMLSelectElement>(null);
+  const refMensagem = useRef<HTMLTextAreaElement>(null);
 
+  // Todos os campos são exigidos, a pedido do cliente.
+  //
+  // O custo é real e está assumido: cada campo obrigatório a mais é gente
+  // que desiste no meio. A contrapartida é que o pedido chega completo, e a
+  // agência responde de primeira em vez de perguntar.
+  //
+  // Cada mensagem diz o que fazer, e não que algo está errado. "Campo
+  // obrigatório" informa o óbvio; "Diga como podemos te chamar" diz o que
+  // falta fazer.
   function validar(): Erros {
     const achados: Erros = {};
+
     if (!nome.trim()) achados.nome = "Diga como podemos te chamar.";
 
     const digitos = whatsapp.replace(/\D/g, "");
     if (!digitos) achados.whatsapp = "Precisamos do seu WhatsApp para responder.";
     else if (digitos.length < 10) achados.whatsapp = "Faltam dígitos neste número.";
+
+    // Checagem frouxa de propósito: arroba, ponto depois, sem espaço.
+    // Expressão rigorosa de e-mail recusa endereço válido, e recusar o
+    // e-mail certo de um cliente é pior do que aceitar um errado.
+    const correio = email.trim();
+    if (!correio) achados.email = "Precisamos do seu e-mail.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correio))
+      achados.email = "Confira este e-mail.";
+
+    if (!servico) achados.servico = "Escolha o que você precisa.";
+
+    if (!mensagem.trim())
+      achados.mensagem = "Conte um pouco do que você precisa.";
 
     return achados;
   }
@@ -97,7 +141,18 @@ export default function FormularioOrcamento() {
     if (Object.keys(achados).length > 0) {
       // O foco vai para o primeiro campo com problema: sem isso, quem navega
       // por teclado recebe o erro e continua no botão, longe do que errou.
-      (achados.nome ? refNome : refZap).current?.focus();
+      // Na ordem da tela, e não na da validação: o primeiro erro que a
+      // pessoa vê é o que deve receber o cursor.
+      const alvo = achados.nome
+        ? refNome
+        : achados.whatsapp
+          ? refZap
+          : achados.email
+            ? refEmail
+            : achados.servico
+              ? refServico
+              : refMensagem;
+      alvo.current?.focus();
       return;
     }
 
@@ -109,6 +164,7 @@ export default function FormularioOrcamento() {
         body: JSON.stringify({
           nome: nome.trim(),
           whatsapp,
+          email: email.trim(),
           servico,
           mensagem: mensagem.trim(),
           sobrenome,
@@ -241,41 +297,106 @@ export default function FormularioOrcamento() {
           </div>
         </div>
 
-        <div>
-          <label htmlFor="orc-servico" className={rotuloCampo}>
-            O que você precisa
-          </label>
-          {/* A ordem é a mesma de todo lugar que lista serviços no site, e
-              "Ainda não sei" vem primeiro porque é a resposta mais honesta
-              de quem está pedindo orçamento pela primeira vez. */}
-          <select
-            id="orc-servico"
-            value={servico}
-            onChange={(e) => setServico(e.target.value)}
-            className={`${caixaCampo} border-contorno focus:border-salmon/60`}
-          >
-            <option value={INDECISO}>{INDECISO}</option>
-            {services.map((s) => (
-              <option key={s.slug} value={s.name}>
-                {s.name}
+        {/* E-mail e serviço dividem a linha. O e-mail entrou depois, e
+            sozinho numa linha inteira pareceria o campo mais importante do
+            formulário — sendo o único opcional dos quatro. */}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="orc-email" className={rotuloCampo}>
+              E-mail
+            </label>
+            <input
+              id="orc-email"
+              ref={refEmail}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="voce@suaempresa.com"
+              aria-invalid={Boolean(erros.email)}
+              aria-describedby={erros.email ? "orc-email-erro" : undefined}
+              className={`${caixaCampo} ${
+                erros.email
+                  ? "border-salmon"
+                  : "border-contorno focus:border-salmon/60"
+              }`}
+            />
+            <p
+              id="orc-email-erro"
+              aria-live="polite"
+              className="mt-1.5 text-[0.8rem] text-destaque empty:hidden"
+            >
+              {erros.email ?? ""}
+            </p>
+            </div>
+
+            <div>
+            <label htmlFor="orc-servico" className={rotuloCampo}>
+              O que você precisa
+            </label>
+            {/* A ordem é a mesma de todo lugar que lista serviços no site, e
+                "Ainda não sei" vem primeiro porque é a resposta mais honesta
+                de quem está pedindo orçamento pela primeira vez. */}
+            <select
+              id="orc-servico"
+              ref={refServico}
+              value={servico}
+              onChange={(e) => setServico(e.target.value)}
+              aria-invalid={Boolean(erros.servico)}
+              aria-describedby={erros.servico ? "orc-servico-erro" : undefined}
+              className={`${caixaCampo} ${
+                erros.servico
+                  ? "border-salmon"
+                  : "border-contorno focus:border-salmon/60"
+              }`}
+            >
+              <option value={NADA_ESCOLHIDO} disabled>
+                Escolha uma frente
               </option>
-            ))}
-          </select>
+              <option value={INDECISO}>{INDECISO}</option>
+              {services.map((s) => (
+                <option key={s.slug} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <p
+              id="orc-servico-erro"
+              aria-live="polite"
+              className="mt-1.5 text-[0.8rem] text-destaque empty:hidden"
+            >
+              {erros.servico ?? ""}
+            </p>
+          </div>
         </div>
 
         <div>
           <label htmlFor="orc-mensagem" className={rotuloCampo}>
-            Detalhes{" "}
-            <span className="font-normal text-tinta/40">(opcional)</span>
+            Detalhes
           </label>
           <textarea
             id="orc-mensagem"
+            ref={refMensagem}
             value={mensagem}
             onChange={(e) => setMensagem(e.target.value)}
             rows={4}
             placeholder="Conte do seu negócio, do que já tentou e do que espera."
-            className={`${caixaCampo} resize-y border-contorno focus:border-salmon/60`}
+            aria-invalid={Boolean(erros.mensagem)}
+            aria-describedby={erros.mensagem ? "orc-mensagem-erro" : undefined}
+            className={`${caixaCampo} resize-y ${
+              erros.mensagem
+                ? "border-salmon"
+                : "border-contorno focus:border-salmon/60"
+            }`}
           />
+          <p
+            id="orc-mensagem-erro"
+            aria-live="polite"
+            className="mt-1.5 text-[0.8rem] text-destaque empty:hidden"
+          >
+            {erros.mensagem ?? ""}
+          </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
