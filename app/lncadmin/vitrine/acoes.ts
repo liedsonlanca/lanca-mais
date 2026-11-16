@@ -191,3 +191,93 @@ export async function posicionarPeca(dados: FormData) {
   await avisar("Peça movida de posição.");
   atualizarSite();
 }
+
+/**
+ * Reorganiza o trilho: alterna os tipos e põe o recente na frente.
+ *
+ * ---------- O desenho ----------
+ *
+ * A ordem vira vídeo, estático, vídeo, carrossel, vídeo, estático, e assim por
+ * diante: vídeo em toda posição ímpar, e as pares revezando entre os tipos
+ * parados que existirem, na ordem estático → carrossel → trinca.
+ *
+ * O motivo é que o trilho desliza sozinho. Com os vídeos agrupados, quem passa
+ * os olhos vê um pedaço só de movimento e o resto parado; alternando, o
+ * movimento se distribui e o trilho não tem trecho morto.
+ *
+ * ---------- Por que o recente primeiro ----------
+ *
+ * Dentro de cada tipo a peça mais nova vem antes. O trilho é vitrine de
+ * trabalho atual, e trabalho de dois anos atrás na frente do de ontem diz a
+ * coisa errada sobre a agência — ainda que a peça antiga seja boa.
+ *
+ * Por `criado_em`, e não pelo id: id é ordem de cadastro, e peça recadastrada
+ * depois de uma correção nasce com id novo sem ser trabalho novo. O
+ * desempate por id só entra quando o carimbo é o mesmo, que é o caso das
+ * peças criadas na mesma transação.
+ *
+ * ---------- O que acontece quando um lado acaba ----------
+ *
+ * Se houver dez vídeos e dois estáticos, a alternância vale enquanto houver
+ * os dois, e o que sobrar entra em seguida, do mais novo para o mais velho.
+ * Forçar o padrão até o fim exigiria inventar peça que não existe.
+ *
+ * É destrutivo para a ordem manual: quem tiver arrastado peça a peça perde o
+ * arranjo. Por isso é um botão, e não algo que roda sozinho ao salvar.
+ */
+export async function intercalarPecas() {
+  const banco = await preparar();
+
+  const linhas = (await banco.query(
+    "SELECT id, tipo FROM vitrine ORDER BY criado_em DESC NULLS LAST, id DESC"
+  )) as Array<{ id: number; tipo: string | null }>;
+
+  if (linhas.length === 0) {
+    await avisar("Não há peças para organizar.");
+    return;
+  }
+
+  const videos = linhas.filter((l) => l.tipo === "video");
+
+  // A ordem do rodízio dos parados. Só entram os tipos que existem: uma lista
+  // fixa deixaria buracos quando a agência não usa carrossel, por exemplo.
+  const ORDEM_PARADOS = ["imagem", "carrossel", "trinca"];
+  const parados = ORDEM_PARADOS.map((tipo) =>
+    linhas.filter((l) => (l.tipo ?? "imagem") === tipo)
+  ).filter((grupo) => grupo.length > 0);
+
+  const final: number[] = [];
+  let vez = 0;
+
+  // Enquanto houver dos dois lados, alterna. O lado parado avança de grupo a
+  // cada rodada, e pula o grupo que já esvaziou.
+  while (videos.length > 0 && parados.some((g) => g.length > 0)) {
+    final.push(videos.shift()!.id);
+
+    for (let tentativas = 0; tentativas < parados.length; tentativas += 1) {
+      const grupo = parados[vez % parados.length];
+      vez += 1;
+      if (grupo.length > 0) {
+        final.push(grupo.shift()!.id);
+        break;
+      }
+    }
+  }
+
+  // O resto, do mais novo para o mais velho. `linhas` já está nessa ordem,
+  // então basta varrer e pegar quem ficou de fora.
+  const jaPostos = new Set(final);
+  for (const linha of linhas) {
+    if (!jaPostos.has(linha.id)) final.push(linha.id);
+  }
+
+  for (let i = 0; i < final.length; i += 1) {
+    await banco.query("UPDATE vitrine SET ordem = $1 WHERE id = $2", [
+      i,
+      final[i],
+    ]);
+  }
+
+  await avisar(`Trilho reorganizado: ${final.length} peças.`);
+  atualizarSite();
+}

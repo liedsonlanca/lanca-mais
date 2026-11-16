@@ -21,6 +21,7 @@ import {
   apagarPeca,
   moverPeca,
   posicionarPeca,
+  intercalarPecas,
 } from "./acoes";
 
 export const dynamic = "force-dynamic";
@@ -134,6 +135,38 @@ export default async function AdminVitrine() {
           Adicionar
         </button>
       </form>
+
+      {/* ---------- Organizar sozinho ---------- */}
+      {pecas.length > 1 && (
+        <form
+          action={intercalarPecas}
+          className={`${cartao} mt-8 flex flex-col gap-4 !p-5 sm:flex-row sm:items-center sm:justify-between`}
+        >
+          <div className="text-sm leading-relaxed text-tinta/70">
+            <strong className="font-medium text-tinta">
+              Organizar o trilho sozinho
+            </strong>
+            <p className="mt-1">
+              Alterna vídeo, estático, vídeo, carrossel, e assim por diante,
+              com as peças mais recentes na frente de cada tipo. O trilho
+              desliza sozinho na home: com os vídeos agrupados, metade dele
+              fica parada.
+            </p>
+            {/* Dito antes de clicar, e não depois: quem arrastou peça a peça
+                precisa saber que vai perder o arranjo. */}
+            <p className="mt-2 text-tinta/50">
+              Isto refaz a ordem inteira e desfaz qualquer arrumação manual.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            className={`${botaoSecundario} shrink-0 justify-self-start`}
+          >
+            Organizar
+          </button>
+        </form>
+      )}
 
       {/* ---------- Lista ---------- */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
