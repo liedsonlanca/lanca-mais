@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  origemDaRequisicao,
+  podeTentar,
+  registrarFalha,
+} from "@/lib/tentativas";
 
 // O pedido de orçamento, a caminho do CRM.
 //
@@ -33,33 +38,6 @@ type Pedido = {
   servico: string;
   mensagem: string;
 };
-
-/**
- * Quantos pedidos um mesmo endereço pode mandar, e em quanto tempo.
- *
- * É memória do processo, e não banco: numa função sem estado isto se perde
- * entre instâncias, então não é defesa contra ataque dedicado. Serve para o
- * caso comum — o clique repetido e o robô preguiçoso — e custa nada.
- */
-const JANELA_MS = 60_000;
-const LIMITE = 5;
-const visitas = new Map<string, number[]>();
-
-function excedeu(chave: string) {
-  const agora = Date.now();
-  const recentes = (visitas.get(chave) ?? []).filter((t) => agora - t < JANELA_MS);
-  recentes.push(agora);
-  visitas.set(chave, recentes);
-
-  // A tabela não pode crescer para sempre num processo de vida longa.
-  if (visitas.size > 500) {
-    for (const [k, v] of visitas) {
-      if (v.every((t) => agora - t >= JANELA_MS)) visitas.delete(k);
-    }
-  }
-
-  return recentes.length > LIMITE;
-}
 
 function texto(valor: unknown, limite: number) {
   return typeof valor === "string" ? valor.trim().slice(0, limite) : "";
@@ -113,12 +91,20 @@ export async function POST(requisicao: Request) {
     return NextResponse.json({ ok: false, motivo: "campos" }, { status: 400 });
   }
 
-  const ip =
-    requisicao.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    "desconhecido";
-  if (excedeu(ip)) {
+  // O freio é o mesmo das portas de senha, e pelo mesmo motivo: ele vive
+  // numa tabela, e não na memória do processo.
+  //
+  // Em memória não serve aqui. Cada requisição pode cair numa instância
+  // diferente, e a contagem de uma não enxerga a da outra — quem quisesse
+  // despejar pedido no CRM da agência só precisaria mandar rápido o bastante
+  // para espalhar entre instâncias. Era uma ponta solta minha.
+  const origem = origemDaRequisicao(requisicao);
+  if (!(await podeTentar("orcamento", origem)).permitido) {
     return NextResponse.json({ ok: false, motivo: "limite" }, { status: 429 });
   }
+  // Cada envio conta, e não só os que falham: aqui o que se está freando é o
+  // volume, e não a adivinhação de senha.
+  await registrarFalha("orcamento", origem);
 
   if (!endereco) {
     // Sem a variável configurada, o site não finge que mandou.
