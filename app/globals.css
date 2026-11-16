@@ -361,3 +361,37 @@ body:has(.pagina-legal-fechada) footer {
   background: var(--color-salmon);
   color: var(--color-preto);
 }
+
+/* Atrito contra salvar imagem e vídeo.
+   ---------------------------------------------------------------------------
+
+   O que isto é, e o que não é.
+
+   Não existe impedir download num navegador. Toda imagem e todo vídeo que a
+   pessoa vê já estão na máquina dela — é assim que ela vê. Qualquer pessoa
+   que abra as ferramentas do desenvolvedor, a aba de rede, ou que peça o
+   endereço do arquivo direto, leva o arquivo. Isso não tem conserto, e
+   prometer que tem seria mentira.
+
+   O que estas regras fazem é tirar os caminhos de um clique: o menu do botão
+   direito sobre a mídia, o arrastar para a área de trabalho, e a seleção que
+   o toque longo abre no celular. Segura o curioso, e é tudo o que se pode
+   honestamente oferecer.
+
+   O que NÃO entra aqui, de propósito:
+
+   - bloquear o botão direito na página inteira. A pessoa usa o menu para
+     abrir link em outra aba, copiar texto, traduzir a página. Tirar isso de
+     todo o site cobra de quem só queria ler, para atrapalhar quem ia salvar
+     de qualquer jeito por outro caminho.
+   - bloquear teclas. Não funciona, e trava atalhos de acessibilidade.
+
+   A camada de verdade, para quem precisar dela um dia, é servir a mídia com
+   marca d'água ou por URL assinada de curta duração — e isso é decisão de
+   conteúdo, não de CSS. */
+img,
+video {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}

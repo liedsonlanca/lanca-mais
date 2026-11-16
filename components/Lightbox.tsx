@@ -176,6 +176,13 @@ export default function Lightbox({
                     controls
                     autoPlay
                     playsInline
+                    // Tira o botão de baixar do player e a janelinha
+                    // flutuante, que também serve de saída para o arquivo.
+                    // Como o resto, é atrito: quem abrir a aba de rede leva o
+                    // vídeo do mesmo jeito. É o único player do site com
+                    // controles à mostra, então é o único que precisa disto.
+                    controlsList="nodownload noremoteplayback"
+                    disablePictureInPicture
                     className="h-auto max-h-[78vh] w-full"
                   />
                 ) : (
