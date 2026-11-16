@@ -14,6 +14,16 @@ import type { Service } from "@/lib/site-config";
 //
 // A rolagem é nativa, com scroll-snap, então dedo, roda, teclado e leitor de
 // tela continuam funcionando sem estado nosso para sincronizar.
+
+/**
+ * Quais frentes levam o selo "Mais escolhido".
+ *
+ * Mora aqui, e não num campo da frente, porque é afirmação sobre o conjunto:
+ * dizer que duas são as mais escolhidas só faz sentido olhando as três de uma
+ * vez. Num campo por serviço, nada impediria marcar as três — e selo em todo
+ * mundo não distingue ninguém.
+ */
+const MAIS_ESCOLHIDOS = new Set(["marketing-pessoal", "marketing-empresarial"]);
 export default function ServicosDestaque({
   itens,
   fotos,
@@ -106,9 +116,18 @@ export default function ServicosDestaque({
           <Link
             key={s.slug}
             href={`/servicos/${s.slug}`}
-            // Celular: card inteiro de foto, com o texto pousado embaixo.
-            // Tablet para cima: o texto em cima e a foto sangrando no pé.
-            className="group relative flex min-h-[290px] w-full shrink-0 snap-start flex-col justify-end overflow-hidden rounded-[26px] border border-contorno bg-cartao transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:min-h-0 sm:w-[calc((100%-1.25rem)/2)] sm:justify-start sm:rounded-[28px] lg:w-[calc((100%-2.5rem)/3)]"
+            // Card inteiro de foto, com o texto pousado embaixo.
+            //
+            // Do tablet para cima isto já foi outra coisa: card branco, texto
+            // em cima e a foto como tira de 230px no pé. Os dois desenhos
+            // conviveram até ficar claro, olhando lado a lado, que o do
+            // celular era o bom — a foto é o argumento, e dar a ela o card
+            // inteiro diz mais do que descrevê-la em texto sobre fundo branco.
+            //
+            // O que ainda muda por largura é só o arranjo: um por vez no
+            // celular, dois no tablet, três no desktop, onde o card também
+            // fica mais alto para a foto não virar faixa.
+            className="group relative flex min-h-[290px] w-full shrink-0 snap-start flex-col justify-end overflow-hidden rounded-[26px] border border-contorno bg-cartao transition-all duration-500 hover:-translate-y-1.5 hover:border-salmon/50 focus-visible:-translate-y-1.5 focus-visible:border-salmon focus-visible:outline-none sm:w-[calc((100%-1.25rem)/2)] sm:rounded-[28px] lg:min-h-[400px] lg:w-[calc((100%-2.5rem)/3)]"
           >
             {/* Régua de lançamento no topo, a mesma dos cards do site.
 
@@ -130,18 +149,34 @@ export default function ServicosDestaque({
                 esse tipo de peça repetida que faz um site parecer feito por
                 molde. O ícone continua onde tem função, na página de serviços,
                 onde são oito e o desenho ajuda a achar. */}
-            {/* As cores viram duas vezes: no celular o texto está sobre a foto
-                escurecida, então é claro; do tablet para cima está sobre o
-                card, então segue o tema. */}
+            {/* O texto é claro em qualquer largura, porque em qualquer largura
+                ele está sobre a foto escurecida. Antes ele virava para a cor
+                do tema a partir do tablet, quando passava a ficar sobre o
+                card branco. */}
             <div className="relative z-10 px-7 pb-7 pt-8">
-              <span className="numeral-fantasma block text-sm text-bege/55 transition-colors duration-500 group-hover:text-salmon sm:text-tinta/45 sm:group-hover:text-destaque">
-                {String(itens.indexOf(s) + 1).padStart(2, "0")}
-              </span>
+              {/* O número e o selo dividem a primeira linha.
+                  O canto superior direito parece o lugar óbvio e não é: ali
+                  mora a seta, e os dois se atropelariam. */}
+              <div className="flex items-center gap-3">
+                <span className="numeral-fantasma block text-sm text-bege/55 transition-colors duration-500 group-hover:text-salmon">
+                  {String(itens.indexOf(s) + 1).padStart(2, "0")}
+                </span>
 
-              <h3 className="font-heading mt-3 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-bege sm:mt-4 sm:text-tinta">
+                {/* Salmão puro, porque aqui ele está sempre sobre a foto
+                    escurecida — onde ele passa de sobra em contraste. Sobre
+                    fundo claro reprovaria, e foi por isso que esta cor virava
+                    quando o card ainda era branco do tablet para cima. */}
+                {MAIS_ESCOLHIDOS.has(s.slug) && (
+                  <span className="rounded-full border border-salmon/35 bg-salmon/12 px-2.5 py-1 text-xs font-medium leading-none text-salmon">
+                    Mais escolhido
+                  </span>
+                )}
+              </div>
+
+              <h3 className="font-heading mt-3 text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.03em] text-bege sm:mt-4">
                 {s.name}
               </h3>
-              <span className="mt-2.5 block max-w-[26ch] leading-relaxed text-bege/75 sm:mt-3 sm:text-tinta/65">
+              <span className="mt-2.5 block max-w-[26ch] leading-relaxed text-bege/75 sm:mt-3">
                 {s.shortDescription}
               </span>
             </div>
@@ -154,7 +189,7 @@ export default function ServicosDestaque({
             {foto && (
               // No celular a foto preenche o card inteiro, por baixo do texto.
               // A partir do tablet ela volta a ser uma faixa no pé.
-              <div className="absolute inset-0 overflow-hidden sm:relative sm:inset-auto sm:mt-auto sm:h-[230px]">
+              <div className="absolute inset-0 overflow-hidden">
                 <Image
                   src={foto.src}
                   alt={foto.alt}
@@ -168,46 +203,32 @@ export default function ServicosDestaque({
                     rosto. Só no celular, que é onde o texto fica por cima. */}
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-preto via-preto/70 to-preto/10 sm:hidden"
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-preto via-preto/70 to-preto/10"
                 />
 
-                {/* O escurecimento da foto, do tablet para cima.
+                {/* Aqui havia mais dois véus, só do tablet para cima: um
+                    escurecimento parejo da foto inteira, que levantava ao
+                    passar o ponteiro, e uma faixa curta no pé por baixo da
+                    seta.
 
-                    Nasceu quando as fotos de estúdio da equipe deram lugar às
-                    peças de cliente. Aquelas eram fundo cinza e roupa preta,
-                    então já chegavam no tom do site. Estas são o trabalho de
-                    verdade: parede laranja, estúdio branco, luz de set. Lado
-                    a lado, três fotos assim puxavam o olho para elas e o card
-                    virava moldura de uma imagem solta.
+                    Os dois existiam para o desenho antigo, em que o card era
+                    branco e a foto uma tira de 230px no pé. Com a foto
+                    ocupando o card inteiro, o véu parelho escurecia o topo
+                    justamente onde está o assunto da imagem, e a faixa de pé
+                    ficou sem função, porque a seta subiu para o topo.
 
-                    O véu devolve as três ao mesmo registro sem tocar nos
-                    arquivos: quem publica manda a foto como ela é, e quem
-                    decide o tom é o site.
-
-                    E ele levanta ao passar o ponteiro, porque aí a pessoa
-                    escolheu olhar aquele card — o descanso é sóbrio, a
-                    atenção é colorida. */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 hidden bg-preto/45 transition-colors duration-700 group-hover:bg-preto/10 group-focus-visible:bg-preto/10 sm:block"
-                />
-
-                {/* No tablet para cima, o véu curto por baixo da seta: sem
-                    ele, a seta cai numa região clara da foto e some. */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-28 bg-gradient-to-t from-preto/70 to-transparent sm:block"
-                />
+                    O degradê acima faz o serviço sozinho, e é o mesmo que o
+                    celular já usava. */}
               </div>
             )}
 
             {/* A seta grande, apoiada no canto da prévia. É ela que diz que o
                 card inteiro leva a algum lugar, sem precisar de "saiba mais". */}
-            {/* No celular ela vai para o topo: embaixo cairia em cima do
-                texto, que ali ocupa o pé do card. */}
+            {/* No topo, e não no pé: embaixo ela cairia em cima do texto, que
+                ocupa o pé do card. */}
             <span
               aria-hidden
-              className="absolute right-6 top-6 z-10 flex h-14 w-14 items-center justify-center rounded-full border border-contorno bg-fundo text-tinta shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto group-focus-visible:border-salmon group-focus-visible:bg-salmon group-focus-visible:text-preto sm:bottom-7 sm:right-7 sm:top-auto"
+              className="absolute right-6 top-6 z-10 flex h-14 w-14 items-center justify-center rounded-full border border-contorno bg-fundo text-tinta shadow-[var(--sombra-cartao)] transition-all duration-500 group-hover:border-salmon group-hover:bg-salmon group-hover:text-preto group-focus-visible:border-salmon group-focus-visible:bg-salmon group-focus-visible:text-preto"
             >
               <svg
                 viewBox="0 0 24 24"
