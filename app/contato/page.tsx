@@ -125,7 +125,6 @@ export default function ContatoPage() {
   return (
     <>
       <PageHero
-        eyebrow="Contato"
         titulo={[
           { texto: "Estamos a um" },
           { texto: "toque de distância.", acento: "toque" },

@@ -45,7 +45,6 @@ export default async function SobrePage() {
   return (
     <>
       <PageHero
-        eyebrow="Sobre a LANÇA+"
         titulo={[
           { texto: "Uma agência completa" },
           { texto: "para marcas que querem" },
@@ -73,7 +72,6 @@ export default async function SobrePage() {
 
           <div>
             <SectionHeading
-              eyebrow="Missão"
               alinhamento="esquerda"
               titulo={[
                 { texto: "Transformar marca em" },
@@ -107,7 +105,6 @@ export default async function SobrePage() {
       <section className="relative overflow-hidden bg-fundo text-tinta">
         <div className="mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
-            eyebrow="Como trabalhamos"
             alinhamento="esquerda"
             titulo={[
               { texto: "Princípios que guiam" },
@@ -140,7 +137,6 @@ export default async function SobrePage() {
       <section className="relative overflow-hidden bg-fundo-alt py-14 lg:py-20">
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
           <SectionHeading
-            eyebrow="Nosso time"
             alinhamento="esquerda"
             titulo={[
               { texto: "Quem constrói" },

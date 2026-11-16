@@ -30,7 +30,6 @@ export default function PoliticaDePrivacidade() {
   return (
     <>
       <PageHero
-        eyebrow="Política de Privacidade"
         titulo={[
           { texto: "Seus dados," },
           { texto: "em português claro.", acento: "claro." },

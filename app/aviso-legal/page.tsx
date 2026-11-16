@@ -43,7 +43,6 @@ export default function AvisoLegal() {
   return (
     <>
       <PageHero
-        eyebrow="Aviso Legal"
         titulo={[
           { texto: "O que este site é," },
           { texto: "e o que ele não é.", acento: "não é." },

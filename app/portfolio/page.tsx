@@ -29,7 +29,6 @@ export default async function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="Portfólio"
         titulo={[
           { texto: "Marcas que já lançamos" },
           { texto: "para o próximo nível.", acento: "nível." },

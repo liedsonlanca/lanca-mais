@@ -22,7 +22,6 @@ export default function ServiceFaq({ itens }: { itens: Item[] }) {
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-10 lg:py-20">
         <div className="lg:sticky lg:top-32 lg:self-start">
           <SectionHeading
-            eyebrow="Dúvidas frequentes"
             alinhamento="esquerda"
             titulo={[
               { texto: "Perguntas que" },

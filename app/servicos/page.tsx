@@ -38,7 +38,6 @@ export default async function ServicosPage() {
   return (
     <>
       <ArcoDeFotos
-        eyebrow="Serviços"
         titulo={[
           { texto: "Oito frentes que constroem" },
           { texto: "uma marca por inteiro.", acento: "inteiro." },

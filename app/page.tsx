@@ -26,7 +26,7 @@ import Sintomas from "@/components/home/Sintomas";
 import DepoimentosVideo, {
   ReservaDoBloco,
 } from "@/components/home/DepoimentosVideo";
-import { Rotulo, Titulo, Botao, LinkSeta } from "@/components/home/Pecas";
+import { Titulo, Botao, LinkSeta } from "@/components/home/Pecas";
 import Reveal from "@/components/motion/Reveal";
 import Stagger, { StaggerItem } from "@/components/motion/Stagger";
 
@@ -209,7 +209,6 @@ export default async function Home() {
       <Miolo className="pt-12 lg:pt-16">
         <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
           <div>
-            <Rotulo>O que trava a sua marca</Rotulo>
             <Titulo
               linhas={[
                 { texto: "Bom negócio, presença mediana.", acento: "mediana." },
@@ -290,7 +289,6 @@ export default async function Home() {
   secoes.push((claro) => (
     <Painel key="servicos" claro={claro}>
       <Miolo className="py-12 lg:py-16">
-        <Rotulo>O que fazemos</Rotulo>
         <Titulo
           linhas={[{ texto: "Três formas de lançar.", acento: "lançar." }]}
         />
@@ -329,7 +327,6 @@ export default async function Home() {
   secoes.push((claro) => (
     <Painel key="metodo" claro={claro}>
       <Miolo className="py-12 lg:py-16">
-        <Rotulo>Como fazemos</Rotulo>
         <Titulo
           linhas={[
             { texto: "Quatro etapas, zero improviso.", acento: "improviso." },
@@ -386,7 +383,6 @@ export default async function Home() {
   secoes.push((claro) => (
     <Painel key="trabalho" claro={claro} id="nosso-trabalho">
       <Miolo className="pt-12 lg:pt-16">
-        <Rotulo>Nosso trabalho</Rotulo>
         <Titulo
           linhas={[{ texto: "Peça por peça, com porquê.", acento: "porquê." }]}
         />
@@ -404,7 +400,6 @@ export default async function Home() {
     secoes.push((claro) => (
       <Painel key="cases" claro={claro}>
         <Miolo className="py-12 lg:py-16">
-          <Rotulo>Resultado</Rotulo>
           <Titulo
             linhas={[
               { texto: "Marcas que mudaram de patamar.", acento: "patamar." },
@@ -455,7 +450,6 @@ export default async function Home() {
     secoes.push((claro) => (
       <Painel key="depoimentos" claro={claro}>
         <Miolo className="py-12 lg:py-16">
-          <Rotulo>Depoimentos</Rotulo>
           <Titulo
             linhas={[
               { texto: "Quem já trabalha com a gente.", acento: "gente." },
@@ -478,7 +472,6 @@ export default async function Home() {
     secoes.push((claro) => (
       <Painel key="faq" claro={claro}>
         <Miolo className="py-12 lg:py-16">
-          <Rotulo>Antes de falar com a gente</Rotulo>
           <Titulo
             linhas={[
               { texto: "As dúvidas que todo mundo tem.", acento: "dúvidas" },
@@ -500,7 +493,6 @@ export default async function Home() {
       <Miolo className="py-12 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16">
           <div>
-            <Rotulo>Quem é a LANÇA+</Rotulo>
             <Titulo
               linhas={[
                 { texto: "Agência inteira, mesmo teto.", acento: "teto." },
@@ -560,12 +552,7 @@ export default async function Home() {
         <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 opacity-40 blur-3xl" />
 
         <div className="relative mx-auto max-w-3xl px-6 py-16 text-center lg:py-24">
-          <span className="eyebrow inline-flex items-center gap-2.5 rounded-full border border-bege/25 px-4 py-2 text-bege/70">
-            <span aria-hidden className="h-1 w-1 rounded-full bg-salmon" />
-            O próximo passo
-          </span>
-
-          <h2 className="font-heading mt-7 text-[2.1rem] font-semibold leading-[1.04] tracking-[-0.035em] text-bege sm:text-5xl lg:text-[3.4rem]">
+          <h2 className="font-heading text-[2.1rem] font-semibold leading-[1.04] tracking-[-0.035em] text-bege sm:text-5xl lg:text-[3.4rem]">
             Pronto para lançar a sua{" "}
             <span className="text-salmon">marca?</span>
           </h2>

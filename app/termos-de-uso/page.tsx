@@ -35,7 +35,6 @@ export default function TermosDeUso() {
   return (
     <>
       <PageHero
-        eyebrow="Termos de Uso"
         titulo={[
           { texto: "As regras de" },
           { texto: "uso deste site.", acento: "site." },

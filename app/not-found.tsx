@@ -29,14 +29,7 @@ export default function NaoEncontrada() {
       <div className="glow-salmon pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[720px] -translate-x-1/2 -translate-y-1/2 opacity-30 blur-3xl" />
 
       <div className="relative mx-auto flex min-h-[78vh] max-w-3xl flex-col items-center justify-center px-6 py-32 text-center">
-        <Reveal>
-          <span className="eyebrow inline-flex items-center gap-3 rounded-full border border-borda px-4 py-1.5 text-bege/78">
-            <span className="h-1 w-1 rounded-full bg-salmon" />
-            Erro 404
-          </span>
-        </Reveal>
-
-        <h1 className="font-heading mt-7 text-4xl font-semibold leading-[1.06] text-bege md:text-6xl">
+        <h1 className="font-heading text-4xl font-semibold leading-[1.06] text-bege md:text-6xl">
           <WordReveal
             linhas={[
               { texto: "Esta página" },

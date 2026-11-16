@@ -18,14 +18,12 @@ import type { Numero } from "@/lib/conteudo";
 export type { FotoDoArco };
 
 export default function ArcoDeFotos({
-  eyebrow,
   titulo,
   lead,
   botao,
   fotos,
   numeros,
 }: {
-  eyebrow: string;
   titulo: Linha[];
   lead?: string;
   botao?: { href: string; texto: string };
@@ -40,14 +38,7 @@ export default function ArcoDeFotos({
         <Arco fotos={fotos} tamanho="abertura" tom="escuro">
           {/* O texto, no vão sob as fotos. */}
           <div className="text-center">
-            <Reveal>
-              <span className="eyebrow inline-flex items-center gap-3 rounded-full border border-borda px-4 py-2 text-bege/75">
-                <span aria-hidden className="h-1 w-1 rounded-full bg-salmon" />
-                {eyebrow}
-              </span>
-            </Reveal>
-
-            <h1 className="font-heading mt-7 text-[2.2rem] font-semibold leading-[1.04] tracking-[-0.035em] text-bege sm:text-5xl lg:text-[3.6rem]">
+            <h1 className="font-heading text-[2.2rem] font-semibold leading-[1.04] tracking-[-0.035em] text-bege sm:text-5xl lg:text-[3.6rem]">
               <WordReveal linhas={titulo} delay={0.2} />
             </h1>
 

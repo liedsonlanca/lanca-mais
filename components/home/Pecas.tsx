@@ -13,18 +13,6 @@ import WordReveal, { type Linha } from "@/components/motion/WordReveal";
 // Nada aqui usa "use client": todas são componentes de servidor que embrulham
 // os de movimento, que já são de cliente.
 
-/** Rótulo da seção: texto na cor da marca, com um fio curto antes. */
-export function Rotulo({ children }: { children: React.ReactNode }) {
-  return (
-    <Reveal>
-      <span className="flex items-center gap-4">
-        <span aria-hidden className="h-px w-10 bg-salmon" />
-        <span className="eyebrow text-destaque">{children}</span>
-      </span>
-    </Reveal>
-  );
-}
-
 /**
  * Título de bloco, em corpo de display.
  *

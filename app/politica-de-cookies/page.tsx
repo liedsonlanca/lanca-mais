@@ -34,7 +34,6 @@ export default function PoliticaDeCookies() {
   return (
     <>
       <PageHero
-        eyebrow="Política de Cookies"
         titulo={[
           { texto: "O que guardamos" },
           { texto: "no seu navegador.", acento: "navegador." },

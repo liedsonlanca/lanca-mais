@@ -29,7 +29,6 @@ export default async function BlogPage() {
   return (
     <>
       <PageHero
-        eyebrow="Blog"
         titulo={[
           { texto: "Estratégia de marca," },
           { texto: "sem enrolação.", acento: "enrolação." },

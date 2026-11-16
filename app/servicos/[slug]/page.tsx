@@ -96,14 +96,7 @@ export default async function ServicoPage({
 
           <div className="mt-10 grid gap-12 lg:grid-cols-[1.15fr_1fr] lg:items-start lg:gap-16">
             <div>
-              <Reveal>
-                <span className="eyebrow inline-flex items-center gap-3 rounded-full border border-borda px-4 py-1.5 text-bege/78">
-                  <span className="h-1 w-1 rounded-full bg-salmon" />
-                  {page.heroKicker}
-                </span>
-              </Reveal>
-
-              <h1 className="font-heading mt-7 text-4xl font-semibold leading-[1.04] text-bege md:text-6xl">
+              <h1 className="font-heading text-4xl font-semibold leading-[1.04] text-bege md:text-6xl">
                 <WordReveal
                   linhas={[{ texto: service.name, acento: true }]}
                   delay={0.2}
@@ -191,7 +184,6 @@ export default async function ServicoPage({
       >
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
-            eyebrow="Como funciona"
             titulo={[
               { texto: "Como o trabalho" },
               { texto: "acontece.", acento: true },
@@ -225,7 +217,6 @@ export default async function ServicoPage({
             nuvem de entregáveis ficava colada no topo com um vazio embaixo. */}
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-10 lg:py-20">
           <SectionHeading
-            eyebrow="Entregáveis"
             alinhamento="esquerda"
             titulo={[{ texto: "O que você" }, { texto: "recebe.", acento: true }]}
             lead="Entregas concretas, combinadas desde o começo, sem surpresa no meio do caminho."
@@ -261,7 +252,6 @@ export default async function ServicoPage({
       <section className="relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
-            eyebrow="Por que a LANÇA+"
             alinhamento="esquerda"
             titulo={[
               { texto: "O que torna esse" },
@@ -300,7 +290,6 @@ export default async function ServicoPage({
       <section className="tema-claro relative overflow-hidden bg-fundo">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeading
-            eyebrow="Continue explorando"
             alinhamento="esquerda"
             titulo={[
               { texto: "Serviços" },
