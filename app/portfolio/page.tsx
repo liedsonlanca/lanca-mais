@@ -92,10 +92,6 @@ export default async function PortfolioPage() {
             ))}
           </Stagger>
 
-          <p className="mt-10 text-center text-sm text-tinta/50">
-            Cases ilustrativos. Substitua pelos resultados reais de clientes
-            antes de publicar o site.
-          </p>
         </div>
       </section>
 
