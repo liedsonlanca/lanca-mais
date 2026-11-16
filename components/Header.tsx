@@ -145,8 +145,45 @@ export default function Header({
     setRolou(valor > 24);
   });
 
+  // Enquanto a marca da abertura está em cena, a do cabeçalho se recolhe.
+  //
+  // Na home o logo aparecia duas vezes a poucos centímetros: o grande, que é
+  // o assunto da abertura, e o pequeno aqui em cima. Duas vezes a mesma marca
+  // na mesma tela não reforça nada — só faz o topo parecer repetido.
+  //
+  // Some enquanto o grande estiver visível e volta assim que ele sai, o que
+  // na prática é a pessoa começar a descer.
+  //
+  // Por observação do elemento, e não por um número de pixels: a marca muda
+  // de tamanho entre celular e desktop, e qualquer limiar escrito à mão
+  // estaria errado numa das duas. O IntersectionObserver responde pela
+  // posição real, e não custa nada por quadro.
+  //
+  // Também não serve o `sobreClaro` que já existe aqui: a home alterna
+  // seções claras e escuras ao longo da página inteira, então o logo sumiria
+  // em metade dela.
+  const [marcaNaAbertura, setMarcaNaAbertura] = useState(false);
+
+  useEffect(() => {
+    // Página sem marca de abertura: nada a observar, e o cabeçalho mostra a
+    // dele. Quem já zerou o estado foi o ajuste de rota, logo abaixo.
+    const alvo = document.querySelector(".marca-da-abertura");
+    if (!alvo) return;
+
+    const observador = new IntersectionObserver(
+      ([entrada]) => setMarcaNaAbertura(entrada.isIntersecting),
+      { threshold: 0 }
+    );
+    observador.observe(alvo);
+    return () => observador.disconnect();
+  }, [pathname]);
+
   // Com o menu cheio aberto, o que está embaixo é o menu, que é escuro.
   const claroEmCima = sobreClaro && !aberto;
+
+  // Com o menu aberto não há abertura à vista, então a marca volta: sem ela o
+  // menu em tela cheia ficaria sem nada no canto.
+  const marcaRecolhida = marcaNaAbertura && !aberto;
 
   // A página do diagnóstico pede um cabeçalho reduzido.
   //
@@ -169,6 +206,10 @@ export default function Header({
   if (rotaDoMenu !== pathname) {
     setRotaDoMenu(pathname);
     setAberto(false);
+    // Pelo mesmo motivo: sair da home com a marca recolhida deixaria o
+    // cabeçalho sem logo na página nova, até o observador se montar e
+    // responder. Zerando aqui, a página nova já nasce com a marca à mostra.
+    setMarcaNaAbertura(false);
   }
 
   // Trava a rolagem enquanto o menu cheio está aberto.
@@ -239,7 +280,18 @@ export default function Header({
           <Link
             href="/"
             aria-label="LANÇA+, página inicial"
-            className="flex h-11 shrink-0 items-center"
+            // Recolhe por opacidade, e não saindo do fluxo: a linha é
+            // justify-between, e tirar o logo jogaria a navegação para a
+            // esquerda a cada rolagem. O vão fica, e só a marca esmaece.
+            //
+            // aria-hidden e tabIndex acompanham: um link invisível que ainda
+            // recebe o foco do teclado é uma armadilha para quem navega sem
+            // ver a tela.
+            aria-hidden={marcaRecolhida}
+            tabIndex={marcaRecolhida ? -1 : undefined}
+            className={`flex h-11 shrink-0 items-center transition-opacity duration-500 ${
+              marcaRecolhida ? "pointer-events-none opacity-0" : "opacity-100"
+            }`}
           >
             <span className="relative block h-7 w-[110px]">
               {/* Duas versões do logo em cross-fade: a clara vale sobre fundo

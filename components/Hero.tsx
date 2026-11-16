@@ -249,7 +249,11 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                   height={796}
                   priority
                   sizes="(max-width: 1024px) 85vw, 520px"
-                  className="h-auto w-[min(88%,420px)] sm:w-[440px] lg:w-[clamp(340px,36vw,520px)]"
+                  // marca-da-abertura é o gancho que o cabeçalho procura para
+                  // se esconder enquanto esta marca estiver em cena: duas
+                  // vezes o mesmo logo a poucos centímetros é o tipo de coisa
+                  // que se nota sem saber nomear. Ver Header.
+                  className="marca-da-abertura h-auto w-[min(88%,420px)] sm:w-[440px] lg:w-[clamp(340px,36vw,520px)]"
                 />
               </motion.span>
 
