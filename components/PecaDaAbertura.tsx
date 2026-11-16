@@ -97,6 +97,22 @@ export default function PecaDaAbertura({
   const sozinho = total <= 1;
   const ehVideo = peca.tipo === "video" && Boolean(peca.video);
 
+  /**
+   * Se esta peça está à vista.
+   *
+   * A roda mantém montadas as peças até duas casas de distância, e as de
+   * distância 2 ficam com opacidade zero, esperando a vez. Montadas elas
+   * precisam estar — é isso que faz a vizinha aparecer sem trocar de elemento,
+   * e foi assim que o piscar preto acabou.
+   *
+   * Tocando é outra história. Medido na página publicada, a abertura tinha
+   * cinco vídeos com preload="auto" e cinco tocando ao mesmo tempo, para
+   * mostrar três: os dois de bastidor baixavam o arquivo inteiro e
+   * decodificavam quadro a quadro atrás de uma opacidade zero. Era trabalho
+   * que ninguém via, e aparecia na rolagem como tranco.
+   */
+  const emCena = Math.abs(d) <= 1;
+
   const avancar = useCallback(() => {
     aoTrocar((indice + 1) % total);
   }, [aoTrocar, indice, total]);
@@ -143,18 +159,30 @@ export default function PecaDaAbertura({
     return () => v.removeEventListener("loadedmetadata", posicionar);
   }, [parado, peca.video]);
 
+  // Fora de cena, para de tocar.
+  //
+  // O `autoPlay` só vale na montagem, e estes elementos não desmontam mais:
+  // sem isto, a peça que saiu de cena continuaria decodificando atrás de uma
+  // opacidade zero até o fim da visita.
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (!emCena) v.pause();
+    else if (!parado && v.paused) v.play().catch(() => {});
+  }, [emCena, parado]);
+
   // Aba escondida não precisa tocar: pausa, e volta quando a pessoa voltar.
   useEffect(() => {
     function aoMudarVisibilidade() {
       const v = ref.current;
       if (!v) return;
-      if (document.hidden) v.pause();
+      if (document.hidden || !emCena) v.pause();
       else if (!parado) v.play().catch(() => {});
     }
     document.addEventListener("visibilitychange", aoMudarVisibilidade);
     return () =>
       document.removeEventListener("visibilitychange", aoMudarVisibilidade);
-  }, [parado]);
+  }, [parado, emCena]);
 
   // A trava da troca, guardada por índice.
   //
@@ -183,13 +211,17 @@ export default function PecaDaAbertura({
         poster={peca.src || undefined}
         muted
         playsInline
-        autoPlay={!parado}
+        autoPlay={!parado && emCena}
         // A do meio não repete: ela conta cinco segundos e passa a vez, e o
         // fim do arquivo é a rede de segurança para a peça mais curta que o
         // corte. As laterais repetem, porque lateral que acaba e congela vira
         // o retângulo parado que este componente veio consertar.
         loop={sozinho || !centro}
-        preload={parado ? "metadata" : "auto"}
+        // Só quem está à vista baixa o arquivo inteiro. A de bastidor pega o
+        // cabeçalho e espera: quando ela entra em cena, o preload vira "auto"
+        // e o resto chega — e ela ainda tem a travessia inteira até o centro
+        // para terminar de carregar.
+        preload={parado || !emCena ? "metadata" : "auto"}
         onTimeUpdate={(e) => aoAndarOTempo(e.currentTarget)}
         onEnded={() => {
           if (!centro || sozinho || quemJaPediu.current === indice) return;
