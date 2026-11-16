@@ -55,6 +55,31 @@ export const dynamic = "force-dynamic";
 /** Quantos cards a fileira tem. As peças que passam por eles são todas. */
 const QUANTOS_CARDS = 3;
 
+/**
+ * Intercala duas listas em blocos do tamanho da fileira.
+ *
+ * Com blocos de três: três do primeiro, três do segundo, três do primeiro, e
+ * assim por diante. É o que faz cada volta da rotação ser de um tipo só.
+ *
+ * Quando um lado acaba, o resto do outro entra inteiro em seguida — forçar a
+ * alternância até o fim exigiria inventar peça que não existe. É o mesmo
+ * princípio do botão que organiza o trilho no painel.
+ */
+function alternarEmBlocos<T>(a: T[], b: T[], tamanho: number): T[] {
+  const saida: T[] = [];
+  let i = 0;
+  let j = 0;
+
+  while (i < a.length && j < b.length) {
+    saida.push(...a.slice(i, i + tamanho));
+    i += tamanho;
+    saida.push(...b.slice(j, j + tamanho));
+    j += tamanho;
+  }
+
+  return [...saida, ...a.slice(i), ...b.slice(j)];
+}
+
 const canais = [
   {
     rotulo: "WhatsApp",
@@ -120,11 +145,19 @@ export default async function EmBrevePage() {
   const fundo = imagem(imagens, "em-breve-fundo");
   const marca = imagem(imagens, "marca-clara");
 
-  // Vídeo na frente, porque é o que esta tela promete mostrar; as imagens
-  // vêm depois, e completam a volta quando houver menos vídeo que card.
+  // A fileira troca em bloco: três vídeos, três estáticos, três vídeos.
+  //
+  // Antes a lista era todos os vídeos e depois todas as imagens, e como a
+  // rotação anda de três em três, o tipo só mudava quando os vídeos
+  // acabavam — quem ficasse um minuto na tela via vídeo, vídeo, vídeo, e de
+  // repente uma sequência inteira de imagem parada.
+  //
+  // Montando a lista em blocos do tamanho da fileira, cada volta inteira é de
+  // um tipo só e a seguinte é do outro. O vídeo abre, porque é ele que prova
+  // que a agência faz movimento.
   const comVideo = vitrine.filter((p) => p.tipo === "video" && p.video);
   const comImagem = vitrine.filter((p) => p.tipo !== "video" && p.src);
-  const pecas = [...comVideo, ...comImagem];
+  const pecas = alternarEmBlocos(comVideo, comImagem, QUANTOS_CARDS);
 
   return (
     // A classe pagina-em-breve é o gancho que esconde header, rodapé e o botão
