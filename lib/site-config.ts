@@ -18,6 +18,15 @@ export const siteConfig = {
   city: "Cajazeiras, PB",
   cnpj: "65.709.672/0001-16",
   tiktok: "@lancamais", // [TIKTOK], substitua pelo @ real
+  /**
+   * O fluxo do diagnóstico, no CRM da agência.
+   *
+   * Mora aqui porque é usado em dois lugares com necessidades diferentes: a
+   * página /diagnostico o embute numa moldura do site, e a tela de espera
+   * aponta para ele direto — ali o site está fechado, e qualquer caminho
+   * interno devolveria a pessoa para a própria tela de espera.
+   */
+  diagnosticoUrl: "https://cliente.lancamais.com/flow/diagnostico",
 };
 
 /**

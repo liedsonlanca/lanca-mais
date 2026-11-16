@@ -57,8 +57,10 @@ export default function ContagemRegressiva({ lancamento }: { lancamento: string 
   const partes: Array<[number | null, string]> = [
     [restante?.dias ?? null, "dias"],
     [restante?.horas ?? null, "horas"],
-    [restante?.minutos ?? null, "min"],
-    [restante?.segundos ?? null, "seg"],
+    // Por extenso, como na referência. Cabem: são quatro colunas de uma
+    // caixa de 672px, e "segundos" ocupa menos da metade de cada uma.
+    [restante?.minutos ?? null, "minutos"],
+    [restante?.segundos ?? null, "segundos"],
   ];
 
   return (
@@ -69,23 +71,17 @@ export default function ContagemRegressiva({ lancamento }: { lancamento: string 
       className={`transition-opacity duration-700 ${pronto ? "opacity-100" : "opacity-0"}`}
       aria-live="off"
     >
-      {/* Quatro ladrilhos, e não quatro números separados por dois-pontos.
-          O relógio digital era o desenho de qualquer contagem; o ladrilho é a
-          mesma linguagem de card do resto do site, e dá peso à única coisa
-          desta tela que muda sozinha.
-
-          Largura máxima para o conjunto não esticar numa coluna larga: quatro
-          ladrilhos de 300px cada viram painel de aeroporto. */}
-      <div className="grid max-w-md grid-cols-4 gap-2 sm:gap-2.5">
+      {/* Quatro números soltos, sem caixa e sem dois-pontos.
+          O peso vem do tamanho, e não de moldura: quanto menos desenho em
+          volta, maior o número pode ser na mesma largura — e o número é a
+          única coisa desta tela que muda sozinha. */}
+      <div className="mx-auto grid max-w-2xl grid-cols-4">
         {partes.map(([valor, rotulo]) => (
-          <div
-            key={rotulo}
-            className="rounded-2xl border border-bege/12 bg-bege/[0.04] px-1 py-3.5 text-center sm:py-4"
-          >
-            <span className="numeral-fantasma block text-3xl leading-none text-bege sm:text-4xl">
+          <div key={rotulo} className="text-center">
+            <span className="numeral-fantasma block text-[clamp(2.5rem,12vw,4.5rem)] font-light leading-none text-bege">
               {String(valor ?? 0).padStart(2, "0")}
             </span>
-            <span className="mt-1.5 block text-[0.7rem] text-bege/45 sm:text-xs">
+            <span className="mt-2 block text-xs text-bege/50 sm:text-sm">
               {rotulo}
             </span>
           </div>

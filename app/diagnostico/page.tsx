@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/lib/site-config";
 
 // O diagnóstico, dentro do site.
 //
@@ -46,8 +47,6 @@ import type { Metadata } from "next";
 // A reserva do cabeçalho é a mesma medida nos dois lugares, por isso mora numa
 // constante só: se o cabeçalho mudar de altura, muda aqui e o fluxo acompanha.
 
-const ENDERECO = "https://cliente.lancamais.com/flow/diagnostico";
-
 /**
  * Quanto o cabeçalho fixo ocupa no topo.
  *
@@ -70,7 +69,7 @@ export default function DiagnosticoPage() {
       style={{ paddingTop: CABECALHO }}
     >
       <iframe
-        src={ENDERECO}
+        src={siteConfig.diagnosticoUrl}
         title="Diagnóstico LANÇA+"
         className="block w-full border-0"
         style={{ height: `calc(100svh - ${CABECALHO})` }}

@@ -173,8 +173,13 @@ html.lenis body {
 }
 
 /* A página Em breve ocupa a tela inteira: header, rodapé e o botão flutuante
-   do WhatsApp não fazem sentido nela. */
-body:has(.pagina-em-breve) header,
+   do WhatsApp não fazem sentido nela.
+
+   O :not() existe porque a regra pegava qualquer <header> da página, e a tela
+   de espera tem a própria barra de topo — que nascia com zero de altura e
+   zero de largura, sem erro nenhum para investigar. É a mesma defesa que a
+   regra do painel, logo abaixo, já usava. */
+body:has(.pagina-em-breve) header:not(.pagina-em-breve header),
 body:has(.pagina-em-breve) footer,
 body:has(.pagina-em-breve) .botao-whatsapp {
   display: none;
