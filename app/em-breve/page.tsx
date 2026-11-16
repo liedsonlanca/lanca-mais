@@ -7,7 +7,7 @@ import { imagem } from "@/lib/imagens";
 import { linkDoMapa } from "@/components/FooterMap";
 import FormularioAcesso from "@/components/FormularioAcesso";
 import ContagemRegressiva from "@/components/ContagemRegressiva";
-import PecaEmBreve from "@/components/PecaEmBreve";
+import PecasEmBreve from "@/components/PecasEmBreve";
 
 // A tela que o visitante vê enquanto o site está fechado.
 //
@@ -33,9 +33,9 @@ import PecaEmBreve from "@/components/PecaEmBreve";
 //
 // ---------- O que os vídeos custam, e por quê ----------
 //
-// Cada peça mostra só os seis primeiros segundos, em laço: a vitrine tem
-// vídeo de um minuto, e três deles lado a lado viram três filmes concorrendo,
-// cada um pego num ponto aleatório do meio.
+// Cada peça fica cinco segundos e dá lugar à próxima: a vitrine tem
+// vídeo de mais de um minuto, e três deles inteiros lado a lado viram três
+// filmes concorrendo, cada um pego num ponto aleatório do meio.
 //
 // Três vídeos tocando é banda, e esta é a primeira tela que todo visitante vê.
 // Eles entram sem som, em laço, e com preload="metadata": o navegador pega o
@@ -52,8 +52,8 @@ export const metadata: Metadata = {
 // A data vem do banco e muda pelo painel: nada de cache.
 export const dynamic = "force-dynamic";
 
-/** Quantas peças a vitrine empresta para esta tela. */
-const QUANTAS_PECAS = 3;
+/** Quantos cards a fileira tem. As peças que passam por eles são todas. */
+const QUANTOS_CARDS = 3;
 
 const canais = [
   {
@@ -120,11 +120,11 @@ export default async function EmBrevePage() {
   const fundo = imagem(imagens, "em-breve-fundo");
   const marca = imagem(imagens, "marca-clara");
 
-  // Vídeo na frente, porque é o que esta tela promete mostrar; imagem entra só
-  // para completar a fileira quando não houver vídeo cadastrado o bastante.
+  // Vídeo na frente, porque é o que esta tela promete mostrar; as imagens
+  // vêm depois, e completam a volta quando houver menos vídeo que card.
   const comVideo = vitrine.filter((p) => p.tipo === "video" && p.video);
   const comImagem = vitrine.filter((p) => p.tipo !== "video" && p.src);
-  const pecas = [...comVideo, ...comImagem].slice(0, QUANTAS_PECAS);
+  const pecas = [...comVideo, ...comImagem];
 
   return (
     // A classe pagina-em-breve é o gancho que esconde header, rodapé e o botão
@@ -239,45 +239,18 @@ export default async function EmBrevePage() {
           </div>
         )}
 
-        {/* As três peças, com a do meio à frente.
+        {/* As peças do trabalho, passando de cinco em cinco segundos.
 
-            É a composição da referência: a central maior e levantada, as duas
-            de fora um degrau atrás. O degrau é de escala e de brilho, e não de
-            posição absoluta — assim a fileira continua sendo três colunas de
-            grade, e não três caixas presas a coordenadas escritas à mão. */}
-        {pecas.length > 0 && (
-          <div className="mt-11 grid w-full max-w-3xl grid-cols-3 items-center gap-2.5 sm:mt-14 sm:gap-5">
-            {pecas.map((peca, i) => {
-              const central = i === Math.floor(pecas.length / 2);
+            A fileira é a da referência: a central maior e levantada, as duas
+            de fora um degrau atrás. O degrau é de escala e de brilho, e não
+            de posição absoluta — assim continua sendo três colunas de grade,
+            e não três caixas presas a coordenadas escritas à mão.
 
-              return (
-                <div
-                  key={peca.video || peca.src || i}
-                  className={`relative aspect-[4/5] overflow-hidden rounded-2xl border bg-preto transition-all duration-700 sm:rounded-[20px] ${
-                    central
-                      ? "z-10 scale-[1.08] border-bege/25 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.9)]"
-                      : "border-bege/12 brightness-[0.72]"
-                  }`}
-                >
-                  {peca.tipo === "video" && peca.video ? (
-                    <PecaEmBreve
-                      src={peca.video}
-                      poster={peca.src || undefined}
-                    />
-                  ) : (
-                    <Image
-                      src={peca.src}
-                      alt=""
-                      fill
-                      sizes="(max-width: 640px) 33vw, 220px"
-                      className="object-cover"
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+            Vão todas as peças cadastradas, e não as três primeiras: numa
+            tela onde a pessoa está parada esperando, deixar o resto do
+            portfólio guardado é desperdiçar o único argumento que esta tela
+            tem. */}
+        <PecasEmBreve pecas={pecas} slots={QUANTOS_CARDS} />
 
         {/* Uma linha, e não um parágrafo.
 
