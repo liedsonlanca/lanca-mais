@@ -7,6 +7,7 @@ import { imagem } from "@/lib/imagens";
 import { linkDoMapa } from "@/components/FooterMap";
 import FormularioAcesso from "@/components/FormularioAcesso";
 import ContagemRegressiva from "@/components/ContagemRegressiva";
+import PecaEmBreve from "@/components/PecaEmBreve";
 
 // A tela que o visitante vê enquanto o site está fechado.
 //
@@ -31,6 +32,10 @@ import ContagemRegressiva from "@/components/ContagemRegressiva";
 // que derrubou um deploy em novembro.
 //
 // ---------- O que os vídeos custam, e por quê ----------
+//
+// Cada peça mostra só os seis primeiros segundos, em laço: a vitrine tem
+// vídeo de um minuto, e três deles lado a lado viram três filmes concorrendo,
+// cada um pego num ponto aleatório do meio.
 //
 // Três vídeos tocando é banda, e esta é a primeira tela que todo visitante vê.
 // Eles entram sem som, em laço, e com preload="metadata": o navegador pega o
@@ -255,19 +260,9 @@ export default async function EmBrevePage() {
                   }`}
                 >
                   {peca.tipo === "video" && peca.video ? (
-                    // Sem "use client": vídeo em laço e sem som é HTML puro, e
-                    // não precisa de JavaScript nenhum para tocar.
-                    <video
+                    <PecaEmBreve
                       src={peca.video}
                       poster={peca.src || undefined}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                      aria-hidden
-                      tabIndex={-1}
-                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   ) : (
                     <Image
