@@ -223,7 +223,14 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
       <div className="tema-claro relative flex flex-col overflow-hidden rounded-[26px] bg-fundo lg:min-h-[calc(100svh-2rem)] lg:rounded-[32px]">
         <div className="mx-auto grid w-full max-w-7xl flex-1 items-center gap-12 px-5 pb-10 pt-28 sm:px-8 lg:grid-cols-[1fr_1.05fr] lg:gap-6 lg:px-12 lg:pb-8 lg:pt-28">
           {/* ---------- Texto ---------- */}
-          <div>
+          {/* Centralizado no celular, à esquerda a partir do tablet.
+
+              No celular a coluna é a tela inteira e não há nada ao lado: texto
+              encostado à esquerda com a marca centrada por acaso é o tipo de
+              desalinho que se sente sem saber nomear. Do tablet para cima a
+              coluna divide a tela com a composição de vídeos, e aí alinhar à
+              esquerda é o que dá a borda comum entre as duas. */}
+          <div className="text-center sm:text-left">
             {/* Aqui havia um selo "Agência de marketing completa".
 
                 Saiu a pedido. Ele dizia em letra miúda, acima do logo, o que a
@@ -253,13 +260,13 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
                   // se esconder enquanto esta marca estiver em cena: duas
                   // vezes o mesmo logo a poucos centímetros é o tipo de coisa
                   // que se nota sem saber nomear. Ver Header.
-                  className="marca-da-abertura h-auto w-[min(88%,420px)] sm:w-[440px] lg:w-[clamp(340px,36vw,520px)]"
+                  className="marca-da-abertura mx-auto h-auto w-[min(88%,420px)] sm:mx-0 sm:w-[440px] lg:w-[clamp(340px,36vw,520px)]"
                 />
               </motion.span>
 
               <motion.span
                 {...entrada(0.3)}
-                className="mt-6 block max-w-xl text-[clamp(1.45rem,5.6vw,2.25rem)] font-medium leading-[1.14] tracking-[-0.025em] text-tinta/80 lg:text-[clamp(1.6rem,2.35vw,2.25rem)]"
+                className="mx-auto mt-6 block max-w-xl text-[clamp(1.45rem,5.6vw,2.25rem)] font-medium leading-[1.14] tracking-[-0.025em] text-tinta/80 sm:mx-0 lg:text-[clamp(1.6rem,2.35vw,2.25rem)]"
               >
                 Sua marca tem qualidade. Sua presença digital mostra isso?
               </motion.span>
@@ -267,7 +274,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
 
             <motion.p
               {...entrada(0.42)}
-              className="mt-5 max-w-lg text-[16px] leading-relaxed text-tinta/65 sm:text-[17px]"
+              className="mx-auto mt-5 max-w-lg text-[16px] leading-relaxed text-tinta/65 sm:mx-0 sm:text-[17px]"
             >
               A LANÇA+ transforma negócios com bons produtos e serviços em marcas
               com posicionamento sólido: estratégia documentada, conteúdo
@@ -275,7 +282,7 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
             </motion.p>
 
             {depoimento && (
-              <motion.figure {...entrada(0.5)} className="mt-6 flex max-w-md items-center gap-3.5">
+              <motion.figure {...entrada(0.5)} className="mx-auto mt-6 flex max-w-md items-center gap-3.5 text-left sm:mx-0">
                 {depoimento.foto ? (
                   <Image
                     src={depoimento.foto}
