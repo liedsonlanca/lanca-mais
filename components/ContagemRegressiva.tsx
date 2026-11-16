@@ -69,27 +69,25 @@ export default function ContagemRegressiva({ lancamento }: { lancamento: string 
       className={`transition-opacity duration-700 ${pronto ? "opacity-100" : "opacity-0"}`}
       aria-live="off"
     >
-      <div className="flex items-start justify-center gap-3 sm:gap-6">
-        {partes.map(([valor, rotulo], i) => (
-          <div key={rotulo} className="flex items-start gap-3 sm:gap-6">
-            <div className="text-center">
-              <span className="numeral-fantasma block text-4xl leading-none text-[#E8E4D9] sm:text-5xl lg:text-6xl">
-                {String(valor ?? 0).padStart(2, "0")}
-              </span>
-              <span className="mt-2 block text-[10px] uppercase tracking-[0.24em] text-[#E8E4D9]/45 sm:text-xs">
-                {rotulo}
-              </span>
-            </div>
+      {/* Quatro ladrilhos, e não quatro números separados por dois-pontos.
+          O relógio digital era o desenho de qualquer contagem; o ladrilho é a
+          mesma linguagem de card do resto do site, e dá peso à única coisa
+          desta tela que muda sozinha.
 
-            {/* Separador entre os blocos, menos depois do último. */}
-            {i < partes.length - 1 && (
-              <span
-                aria-hidden
-                className="text-3xl leading-none text-[#D97B45]/40 sm:text-4xl lg:text-5xl"
-              >
-                :
-              </span>
-            )}
+          Largura máxima para o conjunto não esticar numa coluna larga: quatro
+          ladrilhos de 300px cada viram painel de aeroporto. */}
+      <div className="grid max-w-md grid-cols-4 gap-2 sm:gap-2.5">
+        {partes.map(([valor, rotulo]) => (
+          <div
+            key={rotulo}
+            className="rounded-2xl border border-bege/12 bg-bege/[0.04] px-1 py-3.5 text-center sm:py-4"
+          >
+            <span className="numeral-fantasma block text-3xl leading-none text-bege sm:text-4xl">
+              {String(valor ?? 0).padStart(2, "0")}
+            </span>
+            <span className="mt-1.5 block text-[0.7rem] text-bege/45 sm:text-xs">
+              {rotulo}
+            </span>
           </div>
         ))}
       </div>
