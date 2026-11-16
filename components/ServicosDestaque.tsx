@@ -206,19 +206,32 @@ export default function ServicosDestaque({
                   className="pointer-events-none absolute inset-0 bg-gradient-to-t from-preto via-preto/70 to-preto/10"
                 />
 
-                {/* Aqui havia mais dois véus, só do tablet para cima: um
-                    escurecimento parejo da foto inteira, que levantava ao
-                    passar o ponteiro, e uma faixa curta no pé por baixo da
-                    seta.
+                {/* O véu de registro, só do tablet para cima.
 
-                    Os dois existiam para o desenho antigo, em que o card era
-                    branco e a foto uma tira de 230px no pé. Com a foto
-                    ocupando o card inteiro, o véu parelho escurecia o topo
-                    justamente onde está o assunto da imagem, e a faixa de pé
-                    ficou sem função, porque a seta subiu para o topo.
+                    Existe por um problema que só aparece ali: no celular vê-se
+                    um card por vez, no desktop os três de uma vez. As fotos
+                    vêm de origens diferentes — parede laranja, estúdio branco,
+                    luz de set — e lado a lado, cada uma no seu tom, o olho vai
+                    para a mais colorida e o card vira moldura de uma imagem
+                    solta.
 
-                    O degradê acima faz o serviço sozinho, e é o mesmo que o
-                    celular já usava. */}
+                    Era 45% e cobria a foto inteira, do tempo em que ela era só
+                    uma tira no pé do card. Com a foto ocupando tudo, aquela
+                    dose apagava justamente o topo, que é onde está o assunto
+                    da imagem. Em 18% ela só tira a aresta entre as três, e a
+                    foto continua sendo foto.
+
+                    Levanta ao passar o ponteiro, porque aí a pessoa escolheu
+                    olhar aquele card: o descanso é sóbrio, a atenção é
+                    colorida.
+
+                    Saiu junto daqui a faixa curta que ficava no pé por baixo
+                    da seta: a seta subiu para o topo, e a faixa ficou sem o
+                    que proteger. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 hidden bg-preto/[0.18] transition-colors duration-700 group-hover:bg-preto/0 group-focus-visible:bg-preto/0 sm:block"
+                />
               </div>
             )}
 
