@@ -6,6 +6,7 @@ import { estadoDoAdmin } from "@/lib/admin";
 import LoginAdmin from "@/components/admin/LoginAdmin";
 import SairDoAdmin from "@/components/admin/SairDoAdmin";
 import MenuLateral from "@/components/admin/MenuLateral";
+import AtualizacaoViva from "@/components/admin/AtualizacaoViva";
 import { lerImagens } from "@/lib/conteudo";
 import { imagem } from "@/lib/imagens";
 
@@ -177,6 +178,10 @@ export default async function AdminLayout({
           </div>
         </main>
       </div>
+
+      {/* O painel se reconsulta sozinho enquanto a aba estiver a vista.
+          Mora aqui, no layout, para valer nas treze telas. */}
+      <AtualizacaoViva />
 
       {/* Os recados das ações. Fixo no canto, por cima de tudo, então mora
           fora do <main> e não entra no fluxo de nenhuma tela. */}

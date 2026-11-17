@@ -174,6 +174,19 @@ export default function MenuLateral() {
           <Link
             key={secao.href}
             href={secao.href}
+            // Sem pre-busca, e isto nao e economia de bytes.
+            //
+            // O Next busca de antemao os links que estao na tela, e refaz
+            // isso a cada atualizacao do painel. Medido: de seis requisicoes
+            // por rodada, so uma era a tela aberta — as outras cinco eram
+            // estas, cada uma rodando as consultas da sua propria pagina. A
+            // cada quinze segundos o painel consultava telas que ninguem
+            // estava vendo.
+            //
+            // O preco de desligar e a navegacao esperar a resposta, que nas
+            // telas do painel mede uns trezentos milissegundos. Barato perto
+            // de multiplicar a conta do banco por seis.
+            prefetch={false}
             aria-current={atual ? "page" : undefined}
             className={`flex min-h-11 shrink-0 items-center gap-2.5 rounded-xl px-3.5 text-sm transition-colors duration-300 ${
               atual
