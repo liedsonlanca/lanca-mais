@@ -78,6 +78,17 @@ export default function Consentimento() {
   const [decidido, setDecidido] = useState<Categorias | null>(null);
   const [aberto, setAberto] = useState(false);
   const [detalhando, setDetalhando] = useState(false);
+
+  // Minimizar não é responder.
+  //
+  // O aviso não pode sumir sozinho: enquanto não há resposta, nada carrega,
+  // e some a chance de a pessoa dizer sim. Mas ele ocupa o pé da tela, e em
+  // telefone baixo isso é metade do que ela veio ler — segurar a pessoa
+  // refém do aviso é o jeito mais rápido de fazê-la recusar por irritação.
+  //
+  // Minimizado, ele vira uma pastilha no canto: continua à mão, continua
+  // sem consentimento nenhum registrado, e a leitura segue.
+  const [minimizado, setMinimizado] = useState(false);
   const [escolha, setEscolha] = useState<Categorias>(NADA);
 
   useEffect(() => {
@@ -92,6 +103,7 @@ export default function Consentimento() {
     // O link do rodapé reabre o aviso. Vai por evento, e não por estado
     // compartilhado, porque o rodapé é servidor e este componente é cliente.
     const reabrir = () => {
+      setMinimizado(false);
       setEscolha(lerDecisao()?.categorias ?? NADA);
       setDetalhando(true);
       setAberto(true);
@@ -124,7 +136,29 @@ export default function Consentimento() {
     <>
       {decidido && <Rastreadores de={decidido} />}
 
-      {aberto && (
+      {aberto && minimizado && (
+        <button
+          type="button"
+          onClick={() => setMinimizado(false)}
+          className="fixed bottom-4 left-4 z-[110] inline-flex min-h-11 items-center gap-2 rounded-full border border-contorno bg-cartao px-4 text-sm text-tinta shadow-[0_18px_40px_-20px_rgba(10,10,8,0.5)] transition-colors duration-300 hover:border-salmon/50"
+        >
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            className="h-4 w-4 text-destaque"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9 9h.01M15 10h.01M10 15h.01M14.5 14.5h.01" />
+          </svg>
+          Cookies
+        </button>
+      )}
+
+      {aberto && !minimizado && (
         /* z-[110] fica acima de tudo, inclusive das capas de Em breve e de
            manutenção, que ocupam a tela inteira em z-[100]. Atrás delas o
            aviso existia no documento e não podia ser respondido — e como
@@ -138,13 +172,35 @@ export default function Consentimento() {
         >
           <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.45)]">
             <div className="p-6 sm:p-8">
-              <p
-                id="consentimento-titulo"
-                className="font-heading text-xl font-semibold text-tinta sm:text-2xl"
-              >
-                Um minuto sobre{" "}
-                <span className="text-destaque">cookies</span>
-              </p>
+              <div className="flex items-start justify-between gap-4">
+                <p
+                  id="consentimento-titulo"
+                  className="font-heading text-xl font-semibold text-tinta sm:text-2xl"
+                >
+                  Um minuto sobre{" "}
+                  <span className="text-destaque">cookies</span>
+                </p>
+
+                {/* Minimizar, e não fechar: fechar sem resposta seria o
+                    mesmo que recusar sem a pessoa ter dito isso. */}
+                <button
+                  type="button"
+                  onClick={() => setMinimizado(true)}
+                  aria-label="Minimizar o aviso de cookies"
+                  className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-tinta/45 transition-colors duration-300 hover:bg-fundo-alt hover:text-tinta"
+                >
+                  <svg
+                    aria-hidden
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M6 12h12" />
+                  </svg>
+                </button>
+              </div>
 
               <p className="mt-3 text-sm leading-relaxed text-tinta/70">
                 O site funciona sem guardar nada sobre você. Se permitir, usamos
