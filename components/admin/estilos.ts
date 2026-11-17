@@ -24,7 +24,7 @@ export const botaoDiscreto =
   "text-sm text-tinta/45 transition-colors duration-300 hover:text-destaque";
 
 export const cartao =
-  "rounded-3xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)]";
+  "rounded-2xl border border-contorno bg-cartao p-6 shadow-[var(--sombra-cartao)]";
 
 // file:py-3: quem se toca aqui e o botao de dentro do campo, e nao o campo.
 // Com file:py-2 ele ficava com 36px de altura, abaixo do alvo minimo, e no

@@ -1,9 +1,13 @@
 import Link from "next/link";
+import Image from "next/image";
 import Avisos from "@/components/admin/Avisos";
 import type { Metadata } from "next";
 import { estadoDoAdmin } from "@/lib/admin";
 import LoginAdmin from "@/components/admin/LoginAdmin";
 import SairDoAdmin from "@/components/admin/SairDoAdmin";
+import MenuLateral from "@/components/admin/MenuLateral";
+import { lerImagens } from "@/lib/conteudo";
+import { imagem } from "@/lib/imagens";
 
 export const metadata: Metadata = {
   title: "Painel",
@@ -17,23 +21,32 @@ export const metadata: Metadata = {
 // conferir, e nenhuma tela do painel pode existir sem passar por ele. As
 // Server Actions conferem de novo por conta própria, porque são alcançáveis
 // por POST direto, sem passar por esta árvore.
+//
+// ---------- Por que o painel é claro, e o site escuro ----------
+//
+// São duas coisas diferentes. O site é vitrine, e o escuro é escolha de
+// marca; o painel é ferramenta de trabalho, aberta por horas, e ali o claro
+// cansa menos e mostra melhor a imagem que a pessoa está subindo — numa tela
+// escura, toda foto parece mais clara do que vai ficar publicada.
+//
+// Não precisou de nenhuma cor nova: `tema-claro` redefine os mesmos nomes de
+// token que o site já usa (ver globals.css), então `bg-cartao` e `text-tinta`
+// continuam valendo em todas as telas e passam a dar claro. É por isso que
+// esta mudança não tocou nas treze páginas do painel.
+//
+// ---------- Por que barra lateral, e não abas em cima ----------
+//
+// São onze seções. Em cima elas viravam uma fileira de pastilhas que rolava
+// de lado no celular e quebrava em duas linhas no computador, e em nenhum dos
+// dois casos dava para ver onde se está sem ler tudo. Na lateral cabem as
+// onze de uma vez, com a atual marcada, e o conteúdo ganha a largura inteira.
+//
+// Abaixo do `lg` a lateral vira a fileira que rola, porque ali não há largura
+// para as duas colunas.
+
 // A tela do blog continua existindo e funcionando; ela só sai do menu
 // enquanto BLOG_ATIVO for falso, para não oferecer a edição de uma seção que
 // ninguém vê no site.
-const SECOES = [
-  { href: "/lncadmin/site", rotulo: "Estado do site" },
-  { href: "/lncadmin/vitrine", rotulo: "Nosso trabalho" },
-  { href: "/lncadmin/depoimentos", rotulo: "Depoimentos" },
-  { href: "/lncadmin/depoimentos-video", rotulo: "Depoimentos em vídeo" },
-  { href: "/lncadmin/imagens", rotulo: "Imagens do site" },
-  { href: "/lncadmin/textos", rotulo: "Textos do site" },
-  { href: "/lncadmin/equipe", rotulo: "Equipe" },
-  { href: "/lncadmin/cases", rotulo: "Cases" },
-  { href: "/lncadmin/logos", rotulo: "Logos" },
-  { href: "/lncadmin/numeros", rotulo: "Números" },
-  { href: "/lncadmin/seguranca", rotulo: "Segurança" },
-];
-
 export default async function AdminLayout({
   children,
 }: {
@@ -41,22 +54,31 @@ export default async function AdminLayout({
 }) {
   const estado = await estadoDoAdmin();
 
+  // A versão escura da marca, porque o painel é claro.
+  const marca = imagem(await lerImagens(), "marca-escura");
+
   if (estado !== "liberado") {
     return (
-      <div className="pagina-admin flex min-h-screen items-center justify-center bg-fundo-alt px-6">
+      <div className="tema-claro pagina-admin flex min-h-screen items-center justify-center bg-fundo-alt px-6">
         <div className="w-full max-w-sm text-center">
-          <p className="font-heading text-3xl font-semibold text-tinta">
-            Painel <span className="text-destaque">LANÇA+</span>
-          </p>
+          <Image
+            src={marca.src}
+            alt="LANÇA+"
+            width={220}
+            height={62}
+            priority
+            className="mx-auto h-8 w-auto"
+          />
+          <p className="mt-3 text-sm text-tinta/55">Painel</p>
 
           {estado === "sem-senha" ? (
-            <p className="mt-6 leading-relaxed text-tinta/70">
-              O painel ainda não foi configurado. Falta criar a variável de
-              ambiente <code className="text-destaque">ADMIN_SENHA</code> no
-              projeto da Vercel e publicar de novo.
+            <p className="mt-4 rounded-2xl border border-contorno bg-cartao p-5 text-sm leading-relaxed text-tinta/70">
+              Falta a senha do painel no projeto. Defina a variável{" "}
+              <span className="text-destaque">ADMIN_SENHA</span> na Vercel e
+              recarregue esta página.
             </p>
           ) : (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8">
               <LoginAdmin />
             </div>
           )}
@@ -66,23 +88,30 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="pagina-admin min-h-screen bg-fundo-alt">
-      {/* Cabeçalho pensado para o dedo.
-          Cada destino é uma pastilha de 44px de altura, que é o alvo mínimo
-          recomendado no toque: antes eram links de 20px enfileirados, e no
-          celular era fácil errar o vizinho. No computador nada muda além de um
-          respiro a mais. */}
-      <header className="border-b border-contorno bg-cartao">
-        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-          <div className="flex items-center justify-between gap-4">
+    <div className="tema-claro pagina-admin min-h-screen bg-fundo-alt text-tinta">
+      <div className="mx-auto flex w-full max-w-[1400px] flex-col lg:flex-row">
+        {/* ---------- Barra lateral ---------- */}
+        <aside className="border-b border-contorno bg-cartao lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r">
+          <div className="flex items-center justify-between gap-3 px-5 py-4 lg:py-6">
             <Link
               href="/lncadmin"
-              className="font-heading flex min-h-11 items-center text-lg font-semibold text-tinta"
+              className="flex min-h-11 items-center gap-2.5"
             >
-              Painel <span className="ml-1.5 text-destaque">LANÇA+</span>
+              <Image
+                src={marca.src}
+                alt="LANÇA+"
+                width={220}
+                height={62}
+                priority
+                className="h-6 w-auto"
+              />
+              <span className="text-sm text-tinta/45">Painel</span>
             </Link>
 
-            <div className="flex items-center gap-1 text-sm">
+            {/* No celular as duas ações moram aqui, ao lado da marca; do lg
+                para cima descem para o pé da lateral, onde não disputam
+                espaço com a lista. */}
+            <div className="flex items-center gap-1 text-sm lg:hidden">
               <Link
                 href="/"
                 target="_blank"
@@ -95,22 +124,51 @@ export default async function AdminLayout({
             </div>
           </div>
 
-          {/* Rola de lado no celular em vez de quebrar em várias fileiras. */}
-          <nav className="sem-barra -mx-4 mt-1 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
-            {SECOES.map((secao) => (
-              <Link
-                key={secao.href}
-                href={secao.href}
-                className="flex min-h-11 shrink-0 items-center rounded-full px-3.5 text-sm text-tinta/65 transition-colors duration-300 hover:bg-fundo-alt hover:text-destaque"
+          {/* A ação principal no topo da lateral, como na referência.
+              Lá é "Nova Venda"; aqui o que a pessoa mais faz depois de
+              salvar é conferir no site, então é esse o lugar dele. */}
+          <div className="px-3 pb-3">
+            <Link
+              href="/"
+              target="_blank"
+              rel="noopener"
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-tinta px-4 text-sm font-medium text-fundo transition-opacity duration-300 hover:opacity-90"
+            >
+              Ver o site
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-3.5 w-3.5"
               >
-                {secao.rotulo}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </Link>
+          </div>
 
-      <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+          <MenuLateral />
+
+          <div className="mt-auto hidden border-t border-contorno px-3 py-3 lg:block">
+            <Link
+              href="/"
+              target="_blank"
+              rel="noopener"
+              className="flex min-h-11 items-center rounded-xl px-3.5 text-sm text-tinta/55 transition-colors duration-300 hover:bg-fundo-alt hover:text-tinta"
+            >
+              Ver o site
+            </Link>
+            <SairDoAdmin />
+          </div>
+        </aside>
+
+        <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+          {children}
+        </main>
+      </div>
 
       {/* Os recados das ações. Fixo no canto, por cima de tudo, então mora
           fora do <main> e não entra no fluxo de nenhuma tela. */}
