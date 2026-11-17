@@ -136,12 +136,7 @@ const canais = [
   },
 ];
 
-export default async function EmBrevePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ diagnostico?: string }>;
-}) {
-  const { diagnostico } = await searchParams;
+export default async function EmBrevePage() {
   const [{ lancamento }, imagens, vitrine] = await Promise.all([
     lerConfigSite(),
     lerImagens(),
@@ -164,61 +159,6 @@ export default async function EmBrevePage({
   const comVideo = vitrine.filter((p) => p.tipo === "video" && p.video);
   const comImagem = vitrine.filter((p) => p.tipo !== "video" && p.src);
   const pecas = alternarEmBlocos(comVideo, comImagem, QUANTOS_CARDS);
-
-  // O diagnóstico dentro da própria tela de espera.
-  //
-  // Abrir o fluxo noutra aba resolvia o beco que /diagnostico tinha — ali
-  // o menu do site levava de volta para cá, já que o site está fechado —
-  // mas cobrava caro: a pessoa saía do endereço da agência e caía num
-  // domínio que ela não reconhece, sem nada em volta dizendo de quem é.
-  //
-  // Aqui o fluxo abre por cima da própria tela, com uma faixa fina e um
-  // Voltar. Ninguém sai do lugar, e a saída é explícita.
-  //
-  // Por parâmetro de endereço, e não por estado de componente: assim o
-  // Voltar é um link de verdade, o botão de voltar do navegador funciona,
-  // e a tela abre sem depender de JavaScript. A página já é force-dynamic,
-  // então ler o parâmetro não custa cache nenhum.
-  if (diagnostico) {
-    return (
-      <section className="pagina-em-breve fixed inset-0 z-[100] flex flex-col bg-abismo">
-        <div className="flex shrink-0 items-center justify-between gap-4 px-5 py-3 sm:px-8">
-          <Link
-            href="/em-breve"
-            scroll={false}
-            className="group inline-flex min-h-11 items-center gap-2.5 text-sm font-medium text-bege/70 transition-colors duration-500 hover:text-bege"
-          >
-            <svg
-              aria-hidden
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4 transition-transform duration-500 group-hover:-translate-x-1"
-            >
-              <path d="M19 12H5M11 18l-6-6 6-6" />
-            </svg>
-            Voltar
-          </Link>
-
-          {/* Texto, e não a marca: o fluxo traz o próprio logo, e dois
-              LANÇA+ a poucos centímetros é o mesmo problema que a página
-              /diagnostico teve. */}
-          <span className="text-xs text-bege/40 sm:text-sm">
-            Diagnóstico gratuito
-          </span>
-        </div>
-
-        <iframe
-          src={siteConfig.diagnosticoUrl}
-          title="Diagnóstico LANÇA+"
-          className="block w-full flex-1 border-0"
-        />
-      </section>
-    );
-  }
 
   return (
     // A classe pagina-em-breve é o gancho que esconde header, rodapé e o botão
@@ -293,8 +233,7 @@ export default async function EmBrevePage({
               direto não tem esse problema, e é a mesma coisa que a página
               interna embute. */}
           <Link
-            href="/em-breve?diagnostico=1"
-            scroll={false}
+            href="/em-breve/diagnostico"
             className="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-botao px-5 text-sm font-semibold text-branco transition-colors duration-500 hover:bg-salmon-escuro sm:w-[200px] sm:justify-center"
           >
             Fazer diagnóstico
@@ -361,8 +300,7 @@ export default async function EmBrevePage({
         <p className="mt-9 max-w-xl text-sm leading-relaxed text-bege/60 sm:mt-12">
           O site está em obras, a equipe não.{" "}
           <Link
-            href="/em-breve?diagnostico=1"
-            scroll={false}
+            href="/em-breve/diagnostico"
             className="font-medium text-salmon underline decoration-salmon/35 underline-offset-4 transition-colors duration-500 hover:decoration-salmon"
           >
             Faça um diagnóstico gratuito da sua marca

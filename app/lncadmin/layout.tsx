@@ -89,7 +89,13 @@ export default async function AdminLayout({
 
   return (
     <div className="tema-claro pagina-admin min-h-screen bg-fundo-alt text-tinta">
-      <div className="mx-auto flex w-full max-w-[1400px] flex-col lg:flex-row">
+      {/* Sem largura máxima aqui: a lateral tem que encostar na borda da
+          janela, como na referência. Com o conjunto centrado numa caixa de
+          1400px, numa tela larga sobravam duzentos e tantos pixels de cada
+          lado e a lateral ficava boiando no meio do nada.
+          Quem ganha limite é só o conteúdo, lá dentro, porque linha de texto
+          atravessando 1900px não se lê. */}
+      <div className="flex w-full flex-col lg:flex-row">
         {/* ---------- Barra lateral ---------- */}
         <aside className="border-b border-contorno bg-cartao lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between gap-3 px-5 py-4 lg:py-6">
@@ -166,7 +172,9 @@ export default async function AdminLayout({
         </aside>
 
         <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
-          {children}
+          <div className="mx-auto w-full max-w-[1200px]">
+            {children}
+          </div>
         </main>
       </div>
 
