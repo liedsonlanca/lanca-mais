@@ -11,6 +11,7 @@ import SmoothScroll from "@/components/motion/SmoothScroll";
 import MotionProvider from "@/components/motion/MotionProvider";
 import ScrollTopOnNavigate from "@/components/motion/ScrollTopOnNavigate";
 import MidiaProtegida from "@/components/MidiaProtegida";
+import Medidor from "@/components/Medidor";
 import { siteConfig, siteUrl } from "@/lib/site-config";
 import { lerImagens } from "@/lib/conteudo";
 import { imagem } from "@/lib/imagens";
@@ -80,6 +81,7 @@ export default async function RootLayout({
         <SmoothScroll />
         <ScrollTopOnNavigate />
         <MidiaProtegida />
+        <Medidor />
         <MotionProvider>
           <Header marcaClara={marcaClara} marcaEscura={marcaEscura} />
           {/* relative: o "Voltar" se pendura no alto do conteudo sem

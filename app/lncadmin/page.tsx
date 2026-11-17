@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
 import { sql, garantirEsquema } from "@/lib/db";
+import { lerResumo } from "@/lib/acessos";
+import PainelDeAcessos from "@/components/admin/PainelDeAcessos";
 
 export const dynamic = "force-dynamic";
 
@@ -90,19 +92,37 @@ const SECOES: Array<{
   },
 ];
 
+/**
+ * Quantos itens cada seção tem.
+ *
+ * Num SELECT só, e não um por tabela. Eram oito idas ao banco em sequência
+ * para montar esta tela, e cada ida custa uma volta de rede: medido na página
+ * publicada, isto sozinho respondia por mais de um segundo, contra trezentos
+ * milissegundos das outras telas do painel.
+ */
 async function contar() {
   const vazio: Record<string, number> = {};
   if (!sql) return vazio;
 
+  const tabelas = SECOES.map((s) => s.tabela).filter(Boolean) as string[];
+  if (tabelas.length === 0) return vazio;
+
   try {
     await garantirEsquema();
-    for (const secao of SECOES) {
-      if (!secao.tabela) continue;
-      const linhas = (await sql.query(
-        `SELECT count(*)::int AS total FROM ${secao.tabela}`
-      )) as Array<{ total: number }>;
-      vazio[secao.tabela] = linhas[0]?.total ?? 0;
-    }
+
+    // Os nomes vêm da lista escrita à mão acima, e nunca de nada que chegue
+    // de fora: interpolar nome de tabela só é seguro porque a origem é esta
+    // constante.
+    const linhas = (await sql.query(
+      tabelas
+        .map(
+          (tabela) =>
+            `SELECT '${tabela}' AS tabela, count(*)::int AS total FROM ${tabela}`
+        )
+        .join(" UNION ALL ")
+    )) as Array<{ tabela: string; total: number }>;
+
+    for (const linha of linhas) vazio[linha.tabela] = linha.total;
   } catch {
     // O painel abre mesmo sem contagem; a seção diz o que houve.
   }
@@ -116,14 +136,25 @@ export default async function AdminInicio() {
   // fazia esta tela consultar o banco e ia embora dentro do HTML da resposta.
   if (!(await painelLiberado())) return null;
 
-  const totais = await contar();
+  // Em paralelo: uma não depende da outra, e em série a tela esperaria a
+  // soma das duas.
+  const [totais, acessos] = await Promise.all([contar(), lerResumo()]);
 
   return (
     <div>
       <h1 className="font-heading text-3xl font-semibold text-tinta">
-        O que você pode editar
+        Visão geral
       </h1>
       <p className="mt-2 max-w-2xl leading-relaxed text-tinta/65">
+        O movimento do site e o que você pode editar nele.
+      </p>
+
+      <PainelDeAcessos resumo={acessos} />
+
+      <h2 className="font-heading mt-12 text-xl font-semibold text-tinta">
+        O que você pode editar
+      </h2>
+      <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-tinta/65">
         Cada bloco abaixo é uma parte do site. O que você salvar aqui aparece
         no site em segundos, sem precisar publicar nada.
       </p>

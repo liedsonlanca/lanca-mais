@@ -46,6 +46,27 @@ export const sql = bancoConfigurado ? neon(url) : null;
 let criacao: Promise<void> | null = null;
 
 const TABELAS = [
+  // Os acessos ao site, para o painel medir movimento sem depender de
+  // terceiro.
+  //
+  // `visitante` e uma impressao digital em hash, nao uma pessoa: sai de
+  // HMAC do endereco de rede e do navegador com um segredo que troca de dia
+  // (ver lib/acessos.ts). Serve para nao contar a mesma pessoa cinco vezes
+  // na mesma visita, e nao serve para saber quem ela e — amanha o mesmo
+  // visitante vira outro hash, e nada liga os dois.
+  //
+  // O indice por data existe porque toda consulta do painel e uma janela de
+  // tempo: sem ele, contar os ultimos cinco minutos obrigaria a varrer a
+  // tabela inteira, que cresce todo dia.
+  `CREATE TABLE IF NOT EXISTS acessos (
+     id         BIGSERIAL PRIMARY KEY,
+     caminho    TEXT NOT NULL,
+     visitante  TEXT NOT NULL,
+     referencia TEXT,
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS acessos_criado_em ON acessos (criado_em DESC)`,
+
   // Controle interno. Guarda quais tabelas já foram semeadas com o conteúdo
   // que vivia nos arquivos, para que a semeadura aconteça uma vez só: sem
   // isso, apagar todos os depoimentos no painel faria os antigos voltarem no
