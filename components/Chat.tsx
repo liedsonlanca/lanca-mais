@@ -101,6 +101,22 @@ export default function Chat() {
   const fim = useRef<HTMLDivElement | null>(null);
   const campo = useRef<HTMLInputElement | null>(null);
 
+  /**
+   * O piso: ids até aqui não entram mais na tela.
+   *
+   * Serve ao recomeço limpo. A chave continua guardada — é ela que faz a
+   * próxima mensagem herdar nome, WhatsApp e e-mail — mas as mensagens do
+   * atendimento encerrado não devem voltar a aparecer, nem na carga da
+   * página nem na busca periódica seguinte.
+   */
+  const pisoDeId = useRef(0);
+
+  /** Se esta carga de página já leu a conversa do servidor uma vez. */
+  const jaCarregou = useRef(false);
+
+  /** Se esta carga de página começou limpa por cima de um atendimento findo. */
+  const recomecado = useRef(false);
+
   // O id da última mensagem conhecida, para pedir só o que vier depois.
   const ultima = mensagens.reduce((maior, m) => Math.max(maior, m.id), 0);
 
@@ -127,8 +143,10 @@ export default function Chat() {
     if (!chave.current) return;
 
     try {
+      const desde = Math.max(ultima, pisoDeId.current);
+
       const resposta = await fetch(
-        `/api/chat?chave=${chave.current}&depois=${ultima}`,
+        `/api/chat?chave=${chave.current}&depois=${desde}`,
         { cache: "no-store" }
       );
       if (!resposta.ok) return;
@@ -139,6 +157,39 @@ export default function Chat() {
         novas: Mensagem[];
       };
 
+      const primeiraLeitura = !jaCarregou.current;
+      jaCarregou.current = true;
+
+      const novas = dados.novas ?? [];
+
+      /* ---------- Recarregou depois de encerrado: começa limpo ----------
+       *
+       * Atendimento findo é assunto findo. Abrir a página no dia seguinte e
+       * encontrar a conversa de ontem com "a equipe encerrou" no fim não
+       * convida ninguém a nada — é um bilhete velho preso na porta.
+       *
+       * Enquanto o atendimento está em andamento, com o assistente ou com a
+       * equipe, recarregar não perde nada: ali a conversa continua, e quem
+       * recarregou foi a página, não a pessoa.
+       *
+       * A distinção é esta: encerrada **e** é a primeira leitura desta carga
+       * de página. Se a equipe encerrar com o chat aberto na frente da
+       * pessoa, isso não é primeira leitura — ela vê o aviso, que é o certo.
+       *
+       * A chave fica guardada de propósito: é ela que faz a próxima mensagem
+       * abrir uma conversa nova já com os dados dela.
+       */
+      if (primeiraLeitura && dados.estado === "fechada") {
+        pisoDeId.current = novas.reduce(
+          (maior, m) => Math.max(maior, m.id),
+          pisoDeId.current
+        );
+        recomecado.current = true;
+
+        if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
+        return;
+      }
+
       if (dados.estado) {
         // O encerramento também é notícia que vem de fora, então apita como
         // uma mensagem apita. Sem o toque, quem está com a aba atrás de
@@ -147,14 +198,23 @@ export default function Chat() {
         // A comparação fica aqui, e não dentro do `setEstado`: função de
         // atualização tem de ser pura, e o React pode chamá-la duas vezes em
         // desenvolvimento — o bipe sairia dobrado.
-        if (dados.estado === "fechada" && estado !== "fechada") {
+        // Depois de um recomeço limpo o servidor continua dizendo "fechada"
+        // até a pessoa escrever. Mostrar o aviso de encerramento numa tela
+        // que acabou de começar do zero seria dizer que acabou algo que ela
+        // nem viu começar.
+        const visivel =
+          dados.estado === "fechada" && recomecado.current
+            ? "assistente"
+            : dados.estado;
+
+        if (visivel === "fechada" && estado !== "fechada") {
           tocar("mensagem");
         }
-        setEstado(dados.estado);
+        setEstado(visivel);
       }
 
       if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
-      juntar(dados.novas ?? []);
+      juntar(novas);
     } catch {
       // Rede instável: a próxima rodada tenta de novo.
     }
@@ -290,6 +350,11 @@ export default function Chat() {
             texto: pergunta,
           },
         ]);
+
+        // A conversa é outra: o piso e a marca de recomeço eram do
+        // atendimento anterior e não valem mais.
+        pisoDeId.current = 0;
+        recomecado.current = false;
       } else if (dados.minha) {
         // Troca o id provisório pelo do banco, senão a busca periódica traria
         // a mesma mensagem de novo e ela apareceria duas vezes.
