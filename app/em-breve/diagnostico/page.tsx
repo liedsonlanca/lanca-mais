@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site-config";
+import SinalDeLead from "@/components/SinalDeLead";
 
 // O diagnóstico dentro da tela de espera.
 //
@@ -38,6 +39,8 @@ export default function DiagnosticoEmBrevePage() {
     // pagina-em-breve é o gancho que esconde cabeçalho, rodapé e o botão
     // flutuante do site (ver globals.css): aqui a tela é só o fluxo.
     <section className="pagina-em-breve fixed inset-0 z-[100] flex flex-col bg-abismo">
+      <SinalDeLead caminho="/em-breve/diagnostico" />
+
       <div className="flex shrink-0 items-center justify-between gap-4 px-5 py-3 sm:px-8">
         <Link
           href="/em-breve"

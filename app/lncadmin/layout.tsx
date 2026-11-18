@@ -7,6 +7,8 @@ import LoginAdmin from "@/components/admin/LoginAdmin";
 import SairDoAdmin from "@/components/admin/SairDoAdmin";
 import MenuLateral from "@/components/admin/MenuLateral";
 import AtualizacaoViva from "@/components/admin/AtualizacaoViva";
+import Notificacoes from "@/components/admin/Notificacoes";
+import { lerNotificacoes } from "@/lib/eventos";
 import { lerImagens } from "@/lib/conteudo";
 import { imagem } from "@/lib/imagens";
 
@@ -56,7 +58,8 @@ export default async function AdminLayout({
   const estado = await estadoDoAdmin();
 
   // A versão escura da marca, porque o painel é claro.
-  const marca = imagem(await lerImagens(), "marca-escura");
+  const [imagens, avisos] = await Promise.all([lerImagens(), lerNotificacoes()]);
+  const marca = imagem(imagens, "marca-escura");
 
   if (estado !== "liberado") {
     return (
@@ -118,16 +121,22 @@ export default async function AdminLayout({
             {/* No celular as duas ações moram aqui, ao lado da marca; do lg
                 para cima descem para o pé da lateral, onde não disputam
                 espaço com a lista. */}
-            <div className="flex items-center gap-1 text-sm lg:hidden">
-              <Link
-                href="/"
-                target="_blank"
-                rel="noopener"
-                className="flex min-h-11 items-center rounded-full px-3 text-tinta/55 transition-colors duration-300 hover:text-tinta"
-              >
-                Ver o site
-              </Link>
-              <SairDoAdmin />
+            <div className="flex items-center gap-1 text-sm">
+              {/* O sino fica em toda largura: é o aviso de que há alguém no
+                  site agora, e isso não pode depender do tamanho da tela. */}
+              <Notificacoes lista={avisos} />
+
+              <div className="flex items-center gap-1 lg:hidden">
+                <Link
+                  href="/"
+                  target="_blank"
+                  rel="noopener"
+                  className="flex min-h-11 items-center rounded-full px-3 text-tinta/55 transition-colors duration-300 hover:text-tinta"
+                >
+                  Ver o site
+                </Link>
+                <SairDoAdmin />
+              </div>
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site-config";
+import SinalDeLead from "@/components/SinalDeLead";
 
 // O diagnóstico, dentro do site.
 //
@@ -68,6 +69,8 @@ export default function DiagnosticoPage() {
       className="sem-botao-flutuante bg-abismo"
       style={{ paddingTop: CABECALHO }}
     >
+      <SinalDeLead caminho="/diagnostico" />
+
       <iframe
         src={siteConfig.diagnosticoUrl}
         title="Diagnóstico LANÇA+"

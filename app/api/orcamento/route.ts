@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { impressaoDoVisitante } from "@/lib/acessos";
+import { registrarEvento } from "@/lib/eventos";
 import {
   origemDaRequisicao,
   podeTentar,
@@ -133,6 +135,21 @@ export async function POST(requisicao: Request) {
         { status: 502 }
       );
     }
+
+    // O painel avisa que chegou pedido, sem esperar ninguém abrir o CRM.
+    //
+    // Só o nome entra no aviso: telefone e e-mail já estão na ficha, e
+    // repeti-los numa lista que fica aberta na tela do painel não ajuda em
+    // nada — só espalha o dado por mais um lugar.
+    await registrarEvento({
+      tipo: "orcamento_enviado",
+      visitante: await impressaoDoVisitante(
+        origem,
+        requisicao.headers.get("user-agent") ?? ""
+      ),
+      caminho: "/contato",
+      detalhe: pedido.nome,
+    });
 
     return NextResponse.json({ ok: true });
   } catch (erro) {

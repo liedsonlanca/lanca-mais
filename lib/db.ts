@@ -67,6 +67,23 @@ const TABELAS = [
    )`,
   `CREATE INDEX IF NOT EXISTS acessos_criado_em ON acessos (criado_em DESC)`,
 
+  // Sinais de interesse, para o painel avisar enquanto a pessoa ainda esta
+  // no site.
+  //
+  // Separado de `acessos` porque a pergunta e outra: acesso e volume, e
+  // evento e acontecimento. Misturar faria toda contagem de pagina precisar
+  // filtrar tipo, e toda leitura de evento varrer a tabela de volume.
+  `CREATE TABLE IF NOT EXISTS eventos (
+     id         BIGSERIAL PRIMARY KEY,
+     tipo       TEXT NOT NULL,
+     visitante  TEXT NOT NULL,
+     caminho    TEXT,
+     detalhe    TEXT,
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS eventos_criado_em ON eventos (criado_em DESC)`,
+  `CREATE INDEX IF NOT EXISTS eventos_visitante ON eventos (visitante, criado_em DESC)`,
+
   // Controle interno. Guarda quais tabelas já foram semeadas com o conteúdo
   // que vivia nos arquivos, para que a semeadura aconteça uma vez só: sem
   // isso, apagar todos os depoimentos no painel faria os antigos voltarem no

@@ -1,0 +1,187 @@
+"use client";
+
+import { useState } from "react";
+import type { Notificacao } from "@/lib/eventos";
+
+// O sino do painel.
+//
+// ---------- Por que ele não busca nada ----------
+//
+// A lista chega pronta do servidor, e se renova junto com o resto do painel
+// (ver AtualizacaoViva). Um componente que busca por conta própria teria o
+// próprio relógio, o próprio intervalo e o próprio jeito de errar — e duas
+// contagens correndo lado a lado é como se descobre, um mês depois, que o
+// número do sino não bate com o da tela.
+//
+// ---------- O ponto vermelho ----------
+//
+// Só acende para quem está no site agora. Aviso de alguém que saiu ontem não
+// é urgente, e um sino que pisca para tudo deixa de ser avisado em uma
+// semana: a pessoa aprende a ignorar.
+
+const CORES: Record<Notificacao["estado"], string> = {
+  agora: "text-destaque",
+  saiu: "text-tinta/35",
+  lead: "text-destaque",
+};
+
+function quandoLegivel(iso: string) {
+  const minutos = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (minutos < 1) return "agora";
+  if (minutos < 60) return `há ${minutos} min`;
+  const horas = Math.round(minutos / 60);
+  if (horas < 24) return `há ${horas} h`;
+  return new Date(iso).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+  });
+}
+
+function Icone({ estado }: { estado: Notificacao["estado"] }) {
+  if (estado === "lead") {
+    return (
+      <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4"
+      >
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    );
+  }
+
+  if (estado === "agora") {
+    return (
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-salmon opacity-60" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-salmon" />
+      </span>
+    );
+  }
+
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <path d="M16 17l5-5-5-5M21 12H9M12 19H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6" />
+    </svg>
+  );
+}
+
+export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
+  const [aberto, setAberto] = useState(false);
+  const agora = lista.filter((n) => n.estado === "agora").length;
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setAberto((v) => !v)}
+        aria-expanded={aberto}
+        aria-label={
+          agora > 0
+            ? `Notificações: ${agora} pessoa(s) no diagnóstico agora`
+            : "Notificações"
+        }
+        className="relative flex h-11 w-11 items-center justify-center rounded-xl text-tinta/55 transition-colors duration-300 hover:bg-fundo-alt hover:text-tinta"
+      >
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-5 w-5"
+        >
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" />
+        </svg>
+
+        {agora > 0 && (
+          <span className="absolute right-2 top-2 flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-salmon opacity-70" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-salmon" />
+          </span>
+        )}
+      </button>
+
+      {aberto && (
+        <>
+          {/* A capa fecha ao clicar fora, sem ouvinte no documento: um
+              ouvinte global precisaria saber distinguir o clique de fora do
+              clique no próprio botão, e isso é mais código para o mesmo
+              efeito. */}
+          <button
+            type="button"
+            aria-hidden
+            tabIndex={-1}
+            onClick={() => setAberto(false)}
+            className="fixed inset-0 z-40 cursor-default"
+          />
+
+          <div className="absolute right-0 z-50 mt-1 w-[320px] overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.35)]">
+            <div className="border-b border-contorno px-4 py-3">
+              <p className="text-sm font-semibold text-tinta">Notificações</p>
+              <p className="mt-0.5 text-xs text-tinta/45">
+                Últimas 24 horas, atualizando sozinho.
+              </p>
+            </div>
+
+            <ul className="max-h-[360px] overflow-y-auto">
+              {lista.length === 0 && (
+                <li className="px-4 py-6 text-sm text-tinta/50">
+                  Nada ainda. Os avisos aparecem quando alguém abrir o
+                  diagnóstico ou pedir um orçamento.
+                </li>
+              )}
+
+              {lista.map((n) => (
+                <li
+                  key={n.chave}
+                  className="flex gap-3 border-b border-contorno px-4 py-3 last:border-b-0"
+                >
+                  <span
+                    className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center ${CORES[n.estado]}`}
+                  >
+                    <Icone estado={n.estado} />
+                  </span>
+
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-tinta">{n.titulo}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-tinta/60">
+                      {n.texto}
+                    </p>
+                    <p className="mt-1 text-[0.7rem] text-tinta/35">
+                      {quandoLegivel(n.quando)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            {/* Dito aqui, e não escondido num comentário de código: quem abre
+                o painel precisa saber que o site não lê o formulário. */}
+            <p className="border-t border-contorno px-4 py-3 text-[0.7rem] leading-relaxed text-tinta/40">
+              O site vê quando alguém abre o diagnóstico e quanto tempo fica,
+              mas não o que a pessoa digita — o formulário é do CRM, noutro
+              domínio.
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
