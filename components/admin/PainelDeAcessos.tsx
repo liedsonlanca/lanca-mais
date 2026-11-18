@@ -1,4 +1,5 @@
 import type { Resumo } from "@/lib/acessos";
+import { limparMedicao } from "@/app/lncadmin/acoes";
 
 // O movimento do site, na primeira tela do painel.
 //
@@ -249,6 +250,54 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
           </div>
         </div>
       </div>
+
+      {/* Zerar a medição, atrás de uma gaveta fechada.
+
+          Não é por capricho de desenho: apagar aqui é DELETE, e um
+          histórico de acessos não tem original em lugar nenhum para ser
+          restaurado. Solto ao lado dos números, um clique errado levaria
+          tudo; fechado, são dois cliques deliberados e o segundo diz o que
+          vai acontecer.
+
+          <details> e não um aviso de JavaScript: o painel é feito de
+          formulário nativo, e isto continua funcionando com o script
+          desligado. */}
+      <details className="group mt-4">
+        <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm text-tinta/45 transition-colors duration-300 hover:text-tinta">
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4 transition-transform duration-300 group-open:rotate-90"
+          >
+            <path d="m9 6 6 6-6 6" />
+          </svg>
+          Zerar a medição
+        </summary>
+
+        <form action={limparMedicao} className={`${CARTAO} mt-3 max-w-xl`}>
+          <p className="text-sm leading-relaxed text-tinta/70">
+            Apaga todos os acessos e todos os sinais do diagnóstico. Serve
+            para começar a contar do zero depois dos testes, para que a
+            primeira semana de verdade não venha somada às visitas de quem
+            estava conferindo se a medição funciona.
+          </p>
+          <p className="mt-2 text-sm font-medium text-tinta">
+            Não há como desfazer.
+          </p>
+
+          <button
+            type="submit"
+            className="mt-4 inline-flex min-h-11 items-center rounded-full border border-salmon/50 px-5 text-sm font-medium text-destaque transition-colors duration-300 hover:bg-salmon/10"
+          >
+            Apagar tudo e começar do zero
+          </button>
+        </form>
+      </details>
     </section>
   );
 }
