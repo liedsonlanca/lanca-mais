@@ -23,6 +23,28 @@ export async function responderNoChat(dados: FormData) {
     return;
   }
 
+  // A conversa precisa estar com a equipe.
+  //
+  // A tela já esconde o campo quando não está, e esconder é conveniência:
+  // esta ação é um endereço alcançável por POST, e a aba pode estar aberta
+  // desde antes de alguém encerrar a conversa noutra janela. Sem esta
+  // conferência, a resposta entraria numa conversa encerrada e apareceria
+  // para quem já tinha sido avisado de que o atendimento acabou.
+  const atual = (await banco.query(
+    "SELECT estado FROM conversas WHERE id = $1",
+    [id]
+  )) as Array<{ estado: string }>;
+
+  if (atual[0]?.estado !== "equipe") {
+    await avisar(
+      atual[0]?.estado === "fechada"
+        ? "Essa conversa foi encerrada. Ela só reabre se a pessoa escrever de novo."
+        : "Essa conversa está com o assistente. Traga-a de volta antes de responder.",
+      "erro"
+    );
+    return;
+  }
+
   await gravarMensagem(id, "equipe", resposta);
 
   // A conversa volta a "equipe" mesmo se estava fechada: respondê-la é

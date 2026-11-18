@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
 import { lerConversa } from "@/lib/conversas";
+import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import { campo, botaoPrimario } from "@/components/admin/estilos";
 import RespostasProntas from "@/components/admin/RespostasProntas";
 import {
@@ -11,14 +12,17 @@ import {
 
 export const dynamic = "force-dynamic";
 
-// Uma conversa inteira, com o campo de resposta.
+// Uma conversa aberta: o fio no meio, os dados à direita.
 //
-// ---------- Por que é uma página, e não um painel ao lado da lista ----------
+// ---------- Por que o campo de resposta nem sempre existe ----------
 //
-// Escolher a conversa por `?id=` na mesma página não funciona: o App Router
-// não refaz a tela quando só a parte depois da interrogação muda, e o clique
-// não levava a nada. Endereço próprio resolve, e de brinde a conversa fica
-// com um link que se manda para alguém.
+// Ele só aparece quando a conversa está com a equipe. Encerrada, ela acabou;
+// devolvida ao assistente, quem responde é ele. Nos dois casos, um campo de
+// texto convidando a escrever seria convite para mandar mensagem numa
+// conversa que não é mais sua — e quem recebe não entenderia de onde veio.
+//
+// Deixar o campo e recusar o envio depois seria pior: a pessoa escreve o
+// texto inteiro para descobrir no fim.
 
 const CARTAO = "rounded-2xl border border-contorno bg-cartao";
 
@@ -26,6 +30,12 @@ const AUTORES = {
   cliente: { rotulo: "Visitante", classe: "text-tinta" },
   assistente: { rotulo: "Assistente", classe: "text-tinta/55" },
   equipe: { rotulo: "Equipe LANÇA+", classe: "text-destaque" },
+} as const;
+
+const ESTADOS = {
+  equipe: { rotulo: "Esperando você", classe: "text-destaque" },
+  assistente: { rotulo: "Com o assistente", classe: "text-tinta/55" },
+  fechada: { rotulo: "Encerrada", classe: "text-tinta/40" },
 } as const;
 
 function horaLegivel(iso: string) {
@@ -37,6 +47,36 @@ function horaLegivel(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function Dado({
+  rotulo,
+  valor,
+  href,
+}: {
+  rotulo: string;
+  valor: string;
+  href?: string;
+}) {
+  if (!valor) return null;
+
+  return (
+    <div>
+      <p className="text-[0.7rem] uppercase tracking-wide text-tinta/35">
+        {rotulo}
+      </p>
+      {href ? (
+        <a
+          href={href}
+          className="mt-0.5 block break-words text-sm text-tinta/75 transition-colors duration-300 hover:text-tinta"
+        >
+          {valor}
+        </a>
+      ) : (
+        <p className="mt-0.5 break-words text-sm text-tinta/75">{valor}</p>
+      )}
+    </div>
+  );
 }
 
 export default async function AdminConversa({
@@ -51,171 +91,187 @@ export default async function AdminConversa({
 
   if (!dados) {
     return (
-      <div>
-        <Link
-          href="/lncadmin/conversas"
-          className="text-sm text-tinta/50 transition-colors duration-300 hover:text-tinta"
-        >
-          ← Conversas
+      <div className={`${CARTAO} p-5 text-sm text-tinta/60`}>
+        Essa conversa não existe mais.{" "}
+        <Link href="/lncadmin/conversas" className="text-destaque">
+          Voltar
         </Link>
-        <p className={`${CARTAO} mt-5 p-5 text-sm text-tinta/60`}>
-          Essa conversa não existe mais.
-        </p>
       </div>
     );
   }
 
   const { conversa, mensagens } = dados;
+  const estado = ESTADOS[conversa.estado];
+  const minha = conversa.estado === "equipe";
+
+  const soDigitos = conversa.contato.replace(/\D/g, "");
+  const temTelefone = soDigitos.length >= 10;
 
   return (
-    <div>
-      <Link
-        href="/lncadmin/conversas"
-        className="text-sm text-tinta/50 transition-colors duration-300 hover:text-tinta"
-      >
-        ← Conversas
-      </Link>
-
-      <div className="mt-4 flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-tinta">
-            {conversa.nome || "Visitante sem nome"}
-          </h1>
-          <p className="mt-1 text-sm text-tinta/50">
-            começou em {horaLegivel(conversa.criadoEm)}
-          </p>
-
-          {/* Os dados da ficha, quando a pessoa preencheu.
-              Clicáveis porque atender é ligar ou escrever, e copiar número à
-              mão para outra janela é onde o atendimento perde um minuto. */}
-          {(conversa.contato || conversa.email) && (
-            <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-              {conversa.contato && (
-                <a
-                  href={`tel:${conversa.contato}`}
-                  className="text-tinta/70 transition-colors duration-300 hover:text-tinta"
-                >
-                  {conversa.contato}
-                </a>
-              )}
-              {conversa.email && (
-                <a
-                  href={`mailto:${conversa.email}`}
-                  className="text-tinta/70 transition-colors duration-300 hover:text-tinta"
-                >
-                  {conversa.email}
-                </a>
-              )}
+    <div className="grid gap-4 xl:grid-cols-[1fr_17rem]">
+      {/* ---------------- O fio ---------------- */}
+      <div className="min-w-0">
+        <div className={`${CARTAO} flex flex-col`}>
+          <div className="flex items-baseline justify-between gap-3 border-b border-contorno px-5 py-3.5">
+            <p className="min-w-0 truncate text-sm font-semibold text-tinta">
+              {conversa.nome || "Visitante sem nome"}
             </p>
+            <span className={`shrink-0 text-xs ${estado.classe}`}>
+              {estado.rotulo}
+            </span>
+          </div>
+
+          <ul className="grid max-h-[46vh] gap-4 overflow-y-auto px-5 py-4">
+            {mensagens.length === 0 && (
+              <li className="text-sm text-tinta/45">Sem mensagens.</li>
+            )}
+
+            {mensagens.map((mensagem) => {
+              const autor = AUTORES[mensagem.autor];
+
+              return (
+                <li key={mensagem.id}>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-xs font-medium ${autor.classe}`}>
+                      {autor.rotulo}
+                    </span>
+                    <span className="text-[0.7rem] text-tinta/30">
+                      {horaLegivel(mensagem.quando)}
+                    </span>
+                  </div>
+                  <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/75">
+                    {mensagem.texto}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
+        {minha ? (
+          <form action={responderNoChat} className={`${CARTAO} mt-4 p-5`}>
+            <input type="hidden" name="id" value={conversa.id} />
+
+            <label
+              htmlFor="resposta"
+              className="block text-sm font-medium text-tinta"
+            >
+              Responder
+            </label>
+            <p className="mt-1 text-xs leading-relaxed text-tinta/45">
+              Aparece no chat de quem está do outro lado em até cinco segundos.
+              Se já tiver fechado a janela, vê quando voltar.
+            </p>
+
+            <textarea
+              id="resposta"
+              name="texto"
+              rows={4}
+              maxLength={2000}
+              placeholder="Escreva como escreveria no WhatsApp."
+              className={`${campo} mt-3 min-h-28 resize-y`}
+            />
+
+            <RespostasProntas campo="resposta" />
+
+            <button type="submit" className={`${botaoPrimario} mt-4`}>
+              Enviar resposta
+            </button>
+          </form>
+        ) : (
+          <p
+            className={`${CARTAO} mt-4 p-5 text-sm leading-relaxed text-tinta/55`}
+          >
+            {conversa.estado === "fechada"
+              ? "Conversa encerrada. Para voltar a responder, é preciso que a pessoa escreva de novo — e aí ela abre uma conversa nova, que aparece na lista."
+              : "Esta conversa está com o assistente. Ele responde por aqui; ela volta para a sua fila se a pessoa pedir para falar com a equipe."}
+          </p>
+        )}
+      </div>
+
+      {/* ---------------- Os dados ---------------- */}
+      <aside className="grid content-start gap-4">
+        <div className={`${CARTAO} grid gap-4 p-5`}>
+          <Dado
+            rotulo="Nome"
+            valor={conversa.nome || "Não informado"}
+          />
+          <Dado
+            rotulo="WhatsApp"
+            valor={conversa.contato}
+            href={temTelefone ? `https://wa.me/55${soDigitos}` : undefined}
+          />
+          <Dado
+            rotulo="E-mail"
+            valor={conversa.email}
+            href={conversa.email ? `mailto:${conversa.email}` : undefined}
+          />
+          <Dado rotulo="Começou" valor={horaLegivel(conversa.criadoEm)} />
+
+          {conversa.nota !== null && (
+            <div>
+              <p className="text-[0.7rem] uppercase tracking-wide text-tinta/35">
+                Avaliação
+              </p>
+              <p className="mt-0.5 text-sm text-salmon">
+                {"★".repeat(conversa.nota)}
+                <span className="text-tinta/20">
+                  {"★".repeat(5 - conversa.nota)}
+                </span>
+              </p>
+              {conversa.comentario && (
+                <p className="mt-1 text-xs leading-relaxed text-tinta/55">
+                  “{conversa.comentario}”
+                </p>
+              )}
+            </div>
           )}
         </div>
 
-        {conversa.contato && (
-          // O número vira link de WhatsApp quando é número.
-          //
-          // A conversa que começa no site quase sempre termina lá, e quem
-          // está atendendo não deveria ter de copiar dígito a dígito para
-          // outra janela.
-          /^[\d\s()+-]{10,}$/.test(conversa.contato) && (
+        {!equipeNoExpediente() && (
+          <p className={`${CARTAO} p-4 text-xs leading-relaxed text-tinta/50`}>
+            Fora do horário de atendimento. O site disse a essa pessoa que a
+            equipe responde {quandoAEquipeVolta()}.
+          </p>
+        )}
+
+        <div className="grid gap-2">
+          {temTelefone && (
             <a
-              href={`https://wa.me/55${conversa.contato.replace(/\D/g, "")}`}
+              href={`https://wa.me/55${soDigitos}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center rounded-full border border-salmon/50 px-5 text-sm font-medium text-destaque transition-colors duration-300 hover:bg-salmon/10"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-salmon/50 px-5 text-sm font-medium text-destaque transition-colors duration-300 hover:bg-salmon/10"
             >
               Continuar no WhatsApp
             </a>
-          )
-        )}
-      </div>
+          )}
 
-      <ul className={`${CARTAO} mt-5 grid max-h-[55vh] gap-4 overflow-y-auto p-5`}>
-        {mensagens.length === 0 && (
-          <li className="text-sm text-tinta/45">Sem mensagens.</li>
-        )}
+          {conversa.estado === "equipe" && (
+            <form action={devolverAoAssistente}>
+              <input type="hidden" name="id" value={conversa.id} />
+              <button
+                type="submit"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-contorno px-5 text-sm text-tinta/60 transition-colors duration-300 hover:text-tinta"
+              >
+                Devolver ao assistente
+              </button>
+            </form>
+          )}
 
-        {mensagens.map((mensagem) => {
-          const autor = AUTORES[mensagem.autor];
-
-          return (
-            <li key={mensagem.id}>
-              <div className="flex items-baseline gap-2">
-                <span className={`text-xs font-medium ${autor.classe}`}>
-                  {autor.rotulo}
-                </span>
-                <span className="text-[0.7rem] text-tinta/30">
-                  {horaLegivel(mensagem.quando)}
-                </span>
-              </div>
-              <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/75">
-                {mensagem.texto}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
-
-      <form action={responderNoChat} className={`${CARTAO} mt-4 p-5`}>
-        <input type="hidden" name="id" value={conversa.id} />
-
-        <label
-          htmlFor="resposta"
-          className="block text-sm font-medium text-tinta"
-        >
-          Responder
-        </label>
-        <p className="mt-1 text-xs leading-relaxed text-tinta/45">
-          Aparece no chat de quem está do outro lado em até cinco segundos, se
-          a pessoa ainda estiver com a janela aberta. Se já tiver fechado, ela
-          vê quando voltar — a conversa fica guardada no navegador dela.
-        </p>
-
-        <textarea
-          id="resposta"
-          name="texto"
-          rows={4}
-          maxLength={2000}
-          placeholder="Escreva como escreveria no WhatsApp."
-          className={`${campo} mt-3 min-h-28 resize-y`}
-        />
-
-        {/* Os atalhos ficam abaixo do campo, e não acima: acima, eles são a
-            primeira coisa que a pessoa vê e sugerem que o certo é escolher
-            um. O certo é escrever, e usar o atalho quando ele encurta. */}
-        <RespostasProntas campo="resposta" />
-
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button type="submit" className={botaoPrimario}>
-            Enviar resposta
-          </button>
+          {conversa.estado !== "fechada" && (
+            <form action={encerrarConversa}>
+              <input type="hidden" name="id" value={conversa.id} />
+              <button
+                type="submit"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-contorno px-5 text-sm text-tinta/60 transition-colors duration-300 hover:text-tinta"
+              >
+                Encerrar conversa
+              </button>
+            </form>
+          )}
         </div>
-      </form>
-
-      <div className="mt-4 flex flex-wrap gap-3">
-        {conversa.estado === "equipe" && (
-          <form action={devolverAoAssistente}>
-            <input type="hidden" name="id" value={conversa.id} />
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center rounded-full border border-contorno px-5 text-sm text-tinta/60 transition-colors duration-300 hover:text-tinta"
-            >
-              Devolver ao assistente
-            </button>
-          </form>
-        )}
-
-        {conversa.estado !== "fechada" && (
-          <form action={encerrarConversa}>
-            <input type="hidden" name="id" value={conversa.id} />
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center rounded-full border border-contorno px-5 text-sm text-tinta/60 transition-colors duration-300 hover:text-tinta"
-            >
-              Encerrar conversa
-            </button>
-          </form>
-        )}
-      </div>
+      </aside>
     </div>
   );
 }

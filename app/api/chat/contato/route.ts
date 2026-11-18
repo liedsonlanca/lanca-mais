@@ -8,6 +8,7 @@ import {
   passarParaEquipe,
 } from "@/lib/conversas";
 import { origemDaRequisicao, podeTentar, registrarFalha } from "@/lib/tentativas";
+import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 
 // A ficha de contato do chat: nome e sobrenome, WhatsApp e e-mail.
 //
@@ -111,12 +112,20 @@ export async function POST(requisicao: Request) {
   // painel mesmo que o webhook falhe — e a equipe atende por aqui.
   await passarParaEquipe(conversa.id, { nome, contato: whatsapp, email });
 
+  // A confirmação diz quando, e não só que.
+  //
+  // "A equipe foi avisada" sem horário deixa a pessoa olhando a tela. Com o
+  // horário, ela sabe se espera ou se chama no WhatsApp — e volta para o
+  // que estava fazendo em vez de ficar esperando.
+  const quando = equipeNoExpediente()
+    ? "A equipe já foi avisada e responde ainda neste horário"
+    : `A equipe atende ${quandoAEquipeVolta()}, e responde`;
+
   await gravarMensagem(
     conversa.id,
     "assistente",
-    `Obrigado, ${nome.split(/\s+/)[0]}. A equipe da LANÇA+ foi avisada e ` +
-      `responde por aqui ou no seu WhatsApp. Se quiser adiantar, pode ` +
-      `escrever sua dúvida abaixo.`
+    `Obrigado, ${nome.split(/\s+/)[0]}. ${quando} por aqui ou no seu ` +
+      `WhatsApp. Se quiser adiantar, pode escrever sua dúvida abaixo.`
   );
 
   await registrarEvento({

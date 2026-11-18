@@ -230,6 +230,10 @@ const TABELAS = [
      contato    TEXT NOT NULL DEFAULT '',
      email      TEXT NOT NULL DEFAULT '',
      estado     TEXT NOT NULL DEFAULT 'assistente',
+     -- A avaliação do atendimento, pedida quando a conversa encerra.
+     -- Nula enquanto ninguém avaliou, e não zero: zero seria uma nota.
+     nota       INTEGER,
+     comentario TEXT NOT NULL DEFAULT '',
      criado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
      mexido_em  TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
@@ -267,6 +271,11 @@ const EVOLUCOES = [
   // atendimento. Uma linha idempotente é barata; descobrir isso em produção
   // não é.
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS email TEXT NOT NULL DEFAULT ''`,
+  // A avaliação do atendimento. Entra por aqui porque a tabela já existe em
+  // produção desde o primeiro deploy do chat — CREATE TABLE IF NOT EXISTS
+  // não acrescenta coluna a tabela que já está lá.
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS nota INTEGER`,
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS comentario TEXT NOT NULL DEFAULT ''`,
   // Ajuste fino do tamanho de cada logo, em porcentagem.
   //
   // Arquivos de logo chegam com proporções e margens internas diferentes: um

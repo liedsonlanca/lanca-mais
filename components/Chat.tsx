@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -38,6 +39,30 @@ type Mensagem = {
 
 const GUARDA = "lanca:chat";
 const GUARDA_CONVITE = "lanca:chat-convite";
+
+/**
+ * Os dados da pessoa, guardados no navegador dela a pedido dela.
+ *
+ * Servem para a próxima conversa começar com a ficha preenchida. Ficam só
+ * aqui: o servidor já tem os mesmos dados na conversa, então isto não é
+ * espalhar informação, é não cobrar duas vezes.
+ */
+const GUARDA_DADOS = "lanca:chat-dados";
+
+type DadosSalvos = { nome: string; whatsapp: string; email: string };
+
+function lerDados(): DadosSalvos | null {
+  try {
+    const cru = localStorage.getItem(GUARDA_DADOS);
+    if (!cru) return null;
+    const d = JSON.parse(cru) as Partial<DadosSalvos>;
+    if (!d?.nome || !d?.whatsapp || !d?.email) return null;
+    return { nome: d.nome, whatsapp: d.whatsapp, email: d.email };
+  } catch {
+    // Armazenamento recusado ou conteúdo estragado: segue sem lembrar.
+    return null;
+  }
+}
 
 const SAUDACAO: Mensagem = {
   id: 0,
@@ -87,6 +112,11 @@ export default function Chat() {
     "assistente"
   );
   const [temFicha, setTemFicha] = useState(false);
+  const [avaliada, setAvaliada] = useState(false);
+  const [dadosSalvos, setDadosSalvos] = useState<DadosSalvos | null>(null);
+
+  /** Começou limpo por cima de um atendimento que ninguém avaliou. */
+  const [notaPendente, setNotaPendente] = useState(false);
   const [falhou, setFalhou] = useState(false);
 
   // A preferência de som é lida de onde ela mora, e não copiada para cá.
@@ -96,6 +126,8 @@ export default function Chat() {
   // React acusaria diferença entre o HTML do servidor e o primeiro desenho
   // no navegador.
   const comSom = useSyncExternalStore(assinarSom, somLigado, () => true);
+
+  const caminho = usePathname();
 
   const chave = useRef("");
   const fim = useRef<HTMLDivElement | null>(null);
@@ -116,6 +148,16 @@ export default function Chat() {
 
   /** Se esta carga de página começou limpa por cima de um atendimento findo. */
   const recomecado = useRef(false);
+
+  /**
+   * A chave do atendimento que será avaliado.
+   *
+   * Guardada à parte porque a nota é do atendimento anterior, e a chave
+   * corrente passa a ser outra assim que a pessoa escreve a primeira
+   * mensagem da conversa nova. Sem isto, avaliar depois de escrever
+   * carimbaria a nota na conversa errada.
+   */
+  const chaveParaNota = useRef("");
 
   // O id da última mensagem conhecida, para pedir só o que vier depois.
   const ultima = mensagens.reduce((maior, m) => Math.max(maior, m.id), 0);
@@ -154,8 +196,19 @@ export default function Chat() {
       const dados = (await resposta.json()) as {
         estado: "assistente" | "equipe" | "fechada" | null;
         temFicha?: boolean;
+        avaliada?: boolean;
         novas: Mensagem[];
       };
+
+      // Só na primeira leitura desta carga de página.
+      //
+      // A estrela grava no clique, então a busca seguinte já volta com
+      // "avaliada" — e, se isso escondesse o bloco, o campo de comentário
+      // sumiria no meio da digitação de quem estava escrevendo. Quem fecha o
+      // bloco é o envio, não o servidor.
+      if (!jaCarregou.current && typeof dados.avaliada === "boolean") {
+        setAvaliada(dados.avaliada);
+      }
 
       const primeiraLeitura = !jaCarregou.current;
       jaCarregou.current = true;
@@ -187,6 +240,19 @@ export default function Chat() {
         recomecado.current = true;
 
         if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
+
+        // A avaliação do atendimento que acabou, pedida mesmo começando
+        // limpo.
+        //
+        // Sem isto ela quase nunca seria pedida: a equipe encerra depois que
+        // a pessoa já saiu, e quem volta cai justamente neste caminho. Fica
+        // a pergunta sozinha, sem o histórico antigo em volta — é um convite
+        // de duas estrelas, não a conversa de ontem ressuscitada.
+        if (!dados.avaliada) {
+          chaveParaNota.current = chave.current;
+          setNotaPendente(true);
+        }
+
         return;
       }
 
@@ -279,6 +345,12 @@ export default function Chat() {
   function abrir() {
     setConvidando(false);
     guardar(GUARDA_CONVITE, "visto");
+
+    // Os dados guardados são lidos aqui, num clique, e não durante o
+    // desenho da tela: ler armazenamento no meio de um render é impuro, o
+    // React desaprova com razão, e o valor ainda chegaria diferente entre o
+    // HTML do servidor e o primeiro desenho no navegador.
+    setDadosSalvos(lerDados());
     setAberto(true);
   }
 
@@ -373,6 +445,23 @@ export default function Chat() {
       campo.current?.focus();
     }
   }
+
+  /* ---------------- Fora do painel ---------------- */
+
+  // O chat é para o visitante, e o painel é da agência.
+  //
+  // Ele é montado no layout raiz, que embrulha o site inteiro — e o painel
+  // mora dentro desse mesmo layout, então o balão aparecia lá também. Quem
+  // atende não precisa de um chat para falar com o próprio assistente, e o
+  // balão ainda cobria o canto da tela de trabalho.
+  //
+  // A saída é esta, e não CSS escondendo: `display: none` deixaria o
+  // componente vivo, buscando no servidor de tempo em tempo, por trás de uma
+  // tela onde ele não serve para nada. Devolvendo nada, ele não existe.
+  //
+  // Depois de todos os ganchos, de propósito: a ordem dos ganchos não pode
+  // mudar entre um desenho e outro, e sair antes deles quebraria isso.
+  if (caminho.startsWith("/lncadmin")) return null;
 
   /* ---------------- O balão fechado ---------------- */
 
@@ -573,16 +662,41 @@ export default function Chat() {
             A nota é centrada e sem balão de propósito: é recado do sistema,
             e não fala de ninguém. E diz como voltar, porque conversa
             encerrada não é porta trancada. */}
-        {estado === "fechada" && (
-          <p
-            role="status"
-            className="mt-4 border-t border-contorno pt-4 text-center text-xs leading-relaxed text-tinta/45"
-          >
-            A equipe encerrou este atendimento.
-            <br />
-            Se precisar de mais alguma coisa, é só escrever aqui embaixo — a
-            gente começa uma conversa nova, sem você repetir seus dados.
-          </p>
+        {(estado === "fechada" || notaPendente) && (
+          <div className="mt-4 border-t border-contorno pt-4">
+            {estado === "fechada" && (
+              <p
+                role="status"
+                className="text-center text-xs leading-relaxed text-tinta/45"
+              >
+                A equipe encerrou este atendimento.
+                <br />
+                Se precisar de mais alguma coisa, é só escrever aqui embaixo —
+                a gente começa uma conversa nova, sem você repetir seus dados.
+              </p>
+            )}
+
+            {/* A avaliação, pedida aqui e não por e-mail no dia seguinte.
+
+                Pesquisa que chega depois mede quem ficou com raiva e quem
+                ficou encantado; o meio-termo, que é a maioria, nunca
+                responde. No fim da conversa a pessoa ainda está aqui, e são
+                duas estrelas de distância. */}
+            {!avaliada && (
+              <Avaliacao
+                titulo={
+                  estado === "fechada"
+                    ? "Como foi o atendimento?"
+                    : "Como foi o seu último atendimento?"
+                }
+                // Sem `onPronto` que desmonte o bloco: quem fecha o assunto
+                // é o próprio componente, com o "obrigado". Desmontando
+                // aqui, a pessoa clicava em enviar e o bloco sumia sem dizer
+                // nada — parece que a avaliação se perdeu.
+                obterChave={() => chaveParaNota.current || chave.current}
+              />
+            )}
+          </div>
         )}
 
         <div ref={fim} />
@@ -601,6 +715,7 @@ export default function Chat() {
           // o desenho entrega o que havia no desenho anterior, e a chave pode
           // ter acabado de nascer na primeira mensagem.
           obterChave={() => chave.current}
+          salvos={dadosSalvos}
           onPronto={() => {
             setTemFicha(true);
             void buscar();
@@ -646,6 +761,121 @@ export default function Chat() {
   );
 }
 
+/* ---------------- A avaliação ---------------- */
+
+/**
+ * Cinco estrelas e um comentário opcional.
+ *
+ * ---------- Por que o comentário é opcional ----------
+ *
+ * Porque exigir texto reduz a amostra a quem tinha o que reclamar. A nota
+ * sozinha já serve para comparar uma semana com a outra; o comentário é
+ * bônus de quem quis explicar.
+ *
+ * ---------- Por que envia no clique da estrela ----------
+ *
+ * Uma estrela clicada já é a resposta. Pedir um segundo clique em "enviar"
+ * perde gente no meio do caminho — e quem quiser escrever algo ainda tem o
+ * campo, que aparece depois da nota.
+ */
+function Avaliacao({
+  titulo,
+  obterChave,
+}: {
+  titulo: string;
+  obterChave: () => string;
+}) {
+  const [nota, setNota] = useState(0);
+  const [comentario, setComentario] = useState("");
+  const [enviado, setEnviado] = useState(false);
+
+  async function mandar(valor: number, texto: string) {
+    try {
+      await fetch("/api/chat/avaliacao", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({ chave: obterChave(), nota: valor, comentario: texto }),
+      });
+    } catch {
+      // Avaliação é bônus: falhar aqui não pode virar erro na cara de quem
+      // acabou de ser bem atendido.
+    }
+  }
+
+  if (enviado) {
+    return (
+      <p className="mt-3 text-center text-xs text-tinta/45">
+        Obrigado pela avaliação.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      <p className="text-center text-xs text-tinta/55">
+        {titulo}
+      </p>
+
+      <div className="mt-2 flex justify-center gap-1">
+        {[1, 2, 3, 4, 5].map((valor) => (
+          <button
+            key={valor}
+            type="button"
+            onClick={() => {
+              setNota(valor);
+              void mandar(valor, "");
+              tocar("convite");
+            }}
+            aria-label={`${valor} ${valor === 1 ? "estrela" : "estrelas"}`}
+            aria-pressed={valor <= nota}
+            className="p-1 transition-transform duration-200 hover:scale-110"
+          >
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              // Preenchida até a nota escolhida, vazia depois: é como se lê
+              // uma nota sem precisar de legenda.
+              fill={valor <= nota ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
+              className={`h-6 w-6 ${valor <= nota ? "text-salmon" : "text-tinta/30"}`}
+            >
+              <path d="m12 3 2.6 5.6 6.4.8-4.7 4.3 1.2 6.3L12 17l-5.5 3 1.2-6.3L3 9.4l6.4-.8z" />
+            </svg>
+          </button>
+        ))}
+      </div>
+
+      {nota > 0 && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void mandar(nota, comentario.trim());
+            setEnviado(true);
+          }}
+          className="mt-3 flex gap-2"
+        >
+          <input
+            value={comentario}
+            onChange={(e) => setComentario(e.target.value)}
+            maxLength={500}
+            placeholder="Quer contar o porquê? (opcional)"
+            aria-label="Comentário sobre o atendimento"
+            className="min-h-11 flex-1 rounded-xl border border-contorno bg-fundo-alt px-3.5 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
+          />
+          <button
+            type="submit"
+            className="min-h-11 shrink-0 rounded-xl border border-contorno px-4 text-sm text-tinta/70 transition-colors duration-300 hover:text-tinta"
+          >
+            Enviar
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 /* ---------------- A ficha ---------------- */
 
 /**
@@ -660,16 +890,25 @@ export default function Chat() {
  */
 function FichaDeContato({
   obterChave,
+  salvos,
   onPronto,
 }: {
   obterChave: () => string;
+  salvos: DadosSalvos | null;
   onPronto: () => void;
 }) {
-  const [nome, setNome] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [email, setEmail] = useState("");
+  const [nome, setNome] = useState(salvos?.nome ?? "");
+  const [whatsapp, setWhatsapp] = useState(salvos?.whatsapp ?? "");
+  const [email, setEmail] = useState(salvos?.email ?? "");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
+
+  // Marcado por padrão, e dito com todas as letras ao lado.
+  //
+  // Quem já pediu para guardar na vez passada chega com os campos cheios e
+  // só confirma; quem não quer, desmarca uma vez e nunca mais vê os dados
+  // voltarem. Guardar nada é o oposto de um site que lembra de você.
+  const [guardarDados, setGuardarDados] = useState(true);
 
   async function mandar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -709,6 +948,22 @@ function FichaDeContato({
       if (!resposta.ok) {
         setErro("Não deu para enviar. Tente de novo.");
         return;
+      }
+
+      // Guardado só no navegador dela, e só se ela quis. O servidor já tem
+      // os mesmos dados na conversa — isto não espalha informação, apenas
+      // evita cobrar duas vezes a mesma coisa da mesma pessoa.
+      try {
+        if (guardarDados) {
+          localStorage.setItem(
+            GUARDA_DADOS,
+            JSON.stringify({ nome: nome.trim(), whatsapp, email: email.trim() })
+          );
+        } else {
+          localStorage.removeItem(GUARDA_DADOS);
+        }
+      } catch {
+        // Aba privada: vale para esta visita, e pronto.
       }
 
       tocar("mensagem");
@@ -767,6 +1022,26 @@ function FichaDeContato({
           className="min-h-11 rounded-xl border border-contorno bg-fundo-alt px-3.5 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
         />
       </div>
+
+      <label className="mt-3 flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-tinta/50">
+        <input
+          type="checkbox"
+          checked={guardarDados}
+          onChange={(e) => setGuardarDados(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--salmon)]"
+        />
+        Salvar meus dados neste navegador para a próxima conversa
+      </label>
+
+      {/* O horário dito aqui, no momento em que ele passa a importar.
+
+          Antes disso é informação solta; aqui a pessoa acabou de pedir para
+          falar com gente, e saber quando essa gente trabalha é a diferença
+          entre esperar tranquila e achar que foi ignorada. */}
+      <p className="mt-2 text-[0.7rem] leading-relaxed text-tinta/35">
+        Equipe de segunda a sexta, 8h30 às 11h30 e 14h às 17h. O assistente
+        responde a qualquer hora.
+      </p>
 
       {erro && <p className="mt-2 text-xs text-destaque">{erro}</p>}
 

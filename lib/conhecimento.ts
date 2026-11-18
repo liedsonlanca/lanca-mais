@@ -1,3 +1,5 @@
+import { HORARIO_ESCRITO } from "@/lib/expediente";
+
 // O que o assistente do chat sabe, e nada além disto.
 //
 // ---------- Por que este arquivo existe ----------
@@ -128,9 +130,26 @@ entregar peça solta.
 "Onde vocês ficam?" — João Pessoa, Paraíba. O atendimento também é remoto.
 `.trim();
 
+/**
+ * O horário, dito uma vez só.
+ *
+ * Vem de lib/expediente.ts, que é quem decide se a equipe está trabalhando
+ * agora. Escrito à mão aqui também, as duas versões divergiriam no dia em
+ * que o horário mudasse — e o assistente anunciaria um expediente que o
+ * sistema não cumpre.
+ */
+const HORARIO = `
+${HORARIO_ESCRITO}
+
+Quem pede para falar com a equipe fora desse horário não fica sem resposta:
+o pedido entra na fila e alguém responde na abertura seguinte. Se for
+urgente, o WhatsApp (83) 99106-0691 é o caminho.
+`.trim();
+
 /** Tudo junto, na ordem em que o modelo lê. */
 export const CONHECIMENTO = [
   `## Quem é a LANÇA+\n${QUEM_SOMOS}`,
+  `## Horário de atendimento\n${HORARIO}`,
   `## Serviços\n${SERVICOS}`,
   `## Como o trabalho começa\n${COMO_COMECA}`,
   `## Perguntas frequentes\n${PERGUNTAS}`,

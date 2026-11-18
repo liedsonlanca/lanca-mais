@@ -14,6 +14,7 @@ import {
   type Mensagem,
 } from "@/lib/conversas";
 import { origemDaRequisicao, podeTentar, registrarFalha } from "@/lib/tentativas";
+import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 
 // O chat do site: uma rota para mandar mensagem, outra para buscar resposta.
 //
@@ -54,10 +55,26 @@ function texto(valor: unknown, limite: number) {
  * O que ele não pode receber é silêncio — quem manda mensagem e não recebe
  * nada supõe que o site está quebrado, e vai embora sem avisar.
  */
-const RECADO_DE_ENTREGA =
-  "Essa eu prefiro não responder no chute — quem responde isso é a equipe. " +
-  "Deixa seus dados aí embaixo que a gente te procura; se preferir, chama " +
-  "direto no (83) 99106-0691.";
+function recadoDeEntrega() {
+  const base =
+    "Essa eu prefiro não responder no chute — quem responde isso é a " +
+    "equipe. Deixa seus dados aí embaixo que a gente te procura";
+
+  // Fora do expediente, o recado diz quando. É o mesmo fato — "a equipe
+  // responde depois" — dito de um jeito que a pessoa consegue usar: ela
+  // decide se espera até amanhã ou se chama no WhatsApp agora.
+  //
+  // Sem isso, quem escreve às onze da noite fica esperando até as oito e
+  // meia sem saber, e essa espera parece descaso em vez de expediente.
+  if (equipeNoExpediente()) {
+    return `${base}. Se preferir, chama direto no (83) 99106-0691.`;
+  }
+
+  return (
+    `${base} — a equipe atende ${quandoAEquipeVolta()}. ` +
+    "Se for urgente, o WhatsApp é (83) 99106-0691."
+  );
+}
 
 export async function POST(requisicao: Request) {
   const origem = origemDaRequisicao(requisicao);
@@ -150,7 +167,7 @@ export async function POST(requisicao: Request) {
     // Três caminhos chegam aqui: o assistente pediu para passar, ele falhou,
     // ou ele nem existe. O visitante vê a mesma coisa nos três, porque para
     // ele a diferença não existe — o que importa é que alguém vai responder.
-    const fala = dito?.texto || RECADO_DE_ENTREGA;
+    const fala = dito?.texto || recadoDeEntrega();
     const id = await gravarMensagem(conversa.id, "assistente", fala);
     await passarParaEquipe(conversa.id);
     estado = "equipe";
@@ -189,7 +206,7 @@ export async function GET(requisicao: Request) {
   }
 
   const depois = Number(searchParams.get("depois") ?? 0);
-  const { estado, temFicha, novas } = await mensagensDepois(
+  const { estado, temFicha, avaliada, novas } = await mensagensDepois(
     chave,
     Number.isFinite(depois) && depois > 0 ? depois : 0
   );
@@ -198,7 +215,7 @@ export async function GET(requisicao: Request) {
   // um GET de resposta repetida é exatamente o que um intermediário gosta de
   // guardar. Guardada, a pessoa ficaria olhando a mesma resposta de sempre.
   return NextResponse.json(
-    { ok: true, estado, temFicha, novas },
+    { ok: true, estado, temFicha, avaliada, novas },
     { headers: { "Cache-Control": "no-store" } }
   );
 }

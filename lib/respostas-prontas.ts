@@ -42,6 +42,67 @@ export const RESPOSTAS_PRONTAS: GrupoDeRespostas[] = [
           "Oi! Desculpa a demora para responder. Já estou com sua mensagem " +
           "aqui — me conta o que você precisa que a gente resolve.",
       },
+      {
+        rotulo: "Fora do horário",
+        texto:
+          "Oi! Você escreveu fora do nosso horário de atendimento, por isso " +
+          "a demora. Estou aqui agora — me conta o que você precisa.",
+      },
+    ],
+  },
+
+  {
+    // O grupo mais usado, e o que mais muda a conversa.
+    //
+    // Antes de falar de serviço, de preço ou de qualquer coisa, a equipe
+    // precisa saber quem é a pessoa e o que ela faz. Sem isso, toda resposta
+    // vira folheto — e folheto não fecha negócio.
+    grupo: "Descobrir",
+    itens: [
+      {
+        rotulo: "Qual o nicho",
+        texto:
+          "Me conta: o que você faz, e há quanto tempo? Saber o segmento " +
+          "muda bastante o caminho que a gente vai propor.",
+      },
+      {
+        rotulo: "Como te chamo",
+        texto: "Antes de continuar, como você se chama?",
+      },
+      {
+        rotulo: "Isso é para mim?",
+        texto:
+          "Essa resposta depende do seu caso, e é exatamente por isso que a " +
+          "gente começa pelo diagnóstico em vez de empurrar um pacote. Me " +
+          "conta o que você faz e qual o seu objetivo agora — se não for " +
+          "para você, eu te digo com a mesma sinceridade.",
+      },
+      {
+        rotulo: "Qual o objetivo",
+        texto:
+          "O que você quer que mude nos próximos meses? Mais gente " +
+          "conhecendo a marca, mais pedido chegando, ou passar a ser visto " +
+          "de outro jeito? Cada um desses puxa uma estratégia diferente.",
+      },
+      {
+        rotulo: "Quem cuida hoje",
+        texto:
+          "Hoje quem cuida da comunicação de vocês? Alguém de dentro, " +
+          "agência, ou está parado? Pergunto porque isso define se o caminho " +
+          "é consultoria ou gestão.",
+      },
+      {
+        rotulo: "O que já tentaram",
+        texto:
+          "O que vocês já tentaram até aqui, e o que não funcionou? Saber o " +
+          "que já foi feito evita eu te propor justamente aquilo.",
+      },
+      {
+        rotulo: "Qual o Instagram",
+        texto:
+          "Me manda o @ do Instagram? Quero dar uma olhada antes de te " +
+          "responder, para falar do seu caso e não no genérico.",
+      },
     ],
   },
 
@@ -196,6 +257,19 @@ export const RESPOSTAS_PRONTAS: GrupoDeRespostas[] = [
         texto:
           "Fico à disposição! Se surgir qualquer outra dúvida, é só chamar " +
           "aqui ou no (83) 99106-0691.",
+      },
+      {
+        rotulo: "Marcar uma conversa",
+        texto:
+          "Que tal marcarmos uma conversa de uns vinte minutos para eu " +
+          "entender melhor o seu caso? Me diz dois horários que funcionam " +
+          "para você e eu confirmo.",
+      },
+      {
+        rotulo: "Antes de encerrar",
+        texto:
+          "Consegui te ajudar com o que você precisava? Se sim, vou encerrar " +
+          "por aqui — e qualquer coisa é só chamar de novo.",
       },
     ],
   },

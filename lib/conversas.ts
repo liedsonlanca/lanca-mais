@@ -39,6 +39,9 @@ export type Conversa = {
   contato: string;
   email: string;
   estado: "assistente" | "equipe" | "fechada";
+  /** A nota de 1 a 5, ou null enquanto ninguém avaliou. */
+  nota: number | null;
+  comentario: string;
   criadoEm: string;
   mexidoEm: string;
 };
@@ -90,7 +93,7 @@ export async function acharOuAbrir(chave: string, visitante: string) {
     `INSERT INTO conversas (chave, visitante)
           VALUES ($1, $2)
      ON CONFLICT (chave) DO UPDATE SET mexido_em = now()
-       RETURNING id, chave, nome, contato, email, estado,
+       RETURNING id, chave, nome, contato, email, estado, nota, comentario,
                  ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em`,
     [chave, visitante]
   )) as Array<{
@@ -100,6 +103,8 @@ export async function acharOuAbrir(chave: string, visitante: string) {
     contato: string;
     email: string;
     estado: string;
+    nota: number | null;
+    comentario: string;
     criado_em: string;
     mexido_em: string;
   }>;
@@ -114,6 +119,8 @@ export async function acharOuAbrir(chave: string, visitante: string) {
     contato: linha.contato,
     email: linha.email,
     estado: linha.estado as Conversa["estado"],
+    nota: linha.nota === null ? null : Number(linha.nota),
+    comentario: linha.comentario ?? "",
     criadoEm: linha.criado_em,
     mexidoEm: linha.mexido_em,
   } satisfies Conversa;
@@ -190,6 +197,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
   const vazio = {
     estado: null as Conversa["estado"] | null,
     temFicha: false,
+    avaliada: false,
     novas: [] as Mensagem[],
   };
 
@@ -200,7 +208,8 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
     `SELECT m.id, m.autor, m.texto,
             to_char(m.criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS quando,
             c.estado,
-            (c.nome <> '' AND c.contato <> '' AND c.email <> '') AS tem_ficha
+            (c.nome <> '' AND c.contato <> '' AND c.email <> '') AS tem_ficha,
+            (c.nota IS NOT NULL) AS avaliada
        FROM conversas c
        LEFT JOIN mensagens m ON m.conversa = c.id AND m.id > $2
       WHERE c.chave = $1
@@ -214,6 +223,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
     quando: string | null;
     estado: string;
     tem_ficha: boolean;
+    avaliada: boolean;
   }>;
 
   if (linhas.length === 0) return vazio;
@@ -230,6 +240,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
   return {
     estado: linhas[0].estado as Conversa["estado"],
     temFicha: Boolean(linhas[0].tem_ficha),
+    avaliada: Boolean(linhas[0].avaliada),
     novas,
   };
 }
@@ -287,7 +298,7 @@ export async function recomecarConversa(anterior: Conversa, visitante: string) {
   const linhas = (await sql.query(
     `INSERT INTO conversas (chave, visitante, nome, contato, email)
           VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, chave, nome, contato, email, estado,
+       RETURNING id, chave, nome, contato, email, estado, nota, comentario,
                  ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em`,
     [chave, visitante, anterior.nome, anterior.contato, anterior.email]
   )) as Array<Record<string, unknown>>;
@@ -302,6 +313,8 @@ export async function recomecarConversa(anterior: Conversa, visitante: string) {
     contato: String(linha.contato ?? ""),
     email: String(linha.email ?? ""),
     estado: String(linha.estado) as Conversa["estado"],
+    nota: linha.nota == null ? null : Number(linha.nota),
+    comentario: String(linha.comentario ?? ""),
     criadoEm: String(linha.criado_em),
     mexidoEm: String(linha.mexido_em),
   } satisfies Conversa;
@@ -317,6 +330,49 @@ export async function conversaEmTexto(conversa: number, limite = 20) {
   return mensagens
     .map((m) => `${m.autor === "cliente" ? "Visitante" : "Atendimento"}: ${m.texto}`)
     .join("\n");
+}
+
+/**
+ * Guarda a avaliação do atendimento.
+ *
+ * ---------- Por que pela chave, e não pelo id ----------
+ *
+ * Porque quem avalia é o visitante, e a chave é o que o navegador dele tem.
+ * Id é número sequencial, adivinhável: aceitar id aqui seria aceitar que
+ * alguém avaliasse a conversa dos outros.
+ *
+ * ---------- Por que a nota pode ser reescrita ----------
+ *
+ * Primeira versão travava na primeira nota — "quem avaliou, avaliou". Isso
+ * quebrava a tela: a estrela grava na hora do clique, e o comentário chega
+ * depois, num segundo envio que a trava recusava. O comentário se perdia, e
+ * quem clicasse 3 e corrigisse para 5 ficava com 3.
+ *
+ * Reescrever é o comportamento certo, não uma concessão: a pessoa mudar de
+ * ideia antes de fechar a janela é uso normal. E só quem tem a chave da
+ * conversa consegue reescrever — ela é sorteada no servidor e não aparece em
+ * endereço nenhum.
+ */
+export async function avaliarConversa(
+  chave: string,
+  nota: number,
+  comentario: string
+) {
+  if (!sql) return false;
+  await garantirEsquema();
+
+  const linhas = (await sql.query(
+    `UPDATE conversas
+        SET nota = $2,
+            -- Comentário vazio não apaga o que já estava: o segundo envio
+            -- pode ser só a correção da estrela.
+            comentario = COALESCE(NULLIF($3, ''), comentario)
+      WHERE chave = $1
+      RETURNING id`,
+    [chave, nota, comentario.slice(0, 500)]
+  )) as Array<{ id: number }>;
+
+  return linhas.length > 0;
 }
 
 /** Marca a conversa como encerrada pela agência. */
@@ -349,7 +405,7 @@ export async function listarConversas(limite = 50): Promise<ConversaNaLista[]> {
     // ida é uma volta de rede. DISTINCT ON é do Postgres e resolve "a última
     // linha de cada grupo" sem subconsulta aninhada.
     const linhas = (await sql.query(
-      `SELECT c.id, c.chave, c.nome, c.contato, c.email, c.estado,
+      `SELECT c.id, c.chave, c.nome, c.contato, c.email, c.estado, c.nota, c.comentario,
               to_char(c.criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS criado_em,
               to_char(c.mexido_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS mexido_em,
               coalesce(r.n, 0)::int AS mensagens,
@@ -377,6 +433,8 @@ export async function listarConversas(limite = 50): Promise<ConversaNaLista[]> {
       contato: String(l.contato ?? ""),
       email: String(l.email ?? ""),
       estado: String(l.estado) as Conversa["estado"],
+      nota: l.nota == null ? null : Number(l.nota),
+      comentario: String(l.comentario ?? ""),
       criadoEm: String(l.criado_em),
       mexidoEm: String(l.mexido_em),
       mensagens: Number(l.mensagens ?? 0),
@@ -397,7 +455,7 @@ export async function lerConversa(id: number) {
 
     const [cabeca, mensagens] = await Promise.all([
       sql.query(
-        `SELECT id, chave, nome, contato, email, estado,
+        `SELECT id, chave, nome, contato, email, estado, nota, comentario,
                 ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em
            FROM conversas WHERE id = $1`,
         [id]
@@ -416,6 +474,8 @@ export async function lerConversa(id: number) {
         contato: String(linha.contato ?? ""),
         email: String(linha.email ?? ""),
         estado: String(linha.estado) as Conversa["estado"],
+        nota: linha.nota == null ? null : Number(linha.nota),
+        comentario: String(linha.comentario ?? ""),
         criadoEm: String(linha.criado_em),
         mexidoEm: String(linha.mexido_em),
       } satisfies Conversa,
