@@ -4,7 +4,6 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { del } from "@vercel/blob";
 
 // Armazenamento dos arquivos do painel: Cloudflare R2.
 //
@@ -160,19 +159,30 @@ function chaveDaUrl(url: string) {
  * É "melhor esforço": falhar aqui deixa um arquivo órfão ocupando espaço, o
  * que é bem menos grave do que impedir a pessoa de apagar o conteúdo.
  *
- * Ainda aceita endereços do Vercel Blob porque o banco guarda os das peças
- * antigas: enquanto elas não forem substituídas, apagar uma precisa apagar o
- * arquivo no lugar certo.
+ * ---------- Os endereços antigos do Vercel Blob ----------
+ *
+ * O banco ainda guarda endereços da loja antiga, e antes este trecho chamava
+ * o pacote @vercel/blob para apagá-los. Ele saiu, e não por capricho de
+ * dependência: aquele pacote arrastava oito avisos de segurança — sete
+ * altos, entre eles um que derruba o processo e um que ignora a validação de
+ * certificado TLS — e tudo isso entrava no servidor do site para atender uma
+ * loja que está pausada desde a migração para o R2.
+ *
+ * Pausada, ela não serve mais nenhum arquivo: os endereços antigos já estão
+ * quebrados no site, e apagar lá dentro não mudaria nada para ninguém. Em
+ * troca de zero benefício, o site carregava a superfície de ataque inteira.
+ *
+ * O registro fica no console para o dia em que alguém reabrir a loja e
+ * quiser faxinar o que sobrou.
  */
 export async function apagarArquivo(url: string | null | undefined) {
   if (!url) return;
 
   if (url.includes(".blob.vercel-storage.com")) {
-    try {
-      await del(url);
-    } catch {
-      // Silêncio proposital: ver comentário acima.
-    }
+    console.warn(
+      "[upload] arquivo antigo do Vercel Blob não foi apagado (loja pausada):",
+      url
+    );
     return;
   }
 
