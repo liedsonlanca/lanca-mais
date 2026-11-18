@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { sql, garantirEsquema } from "@/lib/db";
 import { CONHECIMENTO } from "@/lib/conhecimento";
 import type { Mensagem } from "@/lib/conversas";
 
@@ -110,6 +111,66 @@ BASE
 ${CONHECIMENTO}
 `.trim();
 
+/**
+ * Teto de respostas do assistente por dia, somando o site inteiro.
+ *
+ * ---------- Por que existe ----------
+ *
+ * A chave da Anthropic é pré-paga e é da agência. O freio por endereço de
+ * rede segura uma pessoa insistindo; não segura cem endereços combinados, e
+ * é barato conseguir cem endereços.
+ *
+ * Sem um teto global, o pior caso é o saldo sumir numa madrugada e a conta
+ * aparecer no dia seguinte, quando já foi. Com ele, o pior caso é um dia de
+ * chat sem assistente — as conversas continuam, só vão direto para a equipe.
+ *
+ * ---------- Por que quinhentas ----------
+ *
+ * Com o Haiku, quinhentas respostas custam centavos de dólar; mesmo no Opus
+ * fica na casa de poucos dólares. E é volume que um site de agência não
+ * alcança por uso legítimo — se alcançar, é notícia boa e o número sobe numa
+ * linha.
+ */
+const TETO_DIARIO = 500;
+
+/**
+ * Conta a resposta do dia e diz se ainda cabe.
+ *
+ * Mora na tabela `meta`, e não na memória do processo: cada requisição pode
+ * cair numa instância diferente da função, e um contador por instância
+ * contaria errado para baixo — que é justamente o erro que não se pode
+ * cometer num freio de gasto.
+ */
+async function aindaCabeHoje() {
+  if (!sql) return true;
+
+  const hoje = new Date().toISOString().slice(0, 10);
+  const chave = `assistente:${hoje}`;
+
+  try {
+    await garantirEsquema();
+
+    // Soma e lê na mesma ida ao banco. Ler e depois gravar abriria espaço
+    // para duas requisições simultâneas lerem o mesmo número e gravarem o
+    // mesmo valor — e o teto vazaria justamente sob carga, que é quando ele
+    // precisa valer.
+    const linhas = (await sql.query(
+      `INSERT INTO meta (chave, valor) VALUES ($1, '1')
+       ON CONFLICT (chave)
+       DO UPDATE SET valor = (COALESCE(NULLIF(meta.valor, '')::int, 0) + 1)::text,
+                     em = now()
+       RETURNING valor`,
+      [chave]
+    )) as Array<{ valor: string }>;
+
+    return Number(linhas[0]?.valor ?? 0) <= TETO_DIARIO;
+  } catch {
+    // Banco fora: o assistente continua. Um freio que derruba o serviço que
+    // deveria proteger é pior do que não ter freio.
+    return true;
+  }
+}
+
 export type Resposta = { texto: string; chamarEquipe: boolean };
 
 /** Se o assistente está ligado. Sem chave, o chat vira chat humano. */
@@ -136,6 +197,13 @@ function obterCliente() {
  */
 export async function responder(mensagens: Mensagem[]): Promise<Resposta | null> {
   if (!assistenteLigado() || mensagens.length === 0) return null;
+
+  // O teto do dia vem antes da chamada, e conta mesmo quando a resposta
+  // falha depois: o que se está limitando e o numero de chamadas pagas.
+  if (!(await aindaCabeHoje())) {
+    console.error("[atendente] teto diario atingido; passando para a equipe");
+    return null;
+  }
 
   // A fala da equipe entra como se fosse do assistente: para o modelo, o
   // que importa é o que o lado da agência já disse, e não quem digitou. Sem

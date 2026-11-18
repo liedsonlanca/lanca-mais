@@ -117,6 +117,18 @@ export default function Chat() {
 
   /** Começou limpo por cima de um atendimento que ninguém avaliou. */
   const [notaPendente, setNotaPendente] = useState(false);
+
+  /**
+   * O expediente, como o servidor o ve.
+   *
+   * Nao calculado aqui: o relogio do aparelho da pessoa pode estar errado, e
+   * fuso certo nao conserta relogio adiantado. Quem sabe que horas sao para
+   * a LANCA+ e o servidor.
+   */
+  const [expediente, setExpediente] = useState<{
+    aberto: boolean;
+    volta: string;
+  } | null>(null);
   const [falhou, setFalhou] = useState(false);
 
   // A preferência de som é lida de onde ela mora, e não copiada para cá.
@@ -197,8 +209,11 @@ export default function Chat() {
         estado: "assistente" | "equipe" | "fechada" | null;
         temFicha?: boolean;
         avaliada?: boolean;
+        expediente?: { aberto: boolean; volta: string };
         novas: Mensagem[];
       };
+
+      if (dados.expediente) setExpediente(dados.expediente);
 
       // Só na primeira leitura desta carga de página.
       //
@@ -393,6 +408,7 @@ export default function Chat() {
         estado?: "assistente" | "equipe";
         temFicha?: boolean;
         novaConversa?: boolean;
+        expediente?: { aberto: boolean; volta: string };
         minha?: number;
         respostas?: Mensagem[];
       };
@@ -401,6 +417,8 @@ export default function Chat() {
         setFalhou(true);
         return;
       }
+
+      if (dados.expediente) setExpediente(dados.expediente);
 
       if (dados.chave) {
         chave.current = dados.chave;
@@ -556,11 +574,22 @@ export default function Chat() {
         <div className="min-w-0">
           <p className="text-sm font-semibold text-tinta">Fale com a LANÇA+</p>
           <p className="mt-0.5 text-xs text-tinta/50">
+            {/* O subtítulo é onde o horário mora.
+
+                Ele estava só na frase de entrega, dita uma vez — e quando a
+                conversa já está com a equipe o servidor não manda mensagem
+                nenhuma, então da segunda mensagem em diante a pessoa
+                escrevia no vazio, sem nada na tela dizendo quando alguém
+                responde. Aqui fica à vista o tempo todo. */}
             {estado === "fechada"
               ? "Atendimento encerrado."
               : estado === "equipe"
-                ? "A equipe foi avisada e responde por aqui."
-                : "Resposta na hora, de segunda a segunda."}
+                ? expediente && !expediente.aberto
+                  ? `Fora do horário — a equipe responde ${expediente.volta}.`
+                  : "A equipe foi avisada e responde por aqui."
+                : expediente && !expediente.aberto
+                  ? `Respondo agora; a equipe atende ${expediente.volta}.`
+                  : "Resposta na hora, de segunda a segunda."}
           </p>
         </div>
 

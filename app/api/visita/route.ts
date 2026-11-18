@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  origemDaRequisicao,
+  podeTentar,
+  registrarFalha,
+} from "@/lib/tentativas";
 import { impressaoDoVisitante, registrarAcesso } from "@/lib/acessos";
 
 // Onde as visitas do site são anotadas.
@@ -51,7 +56,28 @@ function origem(referencia: string, anfitriao: string | null) {
   }
 }
 
+/**
+ * Teto de registros por endereço, a cada quinze minutos.
+ *
+ * Esta rota é pública e escreve uma linha no banco a cada chamada — é o
+ * jeito mais barato que alguém teria de encher a tabela de acessos, inflar o
+ * número do painel até ele não querer dizer nada e fazer o banco crescer às
+ * custas da agência.
+ *
+ * Cento e vinte é folgado para gente de verdade: são oito páginas por
+ * minuto, sem parar, por quinze minutos. Quem passa disso não está lendo.
+ */
+const TETO_POR_ENDERECO = 120;
+
 export async function POST(requisicao: Request) {
+  const freio = origemDaRequisicao(requisicao);
+  if (!(await podeTentar("visita", freio, TETO_POR_ENDERECO)).permitido) {
+    // 204 como em todo o resto da rota: dizer "recusado" ensina quem está
+    // despejando a ajustar o ritmo e continuar.
+    return new NextResponse(null, { status: 204 });
+  }
+  await registrarFalha("visita", freio);
+
   let corpo: Record<string, unknown>;
   try {
     corpo = await requisicao.json();

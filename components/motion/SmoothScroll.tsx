@@ -1,13 +1,31 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { registrarLenis } from "@/lib/scroll";
 
 // Rolagem com inércia — é o que dá a sensação de "suave" antes de qualquer
 // animação de entrada. Desligada para quem pede menos movimento.
+//
+// ---------- E desligada no painel ----------
+//
+// O Lenis captura a roda do mouse na página inteira e rola o documento. Numa
+// página de vitrine isso é o efeito desejado; numa ferramenta de trabalho é
+// defeito: cada lista, cada cartão e cada caixa com rolagem própria deixava
+// de rolar, e a página inteira rolava no lugar.
+//
+// Dá para marcar cada caixa com data-lenis-prevent, e era o que o site já
+// fazia em alguns lugares — mas no painel isso seria marcar todas, inclusive
+// as que ainda não existem. Mais honesto é não ligar a rolagem suave onde
+// ela não deveria estar: o painel não é vitrine, e inércia ao rolar uma
+// lista de conversas só atrapalha quem está trabalhando.
 export default function SmoothScroll() {
+  const caminho = usePathname();
+
   useEffect(() => {
+    if (caminho.startsWith("/lncadmin")) return;
+
     const reduzido = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reduzido.matches) return;
 
@@ -31,7 +49,9 @@ export default function SmoothScroll() {
       lenis.destroy();
       registrarLenis(null);
     };
-  }, []);
+    // Depende do caminho: entrar no painel precisa desmontar o Lenis que
+    // estava rodando, e sair dele precisa montar de volta.
+  }, [caminho]);
 
   return null;
 }

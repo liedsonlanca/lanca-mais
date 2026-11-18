@@ -256,6 +256,34 @@ const TABELAS = [
 
   `CREATE INDEX IF NOT EXISTS mensagens_por_conversa
      ON mensagens (conversa, id)`,
+
+  // Os pedidos de orçamento do formulário.
+  //
+  // ---------- Por que passaram a ser guardados ----------
+  //
+  // Antes não eram, e com razão: o lead vive no CRM, e uma cópia no banco do
+  // site seria uma segunda lista que ninguém abre e que envelhece divergindo
+  // da primeira.
+  //
+  // O que mudou foi a pergunta. A tela "Vieram do site" não é um CRM de
+  // segunda: ela responde o que o CRM não responde — quem chegou por este
+  // site, por qual porta e o que perguntou. Para isso, o dado precisa estar
+  // aqui, e o DGFLOW continua sendo onde o lead é trabalhado.
+  //
+  // Também protege do pior caso: o CRM fora do ar deixava de existir o
+  // pedido. Agora ele fica, e alguém vê.
+  `CREATE TABLE IF NOT EXISTS pedidos (
+     id         BIGSERIAL PRIMARY KEY,
+     nome       TEXT NOT NULL,
+     whatsapp   TEXT NOT NULL DEFAULT '',
+     email      TEXT NOT NULL DEFAULT '',
+     servico    TEXT NOT NULL DEFAULT '',
+     mensagem   TEXT NOT NULL DEFAULT '',
+     -- Se o webhook do CRM aceitou. Falso aqui é um pedido que existe só
+     -- neste banco, e que alguém precisa levar para o DGFLOW à mão.
+     no_crm     BOOLEAN NOT NULL DEFAULT false,
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
 ];
 
 // Colunas acrescentadas depois que as tabelas já existiam em produção.

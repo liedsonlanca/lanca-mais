@@ -2,7 +2,8 @@ import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
 import { lerConversa } from "@/lib/conversas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
-import { campo, botaoPrimario } from "@/components/admin/estilos";
+import { botaoPrimario } from "@/components/admin/estilos";
+import CampoDeResposta from "@/components/admin/CampoDeResposta";
 import RespostasProntas from "@/components/admin/RespostasProntas";
 import {
   responderNoChat,
@@ -163,14 +164,7 @@ export default async function AdminConversa({
               Se já tiver fechado a janela, vê quando voltar.
             </p>
 
-            <textarea
-              id="resposta"
-              name="texto"
-              rows={4}
-              maxLength={2000}
-              placeholder="Escreva como escreveria no WhatsApp."
-              className={`${campo} mt-3 min-h-28 resize-y`}
-            />
+            <CampoDeResposta />
 
             <RespostasProntas campo="resposta" />
 

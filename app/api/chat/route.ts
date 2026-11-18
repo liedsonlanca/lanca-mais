@@ -142,6 +142,10 @@ export async function POST(requisicao: Request) {
       chave: conversa.chave,
       estado: "equipe",
       temFicha,
+      expediente: {
+        aberto: equipeNoExpediente(),
+        volta: quandoAEquipeVolta(),
+      },
       minha,
       respostas: [],
     });
@@ -184,6 +188,10 @@ export async function POST(requisicao: Request) {
     chave: conversa.chave,
     estado,
     temFicha,
+    expediente: {
+      aberto: equipeNoExpediente(),
+      volta: quandoAEquipeVolta(),
+    },
     // O navegador precisa saber que o histórico na tela é de outra conversa,
     // para limpar em vez de emendar as mensagens antigas nas novas.
     novaConversa: Boolean(recomecou),
@@ -214,8 +222,23 @@ export async function GET(requisicao: Request) {
   // Sem cache, e dito aqui em vez de confiado ao padrão: a rota é um GET, e
   // um GET de resposta repetida é exatamente o que um intermediário gosta de
   // guardar. Guardada, a pessoa ficaria olhando a mesma resposta de sempre.
+  // O expediente vai no corpo, e não é calculado no navegador.
+  //
+  // O relógio do aparelho da pessoa pode estar errado, e o fuso certo não
+  // salva um relógio adiantado. Quem sabe que horas são para a LANÇA+ é o
+  // servidor — e é ele quem responde.
   return NextResponse.json(
-    { ok: true, estado, temFicha, avaliada, novas },
+    {
+      ok: true,
+      estado,
+      temFicha,
+      avaliada,
+      novas,
+      expediente: {
+        aberto: equipeNoExpediente(),
+        volta: quandoAEquipeVolta(),
+      },
+    },
     { headers: { "Cache-Control": "no-store" } }
   );
 }

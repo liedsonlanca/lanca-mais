@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  origemDaRequisicao,
+  podeTentar,
+  registrarFalha,
+} from "@/lib/tentativas";
 import { impressaoDoVisitante } from "@/lib/acessos";
 import { registrarEvento, tipoValido } from "@/lib/eventos";
 
@@ -16,7 +21,26 @@ import { registrarEvento, tipoValido } from "@/lib/eventos";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Teto de sinais por endereço, a cada quinze minutos.
+ *
+ * Mesma razão da rota de visitas: pública, escreve uma linha por chamada, e
+ * sem freio alguém enche a tabela de eventos — e com ela o sino do painel,
+ * que passaria a avisar "alguém no diagnóstico" a cada segundo até ninguém
+ * mais olhar para ele.
+ *
+ * Oitenta cabe com folga no uso real: a batida de presença é a cada trinta
+ * segundos, ou seja trinta por janela, mais as aberturas e saídas.
+ */
+const TETO_POR_ENDERECO = 80;
+
 export async function POST(requisicao: Request) {
+  const freio = origemDaRequisicao(requisicao);
+  if (!(await podeTentar("evento", freio, TETO_POR_ENDERECO)).permitido) {
+    return new NextResponse(null, { status: 204 });
+  }
+  await registrarFalha("evento", freio);
+
   let corpo: Record<string, unknown>;
   try {
     corpo = await requisicao.json();
