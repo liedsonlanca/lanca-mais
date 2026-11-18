@@ -27,18 +27,22 @@ import type { Mensagem } from "@/lib/conversas";
 // marcada nunca falha por formatação.
 
 /**
- * O modelo.
+ * O modelo, escolhido pela agência em 18/11/2026.
  *
- * Opus 5.5 porque a conversa é com cliente: a diferença entre uma resposta
- * que soa da casa e uma que soa de robô aparece justamente aqui, na primeira
- * frase que alguém lê da LANÇA+.
+ * Haiku 5.5: US$ 0,10 por milhão de tokens de entrada, contra US$ 4,00 do
+ * Opus 5.5. Quarenta vezes mais barato, e aqui a diferença de capacidade
+ * pesa pouco — o trabalho não é raciocinar, é seguir um texto fechado
+ * (lib/conhecimento.ts) e saber quando a pergunta sai dele.
  *
- * Trocar por `claude-haiku-5-5` corta o custo de entrada de US$ 4,00 para
- * US$ 0,10 por milhão de tokens, e é só mudar esta linha. Com o volume de um
- * chat de site, a conta dos dois é pequena — o Opus de uma conversa inteira
- * fica na casa de centavos.
+ * O que se perde é margem de erro: Haiku segue instrução bem, e segue menos
+ * bem quando a instrução é vaga. Por isso a instrução abaixo é explícita ao
+ * ponto de parecer repetitiva, e por isso a lista do que ele não responde é
+ * nominal em vez de genérica.
+ *
+ * Se um dia as respostas soarem duras ou ele escorregar para fora da base,
+ * é só trocar esta linha por `claude-opus-5-5` — nada mais no arquivo muda.
  */
-const MODELO = "claude-opus-5-5";
+const MODELO = "claude-haiku-5-5";
 
 /**
  * Esforço baixo, de propósito.
