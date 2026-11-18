@@ -2,9 +2,7 @@ import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
 import { lerConversa } from "@/lib/conversas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
-import { botaoPrimario } from "@/components/admin/estilos";
 import CampoDeResposta from "@/components/admin/CampoDeResposta";
-import RespostasProntas from "@/components/admin/RespostasProntas";
 import {
   responderNoChat,
   encerrarConversa,
@@ -116,11 +114,26 @@ export default async function AdminConversa({
             quem rola. A caixa de resposta fica embaixo, fixa: sem isto ela
             descia junto com o historico e saia da tela justamente quando se
             queria escrever. */}
-        <div className={`${CARTAO} flex min-h-0 flex-1 flex-col`}>
-          <div className="flex items-baseline justify-between gap-3 border-b border-contorno px-5 py-3.5">
-            <p className="min-w-0 truncate text-sm font-semibold text-tinta">
-              {conversa.nome || "Visitante sem nome"}
-            </p>
+        <div className={`${CARTAO} flex min-h-36 flex-1 flex-col`}>
+          <div className="flex items-center justify-between gap-3 border-b border-contorno px-4 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-fundo-alt text-xs font-medium text-tinta/60">
+                {(conversa.nome || "?")
+                  .split(/s+/)
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((p) => p[0]?.toUpperCase() ?? "")
+                  .join("") || "?"}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-tinta">
+                  {conversa.nome || "Visitante sem nome"}
+                </p>
+                <p className="truncate text-[0.7rem] text-tinta/45">
+                  {conversa.contato || "sem telefone"}
+                </p>
+              </div>
+            </div>
             <span className={`shrink-0 text-xs ${estado.classe}`}>
               {estado.rotulo}
             </span>
@@ -133,50 +146,53 @@ export default async function AdminConversa({
 
             {mensagens.map((mensagem) => {
               const autor = AUTORES[mensagem.autor];
+              const daCasa = mensagem.autor !== "cliente";
 
+              /* Visitante a esquerda, agencia a direita.
+
+                 E a convencao de todo aplicativo de conversa, e ela faz o
+                 trabalho que o rotulo sozinho nao faz: num fio de trinta
+                 mensagens, o lado diz de quem e a fala antes de a pessoa ler
+                 qualquer palavra. */
               return (
-                <li key={mensagem.id}>
-                  <div className="flex items-baseline gap-2">
-                    <span className={`text-xs font-medium ${autor.classe}`}>
-                      {autor.rotulo}
-                    </span>
-                    <span className="text-[0.7rem] text-tinta/30">
-                      {horaLegivel(mensagem.quando)}
-                    </span>
+                <li
+                  key={mensagem.id}
+                  className={daCasa ? "flex justify-end" : "flex justify-start"}
+                >
+                  <div
+                    className={`max-w-[78%] rounded-2xl px-3.5 py-2.5 ${
+                      daCasa
+                        ? "rounded-br-md bg-salmon/12"
+                        : "rounded-bl-md bg-fundo-alt"
+                    }`}
+                  >
+                    <div className="flex items-baseline gap-2">
+                      <span className={`text-[0.7rem] font-medium ${autor.classe}`}>
+                        {autor.rotulo}
+                      </span>
+                      <span className="text-[0.65rem] text-tinta/30">
+                        {horaLegivel(mensagem.quando)}
+                      </span>
+                    </div>
+                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/80">
+                      {mensagem.texto}
+                    </p>
                   </div>
-                  <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/75">
-                    {mensagem.texto}
-                  </p>
                 </li>
               );
             })}
           </ul>
+
+          {/* A barra fica dentro do mesmo cartão da conversa, colada no
+              rodapé — como em qualquer aplicativo de mensagem. Fora dele,
+              como estava, era um segundo cartão disputando altura com o
+              primeiro, e perdia: a conversa sumia. */}
+          {minha && (
+            <CampoDeResposta acao={responderNoChat} conversa={conversa.id} />
+          )}
         </div>
 
-        {minha ? (
-          <form action={responderNoChat} className={`${CARTAO} mt-4 shrink-0 p-5`}>
-            <input type="hidden" name="id" value={conversa.id} />
-
-            <label
-              htmlFor="resposta"
-              className="block text-sm font-medium text-tinta"
-            >
-              Responder
-            </label>
-            <p className="mt-1 text-xs leading-relaxed text-tinta/45">
-              Aparece no chat de quem está do outro lado em até cinco segundos.
-              Se já tiver fechado a janela, vê quando voltar.
-            </p>
-
-            <CampoDeResposta />
-
-            <RespostasProntas campo="resposta" />
-
-            <button type="submit" className={`${botaoPrimario} mt-4`}>
-              Enviar resposta
-            </button>
-          </form>
-        ) : (
+        {!minha && (
           <p
             className={`${CARTAO} mt-4 shrink-0 p-5 text-sm leading-relaxed text-tinta/55`}
           >
@@ -189,11 +205,40 @@ export default async function AdminConversa({
 
       {/* ---------------- Os dados ---------------- */}
       <aside className="grid content-start gap-4 xl:max-h-full xl:overflow-y-auto">
+        {/* O retrato no topo, como no aplicativo: e o que diz, antes de
+            qualquer texto, de quem e a coluna que se esta lendo. */}
+        <div className={`${CARTAO} grid justify-items-center gap-1 p-5`}>
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-fundo-alt text-base font-medium text-tinta/55">
+            {(conversa.nome || "?")
+              .split(/s+/)
+              .filter(Boolean)
+              .slice(0, 2)
+              .map((p) => p[0]?.toUpperCase() ?? "")
+              .join("") || "?"}
+          </span>
+          <p className="mt-2 text-center text-sm font-semibold text-tinta">
+            {conversa.nome || "Visitante sem nome"}
+          </p>
+          <p className={`text-xs ${estado.classe}`}>{estado.rotulo}</p>
+        </div>
+
         <div className={`${CARTAO} grid gap-4 p-5`}>
-          <Dado
-            rotulo="Nome"
-            valor={conversa.nome || "Não informado"}
-          />
+          <p className="flex items-center gap-2 text-[0.7rem] uppercase tracking-wide text-tinta/35">
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3.5 w-3.5"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            Detalhes
+          </p>
           <Dado
             rotulo="WhatsApp"
             valor={conversa.contato}

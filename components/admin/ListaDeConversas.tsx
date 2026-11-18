@@ -65,14 +65,51 @@ export default function ListaDeConversas({
 }) {
   const caminho = usePathname();
   const [filtro, setFiltro] = useState<Filtro>("todas");
+  const [busca, setBusca] = useState("");
 
   const esperando = lista.filter((c) => c.estado === "equipe").length;
-  const visiveis =
-    filtro === "esperando" ? lista.filter((c) => c.estado === "equipe") : lista;
+  const termo = busca.trim().toLowerCase();
+
+  const visiveis = lista.filter((c) => {
+    if (filtro === "esperando" && c.estado !== "equipe") return false;
+    if (!termo) return true;
+
+    // Procura no que a pessoa lembraria de digitar — nome, telefone e a
+    // ultima frase. Buscar so por nome obriga a lembrar exatamente como
+    // alguem se escreveu, e metade das conversas nem tem nome ainda.
+    return [c.nome, c.contato, c.email, c.ultima]
+      .join(" ")
+      .toLowerCase()
+      .includes(termo);
+  });
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 border-b border-contorno px-4 py-3">
+      <div className="border-b border-contorno px-3 py-3">
+        <div className="relative">
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tinta/35"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar conversa..."
+            aria-label="Buscar conversa"
+            className="min-h-10 w-full rounded-xl border border-contorno bg-fundo-alt pl-9 pr-3 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 border-b border-contorno px-3 py-2.5">
         {(["todas", "esperando"] as Filtro[]).map((alvo) => (
           <button
             key={alvo}

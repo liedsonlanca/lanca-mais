@@ -27,7 +27,6 @@ export default async function LayoutDasConversas({
   if (!(await painelLiberado())) return null;
 
   const conversas = await listarConversas();
-  const esperando = conversas.filter((c) => c.estado === "equipe").length;
   const noExpediente = equipeNoExpediente();
 
   return (
@@ -40,14 +39,14 @@ export default async function LayoutDasConversas({
     // rolar. Assim o cabecalho ocupa o que precisa e as colunas ficam com o
     // que sobrou, seja quanto for.
     <div className="flex flex-col lg:h-[calc(100vh-5rem)]">
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-tinta">Conversas</h1>
-          <p className="mt-1 text-sm text-tinta/55">
-            O chat do site. O assistente responde dúvida sobre serviço e passa
-            para cá o que precisa de gente.
-          </p>
-        </div>
+      {/* Cabecalho em uma linha so.
+
+          Cada pixel aqui sai da conversa la embaixo, e a conversa e o que a
+          pessoa veio ler. O contador de quem esta esperando saiu daqui
+          porque ja existe, maior e mais perto da acao, no filtro da propria
+          lista — duas contagens da mesma coisa so ocupam espaco. */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h1 className="text-xl font-semibold text-tinta">Conversas</h1>
 
         {/* O expediente, dito na própria tela.
 
@@ -76,17 +75,6 @@ export default async function LayoutDasConversas({
         </p>
       )}
 
-      {esperando > 0 && (
-        <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-salmon/50 px-4 py-2 text-sm text-destaque">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-salmon opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-salmon" />
-          </span>
-          {esperando === 1
-            ? "1 conversa esperando resposta"
-            : `${esperando} conversas esperando resposta`}
-        </p>
-      )}
 
       {/* Altura fixa, e rolagem por dentro de cada coluna.
 

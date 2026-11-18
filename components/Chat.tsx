@@ -567,8 +567,9 @@ export default function Chat() {
       // Vai no painel inteiro, e não só na lista: um painel flutuante não
       // deve empurrar a página por baixo de si em lugar nenhum dele.
       data-lenis-prevent
-      className="fixed bottom-6 right-6 z-[60] flex w-[min(380px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_40px_90px_-30px_rgba(0,0,0,0.6)]"
-      style={{ maxHeight: "min(600px, calc(100vh - 6rem))" }}
+      // No telefone ele encosta mais na borda: 24px de margem de cada lado
+      // num aparelho estreito sao 48px perdidos de uma tela que ja e pequena.
+      className="altura-do-chat fixed bottom-4 right-4 z-[60] flex w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_40px_90px_-30px_rgba(0,0,0,0.6)] sm:bottom-6 sm:right-6"
     >
       <div className="flex items-start justify-between gap-2 border-b border-contorno px-4 py-3">
         <div className="min-w-0">

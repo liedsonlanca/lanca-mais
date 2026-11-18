@@ -459,3 +459,22 @@ video {
     animation: none;
   }
 }
+
+/* ---------------- A altura do chat no celular ---------------- */
+
+/* `100vh` mente no celular: ele mede a tela com a barra de endereço
+   escondida, e enquanto ela está à mostra a janela visível é menor do que a
+   conta. O painel do chat calculado em vh ficava mais alto do que o espaço
+   real e passava da tela — embaixo, em cima, ou nos dois.
+
+   `dvh` é a unidade que acompanha: encolhe quando a barra aparece e quando o
+   teclado abre, que é justamente o momento em que alguém está escrevendo no
+   chat e mais precisa ver o que digitou.
+
+   As duas linhas são de propósito, nesta ordem: navegador que não conhece
+   `dvh` ignora a segunda e fica com a primeira, que erra por pouco. Nenhum
+   fica sem limite. */
+.altura-do-chat {
+  max-height: min(600px, calc(100vh - 5.5rem));
+  max-height: min(600px, calc(100dvh - 5.5rem));
+}

@@ -101,7 +101,14 @@ export default async function AdminLayout({
           atravessando 1900px não se lê. */}
       <div className="flex w-full flex-col lg:flex-row">
         {/* ---------- Barra lateral ---------- */}
-        <aside className="border-b border-contorno bg-cartao lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r">
+        {/* `lg:overflow-y-auto`: a lateral tem altura de tela cheia, e com
+            treze seções ela passou a ser mais alta do que isso em notebook —
+            o "Sair" lá embaixo empurrava a página inteira a rolar, mesmo nas
+            telas que cabiam por conta própria.
+
+            Agora ela rola por dentro quando não couber, e o resto do painel
+            fica onde está. */}
+        <aside className="border-b border-contorno bg-cartao lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between gap-3 px-5 py-4 lg:py-6">
             <Link
               href="/lncadmin"
