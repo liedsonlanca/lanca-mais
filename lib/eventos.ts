@@ -63,7 +63,7 @@ export async function registrarEvento(dados: {
 
 export type Notificacao = {
   chave: string;
-  estado: "agora" | "saiu" | "lead";
+  estado: "agora" | "saiu" | "lead" | "chat";
   titulo: string;
   texto: string;
   quando: string;
@@ -113,7 +113,7 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
     // "+00:00". O resultado era "Invalid Date" na tela.
     const quando = `to_char(criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`;
 
-    const [sinais, orcamentos] = await Promise.all([
+    const [sinais, orcamentos, conversas] = await Promise.all([
       sql.query(`
         SELECT tipo, visitante, detalhe, ${quando} AS quando
           FROM eventos
@@ -128,6 +128,21 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
          WHERE criado_em > now() - interval '24 hours'
            AND tipo = 'orcamento_enviado'
          ORDER BY criado_em DESC
+         LIMIT 10
+      `),
+
+      // As conversas do chat que estão esperando a equipe.
+      //
+      // Vem da tabela, e não de um evento gravado: o aviso precisa dizer o
+      // que *está* pendente agora, e não que alguém pediu atendimento há
+      // seis horas. Respondida a conversa, o aviso sai da lista sozinho —
+      // com evento, ele ficaria lá até alguém apagar.
+      sql.query(`
+        SELECT c.id, c.nome,
+               to_char(c.mexido_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS quando
+          FROM conversas c
+         WHERE c.estado = 'equipe'
+         ORDER BY c.mexido_em DESC
          LIMIT 10
       `),
     ]);
@@ -222,15 +237,37 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
       });
     }
 
+    for (const linha of conversas as Array<{
+      id: number;
+      nome: string | null;
+      quando: string;
+    }>) {
+      avisos.push({
+        chave: `c-${linha.id}`,
+        estado: "chat",
+        titulo: "Conversa esperando no chat",
+        texto: linha.nome
+          ? `${linha.nome} pediu para falar com a equipe.`
+          : "Alguém pediu para falar com a equipe.",
+        quando: linha.quando,
+      });
+    }
+
     // Quem está no site agora vem primeiro; o resto, do mais novo ao mais
     // velho. Um aviso de alguém que saiu ontem acima de alguém que está na
     // página neste instante seria a ordem errada.
+    // Urgente é o que tem alguém do outro lado esperando: quem está no
+    // diagnóstico neste instante e quem pediu atendimento no chat. O resto é
+    // histórico, e histórico ordena por data.
+    const urgente = (estado: Notificacao["estado"]) =>
+      estado === "agora" || estado === "chat" ? 0 : 1;
+
     return avisos
-      .sort((a, b) => {
-        if (a.estado === "agora" && b.estado !== "agora") return -1;
-        if (b.estado === "agora" && a.estado !== "agora") return 1;
-        return new Date(b.quando).getTime() - new Date(a.quando).getTime();
-      })
+      .sort(
+        (a, b) =>
+          urgente(a.estado) - urgente(b.estado) ||
+          new Date(b.quando).getTime() - new Date(a.quando).getTime()
+      )
       .slice(0, 20);
   } catch {
     return [];

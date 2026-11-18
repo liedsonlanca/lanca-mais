@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import Chat from "@/components/Chat";
 import BotaoVoltar from "@/components/BotaoVoltar";
 import Consentimento from "@/components/Consentimento";
 import JsonLd from "@/components/JsonLd";
@@ -92,6 +93,7 @@ export default async function RootLayout({
           </main>
           <Footer marca={marcaClara} />
           <WhatsAppButton />
+          <Chat />
 
           {/* Monta os rastreadores por dentro, quando houver permissão.
               Fica no fim para não atrasar nada do que a pessoa veio ver. */}

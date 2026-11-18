@@ -395,3 +395,67 @@ video {
   -webkit-touch-callout: none;
   user-select: none;
 }
+
+/* ---------------- O convite do chat ---------------- */
+
+/* O balão chama atenção depois de trinta segundos de página.
+
+   O tremor ocupa só o começo de um ciclo de cinco segundos, e o resto do
+   ciclo é parado. Isso é de propósito: tremor contínuo num canto da tela
+   cansa em dez segundos e vira motivo para a pessoa fechar o chat sem nunca
+   tê-lo aberto. Em rajadas, o movimento volta a ser notado cada vez.
+
+   A rotação é pequena e o deslocamento, menor ainda: o suficiente para o
+   olho pegar pelo canto, longe de parecer defeito da página. */
+@keyframes balao-chamando {
+  0%,
+  88%,
+  100% {
+    transform: rotate(0deg);
+  }
+  90% {
+    transform: rotate(-9deg);
+  }
+  92% {
+    transform: rotate(7deg);
+  }
+  94% {
+    transform: rotate(-6deg);
+  }
+  96% {
+    transform: rotate(4deg);
+  }
+  98% {
+    transform: rotate(-2deg);
+  }
+}
+
+.balao-chamando {
+  animation: balao-chamando 5s ease-in-out infinite;
+}
+
+/* O recado entra deslizando do lado do balão, uma vez. */
+@keyframes convite-do-chat {
+  from {
+    opacity: 0;
+    transform: translateX(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.convite-do-chat {
+  animation: convite-do-chat 0.35s ease-out both;
+}
+
+/* Quem pediu menos movimento no sistema continua vendo o convite — ele é
+   informação — só não vendo nada se mexer. Trocar a animação por nada é o
+   caminho certo aqui: o aviso não depende do tremor para ser lido. */
+@media (prefers-reduced-motion: reduce) {
+  .balao-chamando,
+  .convite-do-chat {
+    animation: none;
+  }
+}

@@ -23,6 +23,7 @@ const CORES: Record<Notificacao["estado"], string> = {
   agora: "text-destaque",
   saiu: "text-tinta/35",
   lead: "text-destaque",
+  chat: "text-destaque",
 };
 
 function quandoLegivel(iso: string) {
@@ -38,6 +39,23 @@ function quandoLegivel(iso: string) {
 }
 
 function Icone({ estado }: { estado: Notificacao["estado"] }) {
+  if (estado === "chat") {
+    return (
+      <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4"
+      >
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
+      </svg>
+    );
+  }
+
   if (estado === "lead") {
     return (
       <svg
@@ -82,7 +100,13 @@ function Icone({ estado }: { estado: Notificacao["estado"] }) {
 
 export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
   const [aberto, setAberto] = useState(false);
-  const agora = lista.filter((n) => n.estado === "agora").length;
+  // O contador conta o que tem gente do outro lado esperando: quem está no
+  // diagnóstico neste instante e quem pediu atendimento no chat. Avisos de
+  // quem já saiu não entram — número que não pede ação nenhuma ensina a
+  // ignorar o número.
+  const agora = lista.filter(
+    (n) => n.estado === "agora" || n.estado === "chat"
+  ).length;
 
   // O aviso na aba do navegador.
   //
@@ -111,7 +135,7 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
         aria-expanded={aberto}
         aria-label={
           agora > 0
-            ? `Notificações: ${agora} pessoa(s) no diagnóstico agora`
+            ? `Notificações: ${agora} esperando atendimento`
             : "Notificações"
         }
         className="relative flex h-11 w-11 items-center justify-center rounded-xl text-tinta/55 transition-colors duration-300 hover:bg-fundo-alt hover:text-tinta"

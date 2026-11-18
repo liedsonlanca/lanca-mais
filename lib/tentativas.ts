@@ -43,26 +43,35 @@ async function ler(k: string): Promise<Registro | null> {
  * trancado para fora do próprio painel. O freio é uma camada a mais, não a
  * única — a senha continua sendo a barreira.
  */
-export async function podeTentar(escopo: string, origem: string) {
-  if (!sql) return { permitido: true, restantes: LIMITE, ate: 0 };
+export async function podeTentar(
+  escopo: string,
+  origem: string,
+  // Oito tentativas em quinze minutos é a medida certa para quem erra a
+  // senha, e é apertada para quem está conversando: uma conversa de chat
+  // passa de oito mensagens sem nada de errado. Quem precisa de outro teto
+  // informa o seu — o do escopo errado trancaria o visitante no meio da
+  // frase.
+  limite = LIMITE
+) {
+  if (!sql) return { permitido: true, restantes: limite, ate: 0 };
 
   try {
     await garantirEsquema();
     const registro = await ler(chave(escopo, origem));
 
     if (!registro || Date.now() > registro.ate) {
-      return { permitido: true, restantes: LIMITE, ate: 0 };
+      return { permitido: true, restantes: limite, ate: 0 };
     }
 
     return {
-      permitido: registro.n < LIMITE,
-      restantes: Math.max(0, LIMITE - registro.n),
+      permitido: registro.n < limite,
+      restantes: Math.max(0, limite - registro.n),
       // Quando a janela vence. Vai junto para a tela dizer quanto falta, em
       // vez de repetir "quinze minutos" quando faltam dois.
       ate: registro.ate,
     };
   } catch {
-    return { permitido: true, restantes: LIMITE, ate: 0 };
+    return { permitido: true, restantes: limite, ate: 0 };
   }
 }
 

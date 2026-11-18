@@ -210,6 +210,48 @@ const TABELAS = [
      publicado     BOOLEAN NOT NULL DEFAULT true,
      criado_em     TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
+
+  // As conversas do chat do site.
+  //
+  // `visitante` é a mesma impressão em hash dos acessos, e por isso ela
+  // troca de dia: a conversa é identificada pela `chave`, um sorteio que o
+  // navegador guarda, e não pela pessoa. Quem fecha a aba e volta continua
+  // na mesma conversa; quem abre noutro aparelho começa outra, e os dois
+  // casos estão certos.
+  //
+  // `estado` diz quem responde: `assistente` enquanto o robô dá conta,
+  // `equipe` depois que ele passou a bola, `fechada` quando a agência
+  // encerrou. É o que o painel usa para saber o que está esperando gente.
+  `CREATE TABLE IF NOT EXISTS conversas (
+     id         BIGSERIAL PRIMARY KEY,
+     chave      TEXT NOT NULL UNIQUE,
+     visitante  TEXT NOT NULL DEFAULT '',
+     nome       TEXT NOT NULL DEFAULT '',
+     contato    TEXT NOT NULL DEFAULT '',
+     email      TEXT NOT NULL DEFAULT '',
+     estado     TEXT NOT NULL DEFAULT 'assistente',
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
+     mexido_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+
+  // As mensagens, em ordem.
+  //
+  // ON DELETE CASCADE porque conversa apagada sem as mensagens deixaria
+  // linha órfã que nenhuma tela mostra e nenhuma consulta limpa.
+  //
+  // `autor` é 'cliente', 'assistente' ou 'equipe'. Guardar quem falou é o
+  // que permite o painel mostrar a conversa como ela aconteceu, e o modelo
+  // receber o histórico sem confundir a própria fala com a do cliente.
+  `CREATE TABLE IF NOT EXISTS mensagens (
+     id         BIGSERIAL PRIMARY KEY,
+     conversa   BIGINT NOT NULL REFERENCES conversas(id) ON DELETE CASCADE,
+     autor      TEXT NOT NULL,
+     texto      TEXT NOT NULL,
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+
+  `CREATE INDEX IF NOT EXISTS mensagens_por_conversa
+     ON mensagens (conversa, id)`,
 ];
 
 // Colunas acrescentadas depois que as tabelas já existiam em produção.
@@ -219,6 +261,12 @@ const TABELAS = [
 // cada partida sem custo e sem tocar no dado que já está gravado.
 const EVOLUCOES = [
   `ALTER TABLE depoimentos ADD COLUMN IF NOT EXISTS foto TEXT`,
+  // O e-mail do chat. Está também no CREATE TABLE acima, e repetido aqui de
+  // propósito: se um deploy criar a tabela sem a coluna, CREATE TABLE IF NOT
+  // EXISTS nunca mais a acrescenta, e o chat quebraria no primeiro pedido de
+  // atendimento. Uma linha idempotente é barata; descobrir isso em produção
+  // não é.
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS email TEXT NOT NULL DEFAULT ''`,
   // Ajuste fino do tamanho de cada logo, em porcentagem.
   //
   // Arquivos de logo chegam com proporções e margens internas diferentes: um
