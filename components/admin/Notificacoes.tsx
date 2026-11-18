@@ -95,7 +95,7 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
   // continua certo se a página mudar de nome, e volta inteiro quando o
   // último visitante sai.
   useEffect(() => {
-    const original = document.title.replace(/^(d+)s*/, "");
+    const original = document.title.replace(/^\(\d+\)\s*/, "");
     document.title = agora > 0 ? `(${agora}) ${original}` : original;
 
     return () => {
