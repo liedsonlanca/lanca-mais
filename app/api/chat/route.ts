@@ -9,6 +9,7 @@ import {
   novaChave,
   passarParaEquipe,
   quantasMensagens,
+  recomecarConversa,
   TETO_DE_MENSAGENS,
   type Mensagem,
 } from "@/lib/conversas";
@@ -88,7 +89,17 @@ export async function POST(requisicao: Request) {
     requisicao.headers.get("user-agent") ?? ""
   );
 
-  const conversa = await acharOuAbrir(chave, visitante);
+  const achada = await acharOuAbrir(chave, visitante);
+
+  // Encerrada: quem escreve de novo começa outra conversa, levando os dados
+  // que já deu. O assunto anterior fica fechado no painel, e a pessoa não
+  // preenche a ficha duas vezes.
+  const recomecou =
+    achada?.estado === "fechada"
+      ? await recomecarConversa(achada, visitante)
+      : null;
+
+  const conversa = recomecou ?? achada;
   if (!conversa) {
     // Sem banco não há conversa, e fingir que houve seria perder a mensagem
     // de alguém em silêncio.
@@ -111,7 +122,7 @@ export async function POST(requisicao: Request) {
   if (conversa.estado === "equipe") {
     return NextResponse.json({
       ok: true,
-      chave,
+      chave: conversa.chave,
       estado: "equipe",
       temFicha,
       minha,
@@ -153,9 +164,12 @@ export async function POST(requisicao: Request) {
 
   return NextResponse.json({
     ok: true,
-    chave,
+    chave: conversa.chave,
     estado,
     temFicha,
+    // O navegador precisa saber que o histórico na tela é de outra conversa,
+    // para limpar em vez de emendar as mensagens antigas nas novas.
+    novaConversa: Boolean(recomecou),
     minha,
     respostas: resposta ? [resposta] : [],
   });

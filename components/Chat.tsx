@@ -139,13 +139,26 @@ export default function Chat() {
         novas: Mensagem[];
       };
 
-      if (dados.estado) setEstado(dados.estado);
+      if (dados.estado) {
+        // O encerramento também é notícia que vem de fora, então apita como
+        // uma mensagem apita. Sem o toque, quem está com a aba atrás de
+        // outra janela continua esperando uma resposta que não vem mais.
+        //
+        // A comparação fica aqui, e não dentro do `setEstado`: função de
+        // atualização tem de ser pura, e o React pode chamá-la duas vezes em
+        // desenvolvimento — o bipe sairia dobrado.
+        if (dados.estado === "fechada" && estado !== "fechada") {
+          tocar("mensagem");
+        }
+        setEstado(dados.estado);
+      }
+
       if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
       juntar(dados.novas ?? []);
     } catch {
       // Rede instável: a próxima rodada tenta de novo.
     }
-  }, [juntar, ultima]);
+  }, [estado, juntar, ultima]);
 
   /**
    * O convite, depois de trinta segundos de página.
@@ -247,6 +260,7 @@ export default function Chat() {
         chave?: string;
         estado?: "assistente" | "equipe";
         temFicha?: boolean;
+        novaConversa?: boolean;
         minha?: number;
         respostas?: Mensagem[];
       };
@@ -261,9 +275,24 @@ export default function Chat() {
         guardar(GUARDA, dados.chave);
       }
 
-      // Troca o id provisório pelo do banco, senão a busca periódica traria
-      // a mesma mensagem de novo e ela apareceria duas vezes.
-      if (dados.minha) {
+      if (dados.novaConversa) {
+        // O atendimento anterior tinha sido encerrado, e esta mensagem abriu
+        // outra conversa. A tela recomeça: deixar o histórico antigo em cima
+        // faria a pessoa achar que a equipe continua lendo aquilo, e no
+        // painel aquilo é outro assunto, já fechado.
+        //
+        // Os dados dela vão junto no servidor, então a ficha não volta.
+        setMensagens([
+          SAUDACAO,
+          {
+            id: dados.minha ?? provisorio,
+            autor: "cliente",
+            texto: pergunta,
+          },
+        ]);
+      } else if (dados.minha) {
+        // Troca o id provisório pelo do banco, senão a busca periódica traria
+        // a mesma mensagem de novo e ela apareceria duas vezes.
         setMensagens((atuais) =>
           atuais.map((m) => (m.id === provisorio ? { ...m, id: dados.minha! } : m))
         );
@@ -358,6 +387,14 @@ export default function Chat() {
 
   return (
     <div
+      // data-lenis-prevent: a rolagem suave do site captura a roda do mouse
+      // na página inteira, então rolar dentro do chat rolava o site atrás
+      // dele e a conversa ficava parada. Este atributo devolve a rolagem
+      // nativa a tudo que está aqui dentro.
+      //
+      // Vai no painel inteiro, e não só na lista: um painel flutuante não
+      // deve empurrar a página por baixo de si em lugar nenhum dele.
+      data-lenis-prevent
       className="fixed bottom-6 right-6 z-[60] flex w-[min(380px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_40px_90px_-30px_rgba(0,0,0,0.6)]"
       style={{ maxHeight: "min(600px, calc(100vh - 6rem))" }}
     >
@@ -365,9 +402,11 @@ export default function Chat() {
         <div className="min-w-0">
           <p className="text-sm font-semibold text-tinta">Fale com a LANÇA+</p>
           <p className="mt-0.5 text-xs text-tinta/50">
-            {estado === "equipe"
-              ? "A equipe foi avisada e responde por aqui."
-              : "Resposta na hora, de segunda a segunda."}
+            {estado === "fechada"
+              ? "Atendimento encerrado."
+              : estado === "equipe"
+                ? "A equipe foi avisada e responde por aqui."
+                : "Resposta na hora, de segunda a segunda."}
           </p>
         </div>
 
@@ -458,6 +497,28 @@ export default function Chat() {
             </li>
           )}
         </ul>
+
+        {/* O encerramento, dito na conversa.
+
+            Sem isto, a equipe fecha o atendimento e quem está do outro lado
+            continua olhando um chat que parece vivo, esperando uma resposta
+            que não vem mais — e a sensação não é de atendimento concluído, é
+            de ter sido ignorado.
+
+            A nota é centrada e sem balão de propósito: é recado do sistema,
+            e não fala de ninguém. E diz como voltar, porque conversa
+            encerrada não é porta trancada. */}
+        {estado === "fechada" && (
+          <p
+            role="status"
+            className="mt-4 border-t border-contorno pt-4 text-center text-xs leading-relaxed text-tinta/45"
+          >
+            A equipe encerrou este atendimento.
+            <br />
+            Se precisar de mais alguma coisa, é só escrever aqui embaixo — a
+            gente começa uma conversa nova, sem você repetir seus dados.
+          </p>
+        )}
 
         <div ref={fim} />
       </div>

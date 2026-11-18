@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { preparar, avisar, texto, inteiro } from "@/lib/painel";
 import { fecharConversa, gravarMensagem } from "@/lib/conversas";
 
@@ -49,6 +50,13 @@ export async function encerrarConversa(dados: FormData) {
   revalidatePath("/lncadmin/conversas");
   revalidatePath(`/lncadmin/conversas/${id}`);
   revalidatePath("/lncadmin");
+
+  // Volta para a lista.
+  //
+  // Encerrou, acabou: ficar olhando a conversa que você mesma acabou de
+  // fechar não serve para nada, e o que importa agora é quem está esperando.
+  // O redirect precisa ficar fora de try/catch — ele funciona lançando.
+  redirect("/lncadmin/conversas");
 }
 
 /**
@@ -65,6 +73,22 @@ export async function devolverAoAssistente(dados: FormData) {
   const id = inteiro(dados, "id");
   if (!id) return;
 
+  // A pessoa do outro lado é avisada, e avisada como mensagem e não como
+  // recado de sistema.
+  //
+  // Ela estava esperando gente. Se o assistente simplesmente voltar a
+  // responder, a troca parece um atendente mudando de personalidade no meio
+  // da conversa — e, pior, ela não sabe mais a quem está falando.
+  //
+  // Mensagem de verdade também resolve o resto de graça: fica no histórico,
+  // chega pela mesma busca periódica e apita como as outras apitam.
+  await gravarMensagem(
+    id,
+    "assistente",
+    "Voltei a atender por aqui. Pode seguir perguntando — e se precisar " +
+      "falar com alguém da equipe de novo, é só pedir."
+  );
+
   await banco.query(
     "UPDATE conversas SET estado = 'assistente', mexido_em = now() WHERE id = $1",
     [id]
@@ -74,4 +98,7 @@ export async function devolverAoAssistente(dados: FormData) {
   revalidatePath("/lncadmin/conversas");
   revalidatePath(`/lncadmin/conversas/${id}`);
   revalidatePath("/lncadmin");
+
+  // Fora da sua caixa: devolvida ao assistente, ela não espera mais por você.
+  redirect("/lncadmin/conversas");
 }

@@ -262,6 +262,51 @@ export async function passarParaEquipe(
   );
 }
 
+/**
+ * Abre uma conversa nova herdando os dados de quem já se identificou.
+ *
+ * ---------- Por que nova, e não a mesma reaberta ----------
+ *
+ * Atendimento encerrado é assunto encerrado. Quem volta uma semana depois
+ * volta por outro motivo, e emendar isso na conversa antiga dá à equipe uma
+ * linha do tempo que mistura dois assuntos — e, no painel, uma conversa que
+ * nunca termina e cresce para sempre.
+ *
+ * ---------- Por que os dados vão junto ----------
+ *
+ * Porque a pessoa já os deu. Pedir nome, WhatsApp e e-mail de novo a quem
+ * acabou de preencher a ficha é o jeito mais rápido de transformar um
+ * cliente que voltou num cliente que desistiu.
+ */
+export async function recomecarConversa(anterior: Conversa, visitante: string) {
+  if (!sql) return null;
+  await garantirEsquema();
+
+  const chave = novaChave();
+
+  const linhas = (await sql.query(
+    `INSERT INTO conversas (chave, visitante, nome, contato, email)
+          VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, chave, nome, contato, email, estado,
+                 ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em`,
+    [chave, visitante, anterior.nome, anterior.contato, anterior.email]
+  )) as Array<Record<string, unknown>>;
+
+  const linha = linhas[0];
+  if (!linha) return null;
+
+  return {
+    id: Number(linha.id),
+    chave: String(linha.chave),
+    nome: String(linha.nome ?? ""),
+    contato: String(linha.contato ?? ""),
+    email: String(linha.email ?? ""),
+    estado: String(linha.estado) as Conversa["estado"],
+    criadoEm: String(linha.criado_em),
+    mexidoEm: String(linha.mexido_em),
+  } satisfies Conversa;
+}
+
 /** A conversa em texto, para ir junto do lead ao CRM. */
 export async function conversaEmTexto(conversa: number, limite = 20) {
   const mensagens = await historico(conversa, limite);

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
 import { lerConversa } from "@/lib/conversas";
 import { campo, botaoPrimario } from "@/components/admin/estilos";
+import RespostasProntas from "@/components/admin/RespostasProntas";
 import {
   responderNoChat,
   encerrarConversa,
@@ -177,6 +178,11 @@ export default async function AdminConversa({
           placeholder="Escreva como escreveria no WhatsApp."
           className={`${campo} mt-3 min-h-28 resize-y`}
         />
+
+        {/* Os atalhos ficam abaixo do campo, e não acima: acima, eles são a
+            primeira coisa que a pessoa vê e sugerem que o certo é escolher
+            um. O certo é escrever, e usar o atalho quando ele encurta. */}
+        <RespostasProntas campo="resposta" />
 
         <div className="mt-4 flex flex-wrap gap-3">
           <button type="submit" className={botaoPrimario}>
