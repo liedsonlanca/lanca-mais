@@ -196,7 +196,7 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
                 crescendo livre a página inteira virava uma coluna de
                 endereços. Com altura fixa, o cartão fica do tamanho que foi
                 desenhado e quem quiser ver o resto rola ali dentro. */}
-            <ul className="sem-barra mt-4 grid max-h-56 gap-2 overflow-y-auto pr-1">
+            <ul className="mt-4 grid max-h-56 gap-2 overflow-y-auto pr-2">
               {resumo.paginas.length === 0 && (
                 <li className="text-sm text-tinta/45">Nada ainda.</li>
               )}
@@ -229,7 +229,7 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
                 crescendo livre a página inteira virava uma coluna de
                 endereços. Com altura fixa, o cartão fica do tamanho que foi
                 desenhado e quem quiser ver o resto rola ali dentro. */}
-            <ul className="sem-barra mt-4 grid max-h-56 gap-2 overflow-y-auto pr-1">
+            <ul className="mt-4 grid max-h-56 gap-2 overflow-y-auto pr-2">
               {resumo.origens.length === 0 && (
                 <li className="text-sm text-tinta/45">Nada ainda.</li>
               )}
@@ -290,9 +290,32 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
             Não há como desfazer.
           </p>
 
+          {/* Escrever a palavra, e não só clicar.
+
+              A gaveta fechada protege do clique distraído; o campo protege
+              do clique decidido na hora errada. Digitar uma palavra obriga
+              a ler o que está sendo feito, e é o único passo aqui que a
+              pessoa não consegue dar no automático.
+
+              O servidor confere de novo: esta ação é um endereço
+              alcançável por POST direto, e o que impede um apagar sem
+              querer tem que estar do lado que executa. */}
+          <label htmlFor="confirmar-reset" className="mt-4 block text-sm text-tinta/70">
+            Para confirmar, escreva
+            <span className="font-semibold text-tinta"> APAGAR</span> no
+            campo abaixo.
+          </label>
+          <input
+            id="confirmar-reset"
+            name="confirmacao"
+            autoComplete="off"
+            placeholder="APAGAR"
+            className="mt-2 min-h-11 w-full max-w-[220px] rounded-xl border border-contorno bg-fundo-alt px-4 text-sm text-tinta outline-none transition-colors duration-300 focus:border-salmon"
+          />
+
           <button
             type="submit"
-            className="mt-4 inline-flex min-h-11 items-center rounded-full border border-salmon/50 px-5 text-sm font-medium text-destaque transition-colors duration-300 hover:bg-salmon/10"
+            className="mt-4 block inline-flex min-h-11 items-center rounded-full border border-salmon/50 px-5 text-sm font-medium text-destaque transition-colors duration-300 hover:bg-salmon/10"
           >
             Apagar tudo e começar do zero
           </button>

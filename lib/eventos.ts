@@ -81,20 +81,26 @@ function duracao(segundos: number) {
   return resto ? `${horas} h ${resto} min` : `${horas} h`;
 }
 
-type Linha = {
-  visitante: string;
-  abriu: string;
-  ultimo: string;
-  saiu: string | null;
-  segundos: number | null;
-};
 
 /**
- * Os avisos do painel, derivados dos sinais crus.
+ * Os avisos do painel, uma linha por visita.
  *
- * A derivação é no banco, e não no servidor: trazer todos os sinais de um dia
- * para agrupar em JavaScript seria carregar milhares de linhas para mostrar
- * dez. O agrupamento por visitante faz isso em uma consulta.
+ * ---------- Por que por visita, e não por pessoa ----------
+ *
+ * A primeira versão agrupava por visitante: quem entrasse e saísse cinco
+ * vezes virava um aviso só, e o painel dizia "alguém esteve no diagnóstico"
+ * uma vez enquanto a pessoa ia e voltava a tarde inteira. O interessante é
+ * exatamente o contrário — alguém que volta três vezes está decidindo.
+ *
+ * Agora cada abertura começa uma visita, e a saída fecha. O mesmo visitante
+ * aparece tantas vezes quantas voltou.
+ *
+ * ---------- Por que os sinais crus vêm para cá ----------
+ *
+ * Agrupar visita exige olhar a ordem dos sinais, e isso em SQL pede função de
+ * janela e um bloco que ninguém relê com prazer. São no máximo quinhentas
+ * linhas de um dia; montar a sequência aqui é mais barato de entender e não
+ * se paga em tempo.
  */
 export async function lerNotificacoes(): Promise<Notificacao[]> {
   if (!sql) return [];
@@ -102,23 +108,22 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
   try {
     await garantirEsquema();
 
-    const [visitas, orcamentos] = await Promise.all([
+    // O carimbo sai em UTC com Z no fim, e não com o deslocamento do
+    // Postgres: ele escreve "+00", de dois dígitos, e o JavaScript só aceita
+    // "+00:00". O resultado era "Invalid Date" na tela.
+    const quando = `to_char(criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`;
+
+    const [sinais, orcamentos] = await Promise.all([
       sql.query(`
-        SELECT visitante,
-               to_char(min(criado_em), 'YYYY-MM-DD"T"HH24:MI:SSOF') AS abriu,
-               to_char(max(criado_em), 'YYYY-MM-DD"T"HH24:MI:SSOF') AS ultimo,
-               max(CASE WHEN tipo = 'diagnostico_saiu' THEN detalhe END) AS saiu,
-               extract(epoch FROM max(criado_em) - min(criado_em))::int AS segundos
+        SELECT tipo, visitante, detalhe, ${quando} AS quando
           FROM eventos
          WHERE criado_em > now() - interval '24 hours'
            AND tipo LIKE 'diagnostico%'
-         GROUP BY visitante
-         ORDER BY max(criado_em) DESC
-         LIMIT 20
+         ORDER BY visitante, criado_em
+         LIMIT 500
       `),
       sql.query(`
-        SELECT detalhe,
-               to_char(criado_em, 'YYYY-MM-DD"T"HH24:MI:SSOF') AS quando
+        SELECT detalhe, ${quando} AS quando
           FROM eventos
          WHERE criado_em > now() - interval '24 hours'
            AND tipo = 'orcamento_enviado'
@@ -130,40 +135,82 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
     const agora = Date.now();
     const avisos: Notificacao[] = [];
 
-    for (const linha of visitas as Linha[]) {
-      const ultimo = new Date(linha.ultimo).getTime();
-      const calado = agora - ultimo;
-      const tempo = duracao(
-        linha.saiu ? Number(linha.saiu) || 0 : Math.round((agora - new Date(linha.abriu).getTime()) / 1000)
-      );
+    type Sinal = {
+      tipo: string;
+      visitante: string;
+      detalhe: string | null;
+      quando: string;
+    };
 
-      // Saiu de verdade, ou sumiu sem avisar. Os dois contam como saída: o
-      // aviso de saída é enviado no fechar da aba, e o navegador nem sempre
-      // consegue mandar — fechar o aparelho, perder a rede, matar o
-      // aplicativo. Tratar silêncio prolongado como saída evita a pessoa
-      // ficar "no diagnóstico há 9 horas" porque o último sinal se perdeu.
-      const saiu = Boolean(linha.saiu) || calado > SILENCIO_MS;
+    type Visita = {
+      visitante: string;
+      abriu: number;
+      ultimo: number;
+      segundos: number | null;
+    };
+
+    const visitas: Visita[] = [];
+
+    for (const sinal of sinais as Sinal[]) {
+      const instante = new Date(sinal.quando).getTime();
+      if (!Number.isFinite(instante)) continue;
+
+      const atual = visitas[visitas.length - 1];
+      const mesmaVisita =
+        atual &&
+        atual.visitante === sinal.visitante &&
+        atual.segundos === null &&
+        sinal.tipo !== "diagnostico_abriu";
+
+      if (!mesmaVisita) {
+        visitas.push({
+          visitante: sinal.visitante,
+          abriu: instante,
+          ultimo: instante,
+          segundos: null,
+        });
+        continue;
+      }
+
+      atual.ultimo = instante;
+      if (sinal.tipo === "diagnostico_saiu") {
+        atual.segundos = Number(sinal.detalhe) || Math.round((instante - atual.abriu) / 1000);
+      }
+    }
+
+    for (const visita of visitas.slice(-20)) {
+      // Saída declarada, ou silêncio prolongado. O aviso de saída vai no
+      // fechar da aba e o navegador nem sempre consegue mandá-lo — fechar o
+      // aparelho, perder a rede. Sem isto, alguém ficaria "no diagnóstico há
+      // 9 horas" porque o último sinal se perdeu.
+      const saiu = visita.segundos !== null || agora - visita.ultimo > SILENCIO_MS;
+      const segundos =
+        visita.segundos ??
+        Math.round((saiu ? visita.ultimo : agora) - visita.abriu) / 1000;
 
       avisos.push(
         saiu
           ? {
-              chave: `d-${linha.visitante}-saiu`,
+              chave: `d-${visita.visitante}-${visita.abriu}`,
               estado: "saiu",
               titulo: "Saiu do diagnóstico",
-              texto: `Ficou ${tempo} na página.`,
-              quando: linha.ultimo,
+              texto: `Ficou ${duracao(Math.round(segundos))} na página.`,
+              quando: new Date(visita.ultimo).toISOString(),
             }
           : {
-              chave: `d-${linha.visitante}-agora`,
+              chave: `d-${visita.visitante}-${visita.abriu}-agora`,
               estado: "agora",
               titulo: "Alguém no diagnóstico agora",
-              texto: `Está na página há ${tempo}.`,
-              quando: linha.abriu,
+              texto: `Está na página há ${duracao(Math.round(segundos))}.`,
+              quando: new Date(visita.abriu).toISOString(),
             }
       );
     }
 
-    for (const linha of orcamentos as Array<{ detalhe: string | null; quando: string }>) {
+    for (const linha of orcamentos as Array<{
+      detalhe: string | null;
+      quando: string;
+    }>) {
       avisos.push({
         chave: `o-${linha.quando}`,
         estado: "lead",
@@ -184,7 +231,7 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
         if (b.estado === "agora" && a.estado !== "agora") return 1;
         return new Date(b.quando).getTime() - new Date(a.quando).getTime();
       })
-      .slice(0, 12);
+      .slice(0, 20);
   } catch {
     return [];
   }

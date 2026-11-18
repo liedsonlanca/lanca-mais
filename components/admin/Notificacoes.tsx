@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Notificacao } from "@/lib/eventos";
 
 // O sino do painel.
@@ -83,6 +83,25 @@ function Icone({ estado }: { estado: Notificacao["estado"] }) {
 export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
   const [aberto, setAberto] = useState(false);
   const agora = lista.filter((n) => n.estado === "agora").length;
+
+  // O aviso na aba do navegador.
+  //
+  // O painel costuma ficar aberto atrás de outra janela, e é justamente aí
+  // que a informação importa: alguém está no diagnóstico agora, e a
+  // conversa vale mais nesse minuto do que daqui a uma hora. O título da
+  // aba é o único lugar que a pessoa vê sem trocar de janela.
+  //
+  // Guarda o título original em vez de escrevê-lo à mão: assim ele
+  // continua certo se a página mudar de nome, e volta inteiro quando o
+  // último visitante sai.
+  useEffect(() => {
+    const original = document.title.replace(/^(d+)s*/, "");
+    document.title = agora > 0 ? `(${agora}) ${original}` : original;
+
+    return () => {
+      document.title = original;
+    };
+  }, [agora]);
 
   return (
     <div className="relative">
