@@ -97,6 +97,21 @@ export const config = {
     // souber o caminho continua chegando, e quem não souber continua parado na
     // senha. O ganho é tirar o painel da lista que os robôs varrem sozinhos, o
     // que reduz tentativa automática e limpa o registro de acessos.
-    "/((?!em-breve|manutencao|lncadmin|politica-de-cookies|politica-de-privacidade|aviso-legal|termos-de-uso|api/acesso|api/lncadmin|robots.txt|_next/static|_next/image|images|fonts|favicon.ico).*)",
+    // E as rotas de API, todas elas — não só a da senha e a do painel.
+    //
+    // Reescrever uma API para uma página HTML não é fechar o site: é dar
+    // resposta errada com status 200. Quem chamou esperava JSON e recebeu
+    // "<!DOCTYPE html>", então o código do outro lado quebra sem entender.
+    //
+    // Na prática, com o site em "em breve" isso matava três coisas de uma
+    // vez: o chat (a mensagem sumia e a pessoa via "a mensagem não foi"), o
+    // formulário de orçamento, e a contagem de visitas — ou seja, a tela de
+    // espera não aparecia nos números do painel justamente enquanto ela era
+    // a única página que todo mundo via.
+    //
+    // Deixá-las de fora não abre nada: nenhuma delas serve conteúdo do site.
+    // As que mexem em dado da agência têm portão próprio, e as públicas têm
+    // teto por endereço.
+    "/((?!em-breve|manutencao|lncadmin|politica-de-cookies|politica-de-privacidade|aviso-legal|termos-de-uso|api|robots.txt|_next/static|_next/image|images|fonts|favicon.ico).*)",
   ],
 };
