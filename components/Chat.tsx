@@ -540,7 +540,14 @@ export default function Chat() {
 
   if (!aberto) {
     return (
-      <div className="fixed bottom-24 right-6 z-50 flex items-center gap-2">
+      // z-[105] e nao z-50: a tela de "em breve" e a de manutencao sao capas
+      // `fixed inset-0 z-[100]` que cobrem a janela inteira. Em z-50 o balao
+      // ficava desenhado atras delas — visivel, e sem receber clique nenhum.
+      //
+      // Abaixo do aviso de cookies, que mora em z-[110]: consentimento vem
+      // antes de conversa, e um chat por cima do aviso seria o site pedindo
+      // permissao com a mao na frente do papel.
+      <div className="fixed bottom-24 right-6 z-[105] flex items-center gap-2">
         {(convidando || naoLidas > 0) && (
           <>
             {/* O convite abre à esquerda do balão, e não acima: acima ele
@@ -651,7 +658,7 @@ export default function Chat() {
       data-lenis-prevent
       // No telefone ele encosta mais na borda: 24px de margem de cada lado
       // num aparelho estreito sao 48px perdidos de uma tela que ja e pequena.
-      className="altura-do-chat fixed bottom-4 right-4 z-[60] flex w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_40px_90px_-30px_rgba(0,0,0,0.6)] sm:bottom-6 sm:right-6"
+      className="altura-do-chat fixed bottom-4 right-4 z-[106] flex w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_40px_90px_-30px_rgba(0,0,0,0.6)] sm:bottom-6 sm:right-6"
     >
       <div className="flex items-start justify-between gap-2 border-b border-contorno px-4 py-3">
         <div className="min-w-0">
