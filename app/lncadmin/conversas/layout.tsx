@@ -91,9 +91,14 @@ export default async function LayoutDasConversas({
           <ListaDeConversas lista={conversas} />
         </aside>
 
-        <section className="min-w-0 lg:h-full lg:overflow-y-auto">
-          {children}
-        </section>
+        {/* A coluna do meio não rola; quem rola é a lista de mensagens
+            dentro dela.
+
+            Rolando as duas, a caixa de resposta descia junto com a conversa
+            e saía da tela — era preciso rolar de volta para escrever. Com a
+            coluna presa, o campo fica sempre no mesmo lugar e só o histórico
+            se move. */}
+        <section className="flex min-w-0 flex-col lg:h-full">{children}</section>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { impressaoDoVisitante } from "@/lib/acessos";
 import { registrarEvento } from "@/lib/eventos";
+import { registrarPedido, pedidoNoCrm } from "@/lib/contatos";
 import {
   origemDaRequisicao,
   podeTentar,
@@ -108,6 +109,17 @@ export async function POST(requisicao: Request) {
   // volume, e não a adivinhação de senha.
   await registrarFalha("orcamento", origem);
 
+  // Gravado aqui antes de ir para o CRM, e não só lá.
+  //
+  // Isto contraria o que este arquivo dizia antes — "o lead vive no CRM,
+  // guardar cópia criaria uma segunda lista que ninguém abre". A pergunta
+  // mudou: a tela "Vieram do site" não é um CRM de segunda, ela responde o
+  // que o CRM não responde — quem chegou por este site e por qual porta.
+  //
+  // E resolve o pior caso de graça: com o CRM fora do ar, o pedido deixava
+  // de existir. Agora ele fica, marcado como fora do CRM, e alguém vê.
+  const pedidoId = await registrarPedido(pedido);
+
   if (!endereco) {
     // Sem a variável configurada, o site não finge que mandou.
     console.error("[orcamento] DGFLOW_WEBHOOK_URL não configurada");
@@ -135,6 +147,8 @@ export async function POST(requisicao: Request) {
         { status: 502 }
       );
     }
+
+    await pedidoNoCrm(pedidoId);
 
     // O painel avisa que chegou pedido, sem esperar ninguém abrir o CRM.
     //

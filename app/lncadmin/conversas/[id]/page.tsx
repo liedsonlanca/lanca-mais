@@ -109,10 +109,14 @@ export default async function AdminConversa({
   const temTelefone = soDigitos.length >= 10;
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1fr_17rem]">
+    <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[1fr_17rem]">
       {/* ---------------- O fio ---------------- */}
-      <div className="min-w-0">
-        <div className={`${CARTAO} flex flex-col`}>
+      <div className="flex min-h-0 min-w-0 flex-col">
+        {/* O cartao da conversa ocupa o que sobra, e a lista dentro dele e
+            quem rola. A caixa de resposta fica embaixo, fixa: sem isto ela
+            descia junto com o historico e saia da tela justamente quando se
+            queria escrever. */}
+        <div className={`${CARTAO} flex min-h-0 flex-1 flex-col`}>
           <div className="flex items-baseline justify-between gap-3 border-b border-contorno px-5 py-3.5">
             <p className="min-w-0 truncate text-sm font-semibold text-tinta">
               {conversa.nome || "Visitante sem nome"}
@@ -122,7 +126,7 @@ export default async function AdminConversa({
             </span>
           </div>
 
-          <ul className="grid max-h-[46vh] gap-4 overflow-y-auto px-5 py-4">
+          <ul className="grid min-h-28 flex-1 content-start gap-4 overflow-y-auto px-5 py-4">
             {mensagens.length === 0 && (
               <li className="text-sm text-tinta/45">Sem mensagens.</li>
             )}
@@ -150,7 +154,7 @@ export default async function AdminConversa({
         </div>
 
         {minha ? (
-          <form action={responderNoChat} className={`${CARTAO} mt-4 p-5`}>
+          <form action={responderNoChat} className={`${CARTAO} mt-4 shrink-0 p-5`}>
             <input type="hidden" name="id" value={conversa.id} />
 
             <label
@@ -174,7 +178,7 @@ export default async function AdminConversa({
           </form>
         ) : (
           <p
-            className={`${CARTAO} mt-4 p-5 text-sm leading-relaxed text-tinta/55`}
+            className={`${CARTAO} mt-4 shrink-0 p-5 text-sm leading-relaxed text-tinta/55`}
           >
             {conversa.estado === "fechada"
               ? "Conversa encerrada. Para voltar a responder, é preciso que a pessoa escreva de novo — e aí ela abre uma conversa nova, que aparece na lista."
@@ -184,7 +188,7 @@ export default async function AdminConversa({
       </div>
 
       {/* ---------------- Os dados ---------------- */}
-      <aside className="grid content-start gap-4">
+      <aside className="grid content-start gap-4 xl:max-h-full xl:overflow-y-auto">
         <div className={`${CARTAO} grid gap-4 p-5`}>
           <Dado
             rotulo="Nome"
