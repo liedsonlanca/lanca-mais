@@ -26,7 +26,7 @@ export default function CampoDeResposta() {
       <textarea
         id="resposta"
         name="texto"
-        rows={4}
+        rows={3}
         maxLength={2000}
         placeholder="Escreva como escreveria no WhatsApp."
         onKeyDown={(evento) => {
@@ -40,7 +40,7 @@ export default function CampoDeResposta() {
           evento.preventDefault();
           evento.currentTarget.form?.requestSubmit();
         }}
-        className={`${campo} mt-3 min-h-28 resize-y`}
+        className={`${campo} mt-3 min-h-20 resize-y`}
       />
 
       <p className="mt-1.5 text-[0.7rem] text-tinta/35">

@@ -31,7 +31,15 @@ export default async function LayoutDasConversas({
   const noExpediente = equipeNoExpediente();
 
   return (
-    <div>
+    // Altura da tela menos o respiro do painel, e o resto se vira.
+    //
+    // A alternativa era descontar um numero fixo para o cabecalho — e o
+    // cabecalho muda de altura: o aviso do assistente desligado aparece e
+    // some, a tarja de "esperando voce" tambem. Com numero fixo, cada
+    // combinacao sobrava ou faltava alguns pixels, e a pagina voltava a
+    // rolar. Assim o cabecalho ocupa o que precisa e as colunas ficam com o
+    // que sobrou, seja quanto for.
+    <div className="flex flex-col lg:h-[calc(100vh-5rem)]">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-tinta">Conversas</h1>
@@ -86,7 +94,19 @@ export default async function LayoutDasConversas({
           lista para fora da tela e obrigava a rolar de volta até o topo para
           escolher a próxima. Preso na altura da janela, cada lado rola no
           seu canto e os dois continuam visíveis. */}
-      <div className="mt-5 grid gap-4 lg:grid-cols-[320px_1fr] lg:h-[calc(100vh-15rem)]">
+      {/* `grid-rows-[minmax(0,1fr)]` não é enfeite: sem ele, a altura aqui
+          não segura nada.
+
+          Altura no contêiner de um grid não limita a linha — a linha é
+          `auto` por padrão, cresce com o conteúdo e vaza para fora. Era o
+          que acontecia: a conversa longa esticava a linha para quase quatro
+          mil pixels, as duas colunas acompanhavam, e a página inteira
+          passava a rolar com a caixa de resposta lá embaixo, fora da tela.
+
+          `minmax(0, 1fr)` diz que a linha tem no máximo o espaço disponível,
+          e o `0` é o mínimo que permite o conteúdo encolher — sem ele, o
+          mínimo seria o tamanho do conteúdo e estaríamos no mesmo lugar. */}
+      <div className="mt-5 grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[320px_1fr] lg:grid-rows-[minmax(0,1fr)]">
         <aside className="overflow-hidden rounded-2xl border border-contorno bg-cartao lg:h-full">
           <ListaDeConversas lista={conversas} />
         </aside>
