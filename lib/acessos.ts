@@ -96,6 +96,8 @@ export type Resumo = {
   hoje: number;
   seteDias: number;
   trintaDias: number;
+  esperaHoje: number;
+  espera30: number;
   porDia: Array<{ dia: string; visitas: number; pessoas: number }>;
   paginas: Array<{ caminho: string; visitas: number }>;
   origens: Array<{ origem: string; visitas: number }>;
@@ -106,6 +108,8 @@ const VAZIO: Resumo = {
   hoje: 0,
   seteDias: 0,
   trintaDias: 0,
+  esperaHoje: 0,
+  espera30: 0,
   porDia: [],
   paginas: [],
   origens: [],
@@ -134,6 +138,15 @@ export async function lerResumo(): Promise<Resumo> {
         SELECT 'sete', count(*)::int FROM acessos WHERE criado_em > now() - interval '7 days'
         UNION ALL
         SELECT 'trinta', count(*)::int FROM acessos WHERE criado_em > now() - interval '30 days'
+        UNION ALL
+        -- A tela de espera é a única página que todo visitante vê enquanto
+        -- o site está fechado, então ela merece contagem própria: no total
+        -- geral ela se mistura com o resto e some.
+        SELECT 'espera_hoje', count(*)::int FROM acessos
+         WHERE caminho LIKE '/em-breve%' AND criado_em::date = current_date
+        UNION ALL
+        SELECT 'espera_30', count(*)::int FROM acessos
+         WHERE caminho LIKE '/em-breve%' AND criado_em > now() - interval '30 days'
       `),
 
       sql.query(`
@@ -149,7 +162,7 @@ export async function lerResumo(): Promise<Resumo> {
         SELECT caminho, count(*)::int AS visitas
           FROM acessos
          WHERE criado_em > now() - interval '30 days'
-         GROUP BY 1 ORDER BY 2 DESC LIMIT 8
+         GROUP BY 1 ORDER BY 2 DESC LIMIT 25
       `),
 
       sql.query(`
@@ -157,7 +170,7 @@ export async function lerResumo(): Promise<Resumo> {
                count(*)::int AS visitas
           FROM acessos
          WHERE criado_em > now() - interval '30 days'
-         GROUP BY 1 ORDER BY 2 DESC LIMIT 6
+         GROUP BY 1 ORDER BY 2 DESC LIMIT 25
       `),
     ]);
 
@@ -172,6 +185,8 @@ export async function lerResumo(): Promise<Resumo> {
       hoje: achar("hoje"),
       seteDias: achar("sete"),
       trintaDias: achar("trinta"),
+      esperaHoje: achar("espera_hoje"),
+      espera30: achar("espera_30"),
       porDia: porDia as Resumo["porDia"],
       paginas: paginas as Resumo["paginas"],
       origens: origens as Resumo["origens"],

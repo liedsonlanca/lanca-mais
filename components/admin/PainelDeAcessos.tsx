@@ -86,7 +86,7 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
 
   return (
     <section className="mt-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Numero
           valor={resumo.agora}
           rotulo="No site agora"
@@ -103,6 +103,17 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
           valor={resumo.trintaDias}
           rotulo="30 dias"
           ajuda="Páginas abertas"
+        />
+
+        {/* A tela de espera tem cartão próprio.
+
+            Enquanto o site está fechado ela é a única página que todo
+            visitante vê, e no total geral some dentro do resto. Separada,
+            diz quanta gente está batendo na porta antes do lançamento. */}
+        <Numero
+          valor={resumo.espera30}
+          rotulo="Tela de espera"
+          ajuda={`30 dias — ${resumo.esperaHoje.toLocaleString("pt-BR")} hoje`}
         />
       </div>
 
@@ -178,7 +189,13 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
             </h2>
             <p className="mt-0.5 text-xs text-tinta/45">Últimos 30 dias</p>
 
-            <ul className="mt-4 grid gap-2">
+            {/* Rola em vez de esticar o cartão.
+
+                A lista traz até vinte e cinco linhas, e com o cartão
+                crescendo livre a página inteira virava uma coluna de
+                endereços. Com altura fixa, o cartão fica do tamanho que foi
+                desenhado e quem quiser ver o resto rola ali dentro. */}
+            <ul className="sem-barra mt-4 grid max-h-56 gap-2 overflow-y-auto pr-1">
               {resumo.paginas.length === 0 && (
                 <li className="text-sm text-tinta/45">Nada ainda.</li>
               )}
@@ -205,7 +222,13 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
               veio de um link sem origem.
             </p>
 
-            <ul className="mt-4 grid gap-2">
+            {/* Rola em vez de esticar o cartão.
+
+                A lista traz até vinte e cinco linhas, e com o cartão
+                crescendo livre a página inteira virava uma coluna de
+                endereços. Com altura fixa, o cartão fica do tamanho que foi
+                desenhado e quem quiser ver o resto rola ali dentro. */}
+            <ul className="sem-barra mt-4 grid max-h-56 gap-2 overflow-y-auto pr-1">
               {resumo.origens.length === 0 && (
                 <li className="text-sm text-tinta/45">Nada ainda.</li>
               )}
