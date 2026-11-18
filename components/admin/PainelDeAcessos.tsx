@@ -114,7 +114,12 @@ export default function PainelDeAcessos({ resumo }: { resumo: Resumo }) {
         </p>
       )}
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+      {/* items-start para o grafico nao esticar.
+
+          Sem isso, a coluna do grafico cresce ate a altura da coluna de dois
+          cards ao lado, e sobra um vazio embaixo das barras — a caixa fica do
+          tamanho da vizinha, e nao do proprio conteudo. */}
+      <div className="mt-4 grid items-start gap-4 lg:grid-cols-[1.4fr_1fr]">
         {/* ---------- Gráfico ---------- */}
         <div className={CARTAO}>
           <div className="flex items-baseline justify-between gap-4">

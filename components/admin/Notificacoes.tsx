@@ -132,7 +132,13 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
             className="fixed inset-0 z-40 cursor-default"
           />
 
-          <div className="absolute right-0 z-50 mt-1 w-[320px] overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.35)]">
+          {/* Abre para a direita, e nao para a esquerda.
+
+              O sino mora na barra lateral, perto da borda da janela: ancorado
+              a direita, um painel de 320px saia da tela e ficava cortado. A
+              largura tambem deixou de ser fixa — em telefone estreito, 320px
+              passam da tela sozinhos. */}
+          <div className="absolute left-0 z-50 mt-1 w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.35)]">
             <div className="border-b border-contorno px-4 py-3">
               <p className="text-sm font-semibold text-tinta">Notificações</p>
               <p className="mt-0.5 text-xs text-tinta/45">
