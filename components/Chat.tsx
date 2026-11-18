@@ -78,6 +78,15 @@ const ESPERANDO_EQUIPE_MS = 5000;
 const CONVERSA_NORMAL_MS = 20000;
 
 /**
+ * De quanto em quanto tempo o chat fechado pergunta se chegou resposta.
+ *
+ * Mais lento que o aberto de proposito: ninguem esta olhando, e o unico
+ * efeito de uma resposta aqui e acender o aviso no balao. Meio minuto e
+ * tempo de sobra para quem voltou a ler a pagina perceber.
+ */
+const FECHADO_MS = 30000;
+
+/**
  * Quanto tempo de página aberta antes de o balão chamar atenção.
  *
  * Trinta segundos é tempo de ler o começo de uma página. Antes disso o
@@ -117,6 +126,9 @@ export default function Chat() {
 
   /** Começou limpo por cima de um atendimento que ninguém avaliou. */
   const [notaPendente, setNotaPendente] = useState(false);
+
+  /** Quantas mensagens chegaram enquanto o balao estava fechado. */
+  const [naoLidas, setNaoLidas] = useState(0);
 
   /**
    * O expediente, como o servidor o ve.
@@ -295,11 +307,25 @@ export default function Chat() {
       }
 
       if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
+
+      // Chegou resposta com o balão fechado: acende o aviso.
+      //
+      // Sem isto, a equipe respondia e a pessoa não ficava sabendo — a
+      // mensagem esperava dentro de um balão fechado que não dá sinal
+      // nenhum, e quem respondeu fica achando que foi ignorado.
+      //
+      // Só conta o que veio de fora: a própria mensagem da pessoa, enviada
+      // antes de ela fechar, não é novidade para ela.
+      if (!aberto) {
+        const deFora = novas.filter((m) => m.autor !== "cliente").length;
+        if (deFora > 0) setNaoLidas((n) => n + deFora);
+      }
+
       juntar(novas);
     } catch {
       // Rede instável: a próxima rodada tenta de novo.
     }
-  }, [estado, juntar, ultima]);
+  }, [aberto, estado, juntar, ultima]);
 
   /**
    * O convite, depois de trinta segundos de página.
@@ -321,6 +347,26 @@ export default function Chat() {
     return () => clearTimeout(relogio);
   }, [aberto]);
 
+  // A chave é lida assim que a página monta, e não só ao abrir o balão.
+  //
+  // É o que permite escutar de balão fechado: sem a chave em mãos não há o
+  // que perguntar ao servidor, e a resposta da equipe só apareceria se a
+  // pessoa abrisse o chat por conta própria — justamente o que ela não vai
+  // fazer, porque nada a avisou.
+  useEffect(() => {
+    chave.current = ler(GUARDA);
+
+    // E pergunta uma vez na hora, sem esperar a primeira rodada do relógio.
+    //
+    // Quem volta ao site depois de a equipe ter respondido veria o aviso
+    // meio minuto depois de a página abrir — e meio minuto é tempo de a
+    // pessoa já ter rolado, lido e ido embora.
+    if (chave.current) void buscar();
+    // Só na montagem: `buscar` muda de identidade a cada mensagem, e
+    // incluí-lo aqui faria a conversa ser pedida de novo a cada troca.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Ao abrir, recupera a conversa de antes.
   useEffect(() => {
     if (!aberto) return;
@@ -335,13 +381,18 @@ export default function Chat() {
 
   // A busca periódica.
   //
-  // Mais rápida enquanto se espera a equipe, lenta no resto: o minuto em que
-  // alguém digita a resposta é o único em que meio segundo importa.
+  // Mais rápida enquanto se espera a equipe, lenta no resto, e mais lenta
+  // ainda de balão fechado: o minuto em que alguém digita a resposta é o
+  // único em que meio segundo importa, e com o balão fechado o efeito de uma
+  // resposta é só acender um aviso.
   useEffect(() => {
-    if (!aberto || !chave.current) return;
+    if (!chave.current) return;
 
-    const intervalo =
-      estado === "equipe" ? ESPERANDO_EQUIPE_MS : CONVERSA_NORMAL_MS;
+    const intervalo = !aberto
+      ? FECHADO_MS
+      : estado === "equipe"
+        ? ESPERANDO_EQUIPE_MS
+        : CONVERSA_NORMAL_MS;
 
     const relogio = setInterval(() => {
       // Aba escondida não precisa perguntar nada: ninguém está lendo, e a
@@ -366,6 +417,10 @@ export default function Chat() {
     // React desaprova com razão, e o valor ainda chegaria diferente entre o
     // HTML do servidor e o primeiro desenho no navegador.
     setDadosSalvos(lerDados());
+
+    // Abriu, leu: o aviso de mensagem nova perde a razão de existir no
+    // mesmo instante.
+    setNaoLidas(0);
     setAberto(true);
   }
 
@@ -486,17 +541,25 @@ export default function Chat() {
   if (!aberto) {
     return (
       <div className="fixed bottom-24 right-6 z-50 flex items-center gap-2">
-        {convidando && (
+        {(convidando || naoLidas > 0) && (
           <>
             {/* O convite abre à esquerda do balão, e não acima: acima ele
                 cobriria o botão do WhatsApp, que é o atalho que mais gente
-                usa. */}
+                usa.
+
+                Com mensagem nova, o recado deixa de ser convite e passa a
+                ser notícia — e notícia não depende de nenhuma regra de
+                tempo: ela aparece na hora em que chega. */}
             <button
               type="button"
               onClick={abrir}
               className="convite-do-chat max-w-[min(14rem,calc(100vw-7rem))] rounded-2xl rounded-br-md border border-contorno bg-cartao px-3.5 py-2.5 text-left text-sm leading-snug text-tinta shadow-lg shadow-preto/20"
             >
-              Fale com a nossa equipe!
+              {naoLidas > 0
+                ? naoLidas === 1
+                  ? "Nova mensagem da LANÇA+"
+                  : `${naoLidas} mensagens novas`
+                : "Fale com a nossa equipe!"}
             </button>
 
             <button
@@ -504,6 +567,9 @@ export default function Chat() {
               onClick={() => {
                 setConvidando(false);
                 guardar(GUARDA_CONVITE, "visto");
+                // Dispensar também apaga o aviso de mensagem nova: quem
+                // fecha o recado está dizendo que viu.
+                setNaoLidas(0);
               }}
               aria-label="Dispensar o convite"
               // 4,25rem é a largura do balão (3,5rem) mais o vão (0,5rem)
@@ -529,11 +595,15 @@ export default function Chat() {
         <button
           type="button"
           onClick={abrir}
-          aria-label="Abrir conversa com a LANÇA+"
+          aria-label={
+            naoLidas > 0
+              ? `Conversa com a LANÇA+: ${naoLidas} ${naoLidas === 1 ? "mensagem nova" : "mensagens novas"}`
+              : "Abrir conversa com a LANÇA+"
+          }
           // Acima do botão do WhatsApp, e não ao lado: lado a lado, os dois
           // disputam o canto e nenhum fica onde o dedo já procura.
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-contorno bg-cartao text-tinta shadow-lg shadow-preto/20 transition-transform duration-300 hover:scale-105 ${
-            convidando ? "balao-chamando" : ""
+          className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-contorno bg-cartao text-tinta shadow-lg shadow-preto/20 transition-transform duration-300 hover:scale-105 ${
+            convidando || naoLidas > 0 ? "balao-chamando" : ""
           }`}
         >
           <svg
@@ -548,6 +618,18 @@ export default function Chat() {
           >
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
           </svg>
+
+          {/* O número, e não só um ponto.
+
+              Um ponto diz "tem algo"; o número diz quanto, e a diferença
+              entre uma e quatro mensagens esperando muda se a pessoa abre
+              agora ou depois. Acima de nove vira "9+", porque o que importa
+              daí em diante é "bastante". */}
+          {naoLidas > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-salmon px-1 text-[0.65rem] font-semibold text-preto">
+              {naoLidas > 9 ? "9+" : naoLidas}
+            </span>
+          )}
         </button>
       </div>
     );
