@@ -325,6 +325,13 @@ const EVOLUCOES = [
   // conversa que apagou por inatividade pode ser um cliente que ficou sem
   // resposta boa, e isso merece outro olhar.
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS fechada_por TEXT NOT NULL DEFAULT ''`,
+  // Marca os avisos de "ainda está por aí?" que o assistente manda sozinho.
+  //
+  // Eles são fala do assistente, mas não contam como resposta: o relógio do
+  // silêncio e a pergunta "quem falou por último" olham por cima deles. Sem a
+  // marca, um aviso numa conversa da equipe faria a última fala parecer do
+  // assistente, e o prazo de encerramento nunca chegaria.
+  `ALTER TABLE mensagens ADD COLUMN IF NOT EXISTS aviso BOOLEAN NOT NULL DEFAULT false`,
   // Ajuste fino do tamanho de cada logo, em porcentagem.
   //
   // Arquivos de logo chegam com proporções e margens internas diferentes: um

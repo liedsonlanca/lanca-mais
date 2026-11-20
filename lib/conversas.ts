@@ -595,6 +595,7 @@ export async function encerrarPorSilencio() {
       `WITH ultima AS (
          SELECT DISTINCT ON (conversa) conversa, autor
            FROM mensagens
+          WHERE NOT aviso
           ORDER BY conversa, id DESC
        )
        UPDATE conversas c
@@ -620,6 +621,11 @@ export async function encerrarPorSilencio() {
       []
     )) as Array<{ id: number }>;
 
+    // Os avisos vêm depois do encerramento, para que a conversa que já
+    // passou do prazo não receba um "ainda está por aí?" no mesmo instante em
+    // que é encerrada.
+    await avisarQuemSumiu();
+
     if (linhas.length === 0) return 0;
 
     // Uma despedida em cada uma.
@@ -640,6 +646,81 @@ export async function encerrarPorSilencio() {
     // Faxina é acessório: falhar aqui não pode derrubar quem só queria ler a
     // lista de conversas.
     return 0;
+  }
+}
+
+/**
+ * Os avisos antes do encerramento, e quando cada um sai.
+ *
+ * Encerrar sem avisar parece porta batida: a pessoa foi buscar um dado,
+ * voltou, e a conversa acabou. Então, enquanto a LANÇA+ espera a pessoa, o
+ * assistente cutuca duas vezes antes dos 30 minutos.
+ *
+ * Só quando a última fala foi da LANÇA+: se foi do visitante, quem deve
+ * resposta é a agência, e um "ainda está por aí?" seria cobrar a pessoa
+ * pela demora de quem atende.
+ */
+const AVISOS = [
+  {
+    depois: "10 minutes",
+    texto: (nome: string) =>
+      `${nome ? `${nome}, ainda` : "Ainda"} está por aí? Se quiser continuar, é só responder por aqui.`,
+  },
+  {
+    depois: "25 minutes",
+    texto: () =>
+      "Como não tive resposta, vou encerrar este atendimento em 5 minutos. Se ainda precisar de algo, é só mandar uma mensagem.",
+  },
+];
+
+async function avisarQuemSumiu() {
+  if (!sql) return;
+
+  // Um aviso por vez, o próximo da fila de cada conversa: quantos avisos já
+  // saíram desde a última fala de verdade diz qual é o próximo. Uma conversa
+  // esquecida que só é vista aos 26 minutos recebe o primeiro, e não os dois
+  // de uma vez.
+  //
+  // O aviso não mexe em `mexido_em`: o relógio continua contando da última
+  // fala de verdade, e o encerramento chega na hora prevista.
+  //
+  // Do último aviso para o primeiro: na ordem direta, a conversa que recebeu
+  // o primeiro aviso nesta passada já se qualificaria para o segundo na
+  // mesma passada.
+  for (const [ordem, aviso] of [...AVISOS.entries()].reverse()) {
+    const linhas = (await sql.query(
+      `WITH ultima AS (
+         SELECT DISTINCT ON (conversa) conversa, id, autor
+           FROM mensagens
+          WHERE NOT aviso
+          ORDER BY conversa, id DESC
+       ),
+       avisos AS (
+         SELECT m.conversa, count(*)::int AS n
+           FROM mensagens m JOIN ultima u ON u.conversa = m.conversa
+          WHERE m.aviso AND m.id > u.id
+          GROUP BY m.conversa
+       )
+       SELECT c.id, c.nome
+         FROM conversas c
+         JOIN ultima u ON u.conversa = c.id
+         LEFT JOIN avisos a ON a.conversa = c.id
+        WHERE c.estado <> 'fechada'
+          AND ((c.estado = 'assistente' AND u.autor = 'assistente')
+            OR (c.estado = 'equipe' AND u.autor = 'equipe'))
+          AND COALESCE(a.n, 0) = $1
+          AND c.mexido_em < now() - interval '${aviso.depois}'`,
+      [ordem]
+    )) as Array<{ id: number; nome: string }>;
+
+    for (const linha of linhas) {
+      const primeiro = String(linha.nome ?? "").trim().split(/\s+/)[0] ?? "";
+      await sql.query(
+        `INSERT INTO mensagens (conversa, autor, texto, aviso)
+         VALUES ($1, 'assistente', $2, true)`,
+        [Number(linha.id), aviso.texto(primeiro)]
+      );
+    }
   }
 }
 
