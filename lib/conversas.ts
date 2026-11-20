@@ -545,11 +545,17 @@ export async function conversasEsperando() {
  * - Última fala da equipe: a agência fez a parte dela e a pessoa não voltou.
  *   Aí sim, encerra.
  * - Última fala do assistente numa conversa que nunca saiu dele: a pessoa
- *   tirou a dúvida e foi embora. Encerra mais cedo, porque não há ninguém
- *   esperando do lado de cá.
+ *   tirou a dúvida e foi embora. Também encerra.
+ *
+ * ---------- Por que meia hora ----------
+ *
+ * Escolha da agência em 20/11/2026: chat de site é conversa de agora. Quem
+ * some por meia hora depois da resposta não está mais na página, e uma
+ * conversa aberta por horas só enche o painel de linhas que ninguém vai
+ * continuar. Se a pessoa voltar, começa outra — com a avaliação no meio.
  */
-const SILENCIO_COM_ASSISTENTE = "6 hours";
-const SILENCIO_DEPOIS_DA_EQUIPE = "24 hours";
+const SILENCIO_COM_ASSISTENTE = "30 minutes";
+const SILENCIO_DEPOIS_DA_EQUIPE = "30 minutes";
 
 /**
  * Encerra o que morreu de silêncio, e devolve quantas encerrou.
