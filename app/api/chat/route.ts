@@ -261,10 +261,15 @@ export async function GET(requisicao: Request) {
   void encerrarPorSilencio();
 
   const depois = Number(searchParams.get("depois") ?? 0);
-  const { estado, temFicha, temNome, avaliada, novas } = await mensagensDepois(
-    chave,
-    Number.isFinite(depois) && depois > 0 ? depois : 0
-  );
+  const { estado, temFicha, temNome, avaliada, equipeDigitando, vistoPelaEquipe, novas } =
+    await mensagensDepois(
+      chave,
+      Number.isFinite(depois) && depois > 0 ? depois : 0,
+      // O navegador só diz "lendo" com o chat aberto e a aba à vista: balão
+      // fechado ou aba escondida não é leitura, e marcar "visto" ali seria
+      // dizer à equipe que a pessoa leu o que nem apareceu na tela dela.
+      searchParams.get("lendo") === "1"
+    );
 
   // Sem cache, e dito aqui em vez de confiado ao padrão: a rota é um GET, e
   // um GET de resposta repetida é exatamente o que um intermediário gosta de
@@ -281,6 +286,8 @@ export async function GET(requisicao: Request) {
       temFicha,
       temNome,
       avaliada,
+      equipeDigitando,
+      vistoPelaEquipe,
       novas,
       expediente: {
         aberto: equipeNoExpediente(),

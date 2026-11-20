@@ -42,7 +42,20 @@ type Mensagem = {
   id: number;
   autor: Autor;
   texto: string;
+  /** Quando foi gravada, em ISO. Ausente na saudação, que não é gravada. */
+  quando?: string;
 };
+
+/** A hora da mensagem, no relógio de quem lê. */
+function hora(quando?: string) {
+  if (!quando) return "";
+  const data = new Date(quando);
+  if (Number.isNaN(data.getTime())) return "";
+  return data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
+/** De quanto em quanto tempo, no máximo, o "digitando…" é renovado. */
+const SINAL_DIGITANDO_MS = 3000;
 
 const GUARDA = "lanca:chat";
 const GUARDA_CONVITE = "lanca:chat-convite";
@@ -87,7 +100,7 @@ const SAUDACAO: Mensagem = {
 };
 
 /** De quanto em quanto tempo a página pergunta se chegou resposta. */
-const ESPERANDO_EQUIPE_MS = 5000;
+const ESPERANDO_EQUIPE_MS = 3000;
 const CONVERSA_NORMAL_MS = 20000;
 
 /**
@@ -172,6 +185,12 @@ export default function Chat() {
   } | null>(null);
   const [falhou, setFalhou] = useState(false);
 
+  /** Alguém da equipe está escrevendo agora. */
+  const [equipeDigitando, setEquipeDigitando] = useState(false);
+
+  /** A equipe já abriu a conversa depois da última mensagem da pessoa. */
+  const [vistoPelaEquipe, setVistoPelaEquipe] = useState(false);
+
   // A preferência de som é lida de onde ela mora, e não copiada para cá.
   //
   // O terceiro argumento é o que o servidor devolve ao montar o HTML: lá não
@@ -191,6 +210,12 @@ export default function Chat() {
 
   /** Se esta carga de página já leu a conversa do servidor uma vez. */
   const jaCarregou = useRef(false);
+
+  /** Quando o "digitando…" foi mandado pela última vez. */
+  const ultimoSinal = useRef(0);
+
+  /** Quando a última busca saiu, para espaçar as de aba escondida. */
+  const ultimaBusca = useRef(0);
 
   /**
    * Esquece a conversa inteira e volta à saudação.
@@ -218,6 +243,8 @@ export default function Chat() {
     setContato(null);
     setFalhou(false);
     setNaoLidas(0);
+    setEquipeDigitando(false);
+    setVistoPelaEquipe(false);
   }, []);
 
   // O id da última mensagem conhecida, para pedir só o que vier depois.
@@ -244,12 +271,18 @@ export default function Chat() {
 
   const buscar = useCallback(async () => {
     if (!chave.current) return;
+    ultimaBusca.current = Date.now();
 
     try {
       const desde = Math.max(ultima, pisoDeId.current);
 
+      // "Lendo" só com o balão aberto e a aba à vista: é o que acende o
+      // "visto" no painel, e marcar isso com o chat fechado seria dizer à
+      // equipe que a pessoa leu o que nem apareceu na tela dela.
+      const lendo = aberto && !document.hidden ? "&lendo=1" : "";
+
       const resposta = await fetch(
-        `/api/chat?chave=${chave.current}&depois=${desde}`,
+        `/api/chat?chave=${chave.current}&depois=${desde}${lendo}`,
         { cache: "no-store" }
       );
       if (!resposta.ok) return;
@@ -259,11 +292,15 @@ export default function Chat() {
         temFicha?: boolean;
         temNome?: boolean;
         avaliada?: boolean;
+        equipeDigitando?: boolean;
+        vistoPelaEquipe?: boolean;
         expediente?: { aberto: boolean; volta: string };
         novas: Mensagem[];
       };
 
       if (dados.expediente) setExpediente(dados.expediente);
+      setEquipeDigitando(Boolean(dados.equipeDigitando));
+      setVistoPelaEquipe(Boolean(dados.vistoPelaEquipe));
 
       // Só na primeira leitura desta carga de página.
       //
@@ -317,7 +354,10 @@ export default function Chat() {
       //
       // Só conta o que veio de fora: a própria mensagem da pessoa, enviada
       // antes de ela fechar, não é novidade para ela.
-      if (!aberto) {
+      //
+      // Vale também para o chat aberto numa aba escondida: aí quem avisa é o
+      // título da aba (ver o efeito do título, mais abaixo).
+      if (!aberto || document.hidden) {
         const deFora = novas.filter((m) => m.autor !== "cliente").length;
         if (deFora > 0) setNaoLidas((n) => n + deFora);
       }
@@ -403,13 +443,57 @@ export default function Chat() {
         : CONVERSA_NORMAL_MS;
 
     const relogio = setInterval(() => {
-      // Aba escondida não precisa perguntar nada: ninguém está lendo, e a
-      // volta já traz o que chegou.
-      if (!document.hidden) void buscar();
+      // Aba escondida pergunta devagar, de meio em meio minuto, e não para:
+      // é o que deixa o título da aba avisar "(1) Nova mensagem" a quem foi
+      // ler outra coisa enquanto esperava a equipe. Parando de vez, a
+      // resposta chegava e ninguém ficava sabendo.
+      if (
+        document.hidden &&
+        Date.now() - ultimaBusca.current < FECHADO_MS
+      ) {
+        return;
+      }
+      void buscar();
     }, intervalo);
 
     return () => clearInterval(relogio);
   }, [aberto, buscar, estado]);
+
+  // O título da aba pisca com mensagem nova, como nos chats de atendimento.
+  //
+  // É o único aviso que alcança quem trocou de aba: o balão e o número só
+  // existem dentro da página. Alterna com o título original a cada segundo
+  // e meio, e devolve o original assim que a pessoa volta e lê.
+  useEffect(() => {
+    if (naoLidas === 0) return;
+
+    const original = document.title;
+    const alerta =
+      naoLidas === 1 ? "(1) Nova mensagem · LANÇA+" : `(${naoLidas}) Novas mensagens · LANÇA+`;
+    let ligado = false;
+
+    const relogio = setInterval(() => {
+      ligado = !ligado;
+      document.title = ligado ? alerta : original;
+    }, 1500);
+
+    return () => {
+      clearInterval(relogio);
+      document.title = original;
+    };
+  }, [naoLidas]);
+
+  // Voltou à aba com o chat aberto: leu. O aviso apaga e o "visto" segue
+  // para a equipe na hora, sem esperar a próxima rodada.
+  useEffect(() => {
+    function aoVoltar() {
+      if (document.hidden || !aberto) return;
+      setNaoLidas(0);
+      void buscar();
+    }
+    document.addEventListener("visibilitychange", aoVoltar);
+    return () => document.removeEventListener("visibilitychange", aoVoltar);
+  }, [aberto, buscar]);
 
   // Disse o nome: o cursor vai direto para o campo da primeira pergunta.
   useEffect(() => {
@@ -421,7 +505,7 @@ export default function Chat() {
   // escondido até a pessoa descer por conta própria.
   useEffect(() => {
     if (aberto) fim.current?.scrollIntoView({ block: "end" });
-  }, [aberto, mensagens, enviando, estado]);
+  }, [aberto, mensagens, enviando, estado, equipeDigitando]);
 
   function abrir() {
     setConvidando(false);
@@ -438,6 +522,26 @@ export default function Chat() {
     guardarSom(novo);
     // Toca ao ligar, para a pessoa ouvir o que acabou de escolher.
     if (novo) tocar("mensagem");
+  }
+
+  /**
+   * Avisa a equipe de que a pessoa está escrevendo.
+   *
+   * Só com a conversa na equipe (com o assistente não há ninguém olhando), e
+   * no máximo a cada três segundos: o sinal vale por seis no servidor, então
+   * quem digita sem parar fica com o "digitando…" aceso sem uma chamada por
+   * tecla.
+   */
+  function sinalizarDigitando() {
+    if (estado !== "equipe" || !chave.current) return;
+    const agora = Date.now();
+    if (agora - ultimoSinal.current < SINAL_DIGITANDO_MS) return;
+    ultimoSinal.current = agora;
+    void fetch("/api/chat/digitando", {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({ chave: chave.current }),
+    }).catch(() => {});
   }
 
   /** O visitante encerra a conversa: vem a avaliação, depois o recomeço. */
@@ -480,8 +584,14 @@ export default function Chat() {
     const provisorio = -Date.now();
     setMensagens((atuais) => [
       ...atuais,
-      { id: provisorio, autor: "cliente", texto: pergunta },
+      {
+        id: provisorio,
+        autor: "cliente",
+        texto: pergunta,
+        quando: new Date().toISOString(),
+      },
     ]);
+    setVistoPelaEquipe(false);
 
     try {
       const resposta = await fetch("/api/chat", {
@@ -538,6 +648,7 @@ export default function Chat() {
             id: dados.minha ?? provisorio,
             autor: "cliente",
             texto: pergunta,
+            quando: new Date().toISOString(),
           },
         ]);
 
@@ -710,6 +821,10 @@ export default function Chat() {
   const primeiroNome = nome.split(/\s+/)[0];
   const conversando =
     estado !== "fechada" && mensagens.some((m) => m.autor === "cliente");
+  const ultimaDoCliente = mensagens.reduce(
+    (maior, m) => (m.autor === "cliente" ? Math.max(maior, m.id) : maior),
+    0
+  );
 
   return (
     <div
@@ -868,6 +983,26 @@ export default function Chat() {
                 {m.texto}
               </p>
 
+              {/* A hora, e o "visto" na última mensagem da pessoa.
+
+                  O visto só existe com a conversa na equipe: é a resposta à
+                  pergunta "alguém leu?", que com o assistente não se faz —
+                  ele responde na hora. */}
+              {(m.quando || m.id < 0) && (
+                <p
+                  className={`mt-1 text-[0.65rem] text-tinta/35 ${
+                    m.autor === "cliente" ? "text-right" : ""
+                  }`}
+                >
+                  {m.id < 0 ? "Enviando…" : hora(m.quando)}
+                  {m.autor === "cliente" &&
+                    m.id === ultimaDoCliente &&
+                    estado === "equipe" &&
+                    vistoPelaEquipe &&
+                    " · Visto"}
+                </p>
+              )}
+
               {/* Falou em WhatsApp, entrega o botão.
 
                   O número escrito no texto obriga a pessoa a copiar, trocar
@@ -898,6 +1033,21 @@ export default function Chat() {
             )}
             </Fragment>
           ))}
+
+          {/* A equipe escrevendo: o mesmo balão de três pontos do
+              assistente, com o nome de quem escreve. */}
+          {!enviando && estado === "equipe" && equipeDigitando && (
+            <li className="mr-auto rounded-2xl rounded-bl-md bg-fundo-alt px-3.5 py-2.5">
+              <p className="mb-1 text-[0.7rem] font-medium text-destaque">
+                Equipe LANÇA+
+              </p>
+              <span className="flex items-center gap-1" aria-label="A equipe está digitando">
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-tinta/40 [animation-delay:0ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-tinta/40 [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-tinta/40 [animation-delay:300ms]" />
+              </span>
+            </li>
+          )}
 
           {enviando && (
             <li className="mr-auto rounded-2xl rounded-bl-md bg-fundo-alt px-3.5 py-3">
@@ -985,7 +1135,10 @@ export default function Chat() {
           <input
             ref={campo}
             value={rascunho}
-            onChange={(e) => setRascunho(e.target.value)}
+            onChange={(e) => {
+              setRascunho(e.target.value);
+              sinalizarDigitando();
+            }}
             maxLength={1000}
             placeholder="Escreva sua dúvida"
             aria-label="Sua mensagem"

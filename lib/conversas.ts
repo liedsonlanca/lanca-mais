@@ -23,7 +23,14 @@ import { sql, garantirEsquema } from "@/lib/db";
 // troca de dia (ver lib/acessos.ts). Serve para cruzar com o movimento do
 // site no painel, e não serve para identificar ninguém.
 
-export type Autor = "cliente" | "assistente" | "equipe";
+/**
+ * Quem escreveu.
+ *
+ * "nota" é a anotação interna da equipe: fica no fio do painel, entre as
+ * mensagens, e nunca sai dele — o visitante não a recebe, o assistente não a
+ * lê e o CRM não a copia. Cada consulta voltada para fora filtra por ela.
+ */
+export type Autor = "cliente" | "assistente" | "equipe" | "nota";
 
 export type Mensagem = {
   id: number;
@@ -69,7 +76,9 @@ const QUANDO = `to_char(criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z
 const MEXIDO = `to_char(mexido_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`;
 
 function autorValido(valor: string): Autor {
-  return valor === "assistente" || valor === "equipe" ? valor : "cliente";
+  return valor === "assistente" || valor === "equipe" || valor === "nota"
+    ? valor
+    : "cliente";
 }
 
 /** Uma chave de conversa: sorteada no servidor, impossível de adivinhar. */
@@ -146,9 +155,26 @@ export async function gravarMensagem(
     [conversa, autor, texto.slice(0, 2000)]
   )) as Array<{ id: number }>;
 
-  await sql.query("UPDATE conversas SET mexido_em = now() WHERE id = $1", [
-    conversa,
-  ]);
+  // A nota interna não mexe no relógio: ela não é fala com o visitante, e
+  // anotar numa conversa parada não pode adiar o encerramento dela.
+  //
+  // Quem acabou de enviar parou de digitar: o sinal some junto, em vez de o
+  // "digitando…" ficar na tela do outro lado por cima da própria mensagem.
+  if (autor === "cliente") {
+    await sql.query(
+      "UPDATE conversas SET mexido_em = now(), cliente_digitando_em = NULL WHERE id = $1",
+      [conversa]
+    );
+  } else if (autor === "equipe") {
+    await sql.query(
+      "UPDATE conversas SET mexido_em = now(), equipe_digitando_em = NULL WHERE id = $1",
+      [conversa]
+    );
+  } else if (autor !== "nota") {
+    await sql.query("UPDATE conversas SET mexido_em = now() WHERE id = $1", [
+      conversa,
+    ]);
+  }
 
   return Number(linhas[0]?.id ?? 0);
 }
@@ -164,7 +190,12 @@ export async function quantasMensagens(conversa: number) {
 }
 
 /** As últimas mensagens da conversa, da mais antiga para a mais nova. */
-export async function historico(conversa: number, limite = HISTORICO_PARA_O_MODELO) {
+export async function historico(
+  conversa: number,
+  limite = HISTORICO_PARA_O_MODELO,
+  /** Só o painel passa true: as notas internas não saem dele. */
+  comNotas = false
+) {
   if (!sql) return [];
 
   // Pega as últimas em ordem decrescente e inverte aqui: LIMIT com ORDER BY
@@ -174,9 +205,10 @@ export async function historico(conversa: number, limite = HISTORICO_PARA_O_MODE
     `SELECT id, autor, texto, ${QUANDO} AS quando
        FROM mensagens
       WHERE conversa = $1
+        AND ($3 OR autor <> 'nota')
       ORDER BY id DESC
       LIMIT $2`,
-    [conversa, limite]
+    [conversa, limite, comNotas]
   )) as Array<{ id: number; autor: string; texto: string; quando: string }>;
 
   return linhas
@@ -197,17 +229,32 @@ export async function historico(conversa: number, limite = HISTORICO_PARA_O_MODE
  * Perguntar por id, e não por horário, evita perder mensagem gravada no
  * mesmo segundo e evita repetir mensagem por causa de relógio adiantado.
  */
-export async function mensagensDepois(chave: string, depoisDe: number) {
+export async function mensagensDepois(
+  chave: string,
+  depoisDe: number,
+  /** O chat está aberto e à vista: o visitante leu o que está na tela. */
+  lendo = false
+) {
   const vazio = {
     estado: null as Conversa["estado"] | null,
     temFicha: false,
     temNome: false,
     avaliada: false,
+    equipeDigitando: false,
+    vistoPelaEquipe: false,
     novas: [] as Mensagem[],
   };
 
   if (!sql) return vazio;
   await garantirEsquema();
+
+  // Antes da leitura, para o "visto" valer já na resposta que a equipe vê.
+  if (lendo) {
+    await sql.query(
+      "UPDATE conversas SET cliente_viu_em = now() WHERE chave = $1 AND estado <> 'fechada'",
+      [chave]
+    );
+  }
 
   const linhas = (await sql.query(
     `SELECT m.id, m.autor, m.texto,
@@ -215,9 +262,15 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
             c.estado,
             (c.nome <> '' AND c.contato <> '' AND c.email <> '') AS tem_ficha,
             (c.nome <> '') AS tem_nome,
-            (c.nota IS NOT NULL) AS avaliada
+            (c.nota IS NOT NULL) AS avaliada,
+            (c.equipe_digitando_em > now() - interval '6 seconds') AS equipe_digitando,
+            (c.equipe_viu_em IS NOT NULL AND c.equipe_viu_em >= (
+               SELECT max(x.criado_em) FROM mensagens x
+                WHERE x.conversa = c.id AND x.autor = 'cliente'
+            )) AS visto_pela_equipe
        FROM conversas c
-       LEFT JOIN mensagens m ON m.conversa = c.id AND m.id > $2
+       LEFT JOIN mensagens m
+         ON m.conversa = c.id AND m.id > $2 AND m.autor <> 'nota'
       WHERE c.chave = $1
       ORDER BY m.id
       LIMIT 50`,
@@ -231,6 +284,8 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
     tem_ficha: boolean;
     tem_nome: boolean;
     avaliada: boolean;
+    equipe_digitando: boolean | null;
+    visto_pela_equipe: boolean | null;
   }>;
 
   if (linhas.length === 0) return vazio;
@@ -249,6 +304,8 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
     temFicha: Boolean(linhas[0].tem_ficha),
     temNome: Boolean(linhas[0].tem_nome),
     avaliada: Boolean(linhas[0].avaliada),
+    equipeDigitando: Boolean(linhas[0].equipe_digitando),
+    vistoPelaEquipe: Boolean(linhas[0].visto_pela_equipe),
     novas,
   };
 }
@@ -485,7 +542,7 @@ export async function lerConversa(id: number) {
            FROM conversas WHERE id = $1`,
         [id]
       ),
-      historico(id, 200),
+      historico(id, 200, true),
     ]);
 
     const linha = (cabeca as Array<Record<string, unknown>>)[0];
@@ -574,7 +631,7 @@ const SILENCIO_DEPOIS_DA_EQUIPE = "30 minutes";
 /** Quando a faxina rodou pela última vez, nesta instância do servidor. */
 let ultimaFaxina = 0;
 
-export async function encerrarPorSilencio() {
+export async function encerrarPorSilencio(forcar = false) {
   if (!sql) return 0;
 
   // No máximo uma vez por minuto.
@@ -585,7 +642,7 @@ export async function encerrarPorSilencio() {
   // encerrar conversas cujo prazo se mede em horas. Um minuto de atraso no
   // encerramento não se nota; vinte varreduras por segundo, o banco nota.
   const agora = Date.now();
-  if (agora - ultimaFaxina < 60_000) return 0;
+  if (!forcar && agora - ultimaFaxina < 60_000) return 0;
   ultimaFaxina = agora;
 
   try {
@@ -595,7 +652,7 @@ export async function encerrarPorSilencio() {
       `WITH ultima AS (
          SELECT DISTINCT ON (conversa) conversa, autor
            FROM mensagens
-          WHERE NOT aviso
+          WHERE NOT aviso AND autor <> 'nota'
           ORDER BY conversa, id DESC
        )
        UPDATE conversas c
@@ -692,7 +749,7 @@ async function avisarQuemSumiu() {
       `WITH ultima AS (
          SELECT DISTINCT ON (conversa) conversa, id, autor
            FROM mensagens
-          WHERE NOT aviso
+          WHERE NOT aviso AND autor <> 'nota'
           ORDER BY conversa, id DESC
        ),
        avisos AS (
@@ -736,5 +793,198 @@ export async function definirNome(conversa: number, nome: string) {
     );
   } catch {
     // O nome é conveniência; a conversa vale mais do que ele.
+  }
+}
+
+/* ---------------- Presença: digitando e visto ---------------- */
+
+/**
+ * O visitante está digitando. Só vale com a conversa na equipe: com o
+ * assistente não há ninguém do outro lado para ver.
+ */
+export async function clienteDigitando(chave: string) {
+  if (!sql) return;
+  try {
+    await garantirEsquema();
+    await sql.query(
+      `UPDATE conversas SET cliente_digitando_em = now()
+        WHERE chave = $1 AND estado = 'equipe'`,
+      [chave]
+    );
+  } catch {
+    // Sinal de presença é enfeite; falhar não pode atrapalhar a conversa.
+  }
+}
+
+/** Alguém da equipe está digitando nesta conversa. */
+export async function equipeDigitando(conversa: number) {
+  if (!sql) return;
+  try {
+    await garantirEsquema();
+    await sql.query(
+      `UPDATE conversas SET equipe_digitando_em = now()
+        WHERE id = $1 AND estado = 'equipe'`,
+      [conversa]
+    );
+  } catch {
+    // Idem.
+  }
+}
+
+/** A equipe abriu a conversa no painel: leu o que o visitante mandou. */
+export async function equipeViu(conversa: number) {
+  if (!sql) return;
+  try {
+    await garantirEsquema();
+    await sql.query(
+      "UPDATE conversas SET equipe_viu_em = now() WHERE id = $1 AND estado <> 'fechada'",
+      [conversa]
+    );
+  } catch {
+    // Idem.
+  }
+}
+
+/**
+ * O que a tela da conversa no painel precisa saber a cada poucos segundos,
+ * sem recarregar a página inteira: a última mensagem (para saber se chegou
+ * coisa nova), se o visitante está digitando e se ele já viu a última
+ * resposta da equipe.
+ */
+export async function sinaisDaConversa(conversa: number) {
+  const vazio = { ultima: 0, estado: "", digitando: false, visto: false };
+  if (!sql) return vazio;
+  try {
+    await garantirEsquema();
+    const linhas = (await sql.query(
+      `SELECT c.estado,
+              (SELECT max(id) FROM mensagens WHERE conversa = c.id) AS ultima,
+              (c.cliente_digitando_em > now() - interval '6 seconds') AS digitando,
+              (c.cliente_viu_em IS NOT NULL AND c.cliente_viu_em >= (
+                 SELECT max(x.criado_em) FROM mensagens x
+                  WHERE x.conversa = c.id AND x.autor = 'equipe'
+              )) AS visto
+         FROM conversas c WHERE c.id = $1`,
+      [conversa]
+    )) as Array<{
+      estado: string;
+      ultima: number | null;
+      digitando: boolean | null;
+      visto: boolean | null;
+    }>;
+    const l = linhas[0];
+    if (!l) return vazio;
+    return {
+      ultima: Number(l.ultima ?? 0),
+      estado: l.estado,
+      digitando: Boolean(l.digitando),
+      visto: Boolean(l.visto),
+    };
+  } catch {
+    return vazio;
+  }
+}
+
+/* ---------------- Números do atendimento ---------------- */
+
+/**
+ * Os números que dizem se o atendimento vai bem, nos últimos 30 dias.
+ *
+ * - Primeira resposta: da primeira mensagem do visitante depois de a
+ *   conversa chegar à equipe até a primeira fala da equipe. É o número que o
+ *   visitante sente; mediana, e não média, porque uma conversa esquecida de
+ *   madrugada distorceria a média do mês inteiro.
+ * - Resolvidas pelo assistente: conversas que encerraram sem a equipe
+ *   escrever nada.
+ */
+export async function numerosDoAtendimento() {
+  const vazio = {
+    conversas: 0,
+    comEquipe: 0,
+    peloAssistente: 0,
+    primeiraRespostaMin: null as number | null,
+    notaMedia: null as number | null,
+    avaliacoes: 0,
+    contatos: 0,
+  };
+  if (!sql) return vazio;
+
+  try {
+    await garantirEsquema();
+    const linhas = (await sql.query(
+      `WITH recentes AS (
+         SELECT * FROM conversas WHERE criado_em > now() - interval '30 days'
+       ),
+       primeira AS (
+         SELECT r.id,
+                (SELECT min(criado_em) FROM mensagens
+                  WHERE conversa = r.id AND autor = 'equipe') AS equipe_em,
+                (SELECT min(criado_em) FROM mensagens
+                  WHERE conversa = r.id AND autor = 'cliente') AS cliente_em
+           FROM recentes r
+       )
+       SELECT
+         (SELECT count(*)::int FROM recentes) AS conversas,
+         (SELECT count(*)::int FROM primeira WHERE equipe_em IS NOT NULL) AS com_equipe,
+         (SELECT count(*)::int FROM recentes r JOIN primeira p ON p.id = r.id
+           WHERE r.estado = 'fechada' AND p.equipe_em IS NULL AND p.cliente_em IS NOT NULL) AS pelo_assistente,
+         (SELECT percentile_cont(0.5) WITHIN GROUP (
+                   ORDER BY extract(epoch FROM (p.equipe_em - (
+                     SELECT max(m.criado_em) FROM mensagens m
+                      WHERE m.conversa = p.id AND m.autor = 'cliente'
+                        AND m.criado_em < p.equipe_em))) / 60)
+            FROM primeira p WHERE p.equipe_em IS NOT NULL) AS primeira_resposta,
+         (SELECT avg(nota)::float FROM recentes WHERE nota IS NOT NULL) AS nota_media,
+         (SELECT count(*)::int FROM recentes WHERE nota IS NOT NULL) AS avaliacoes,
+         (SELECT count(*)::int FROM recentes WHERE contato <> '') AS contatos`,
+      []
+    )) as Array<Record<string, unknown>>;
+
+    const l = linhas[0];
+    if (!l) return vazio;
+    const numero = (v: unknown) =>
+      v === null || v === undefined ? null : Number(v);
+
+    return {
+      conversas: Number(l.conversas ?? 0),
+      comEquipe: Number(l.com_equipe ?? 0),
+      peloAssistente: Number(l.pelo_assistente ?? 0),
+      primeiraRespostaMin: numero(l.primeira_resposta),
+      notaMedia: numero(l.nota_media),
+      avaliacoes: Number(l.avaliacoes ?? 0),
+      contatos: Number(l.contatos ?? 0),
+    };
+  } catch {
+    return vazio;
+  }
+}
+
+/* ---------------- Prazo de guarda ---------------- */
+
+/**
+ * Por quanto tempo uma conversa encerrada fica guardada.
+ *
+ * A Política de Privacidade promete que conversas são apagadas depois do
+ * prazo necessário. Prometer e não fazer é o pior dos dois mundos, então a
+ * limpeza roda sozinha uma vez por dia (ver app/api/cron/faxina). Um ano
+ * cobre o ciclo comercial de quem volta para fechar meses depois; quem pede
+ * antes é atendido pelo botão de apagar do painel.
+ */
+const GUARDA_DE_CONVERSAS = "365 days";
+
+export async function apagarConversasAntigas() {
+  if (!sql) return 0;
+  try {
+    await garantirEsquema();
+    const linhas = (await sql.query(
+      `DELETE FROM conversas
+        WHERE estado = 'fechada'
+          AND mexido_em < now() - interval '${GUARDA_DE_CONVERSAS}'
+        RETURNING id`,
+      []
+    )) as Array<{ id: number }>;
+    return linhas.length;
+  } catch {
+    return 0;
   }
 }

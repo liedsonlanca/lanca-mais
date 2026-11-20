@@ -332,6 +332,17 @@ const EVOLUCOES = [
   // marca, um aviso numa conversa da equipe faria a última fala parecer do
   // assistente, e o prazo de encerramento nunca chegaria.
   `ALTER TABLE mensagens ADD COLUMN IF NOT EXISTS aviso BOOLEAN NOT NULL DEFAULT false`,
+  // Os sinais de presença de cada lado da conversa: quem está digitando
+  // agora, e até quando cada lado leu.
+  //
+  // Carimbos de tempo, e não verdadeiro/falso: "digitando" é verdade só nos
+  // segundos seguintes ao último toque no teclado, e um booleano ficaria
+  // ligado para sempre quando a pessoa fecha a aba no meio da frase. Com o
+  // horário, quem lê decide o que é "agora" (seis segundos).
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS cliente_digitando_em TIMESTAMPTZ`,
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS equipe_digitando_em TIMESTAMPTZ`,
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS cliente_viu_em TIMESTAMPTZ`,
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS equipe_viu_em TIMESTAMPTZ`,
   // Ajuste fino do tamanho de cada logo, em porcentagem.
   //
   // Arquivos de logo chegam com proporções e margens internas diferentes: um

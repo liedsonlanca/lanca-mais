@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { RESPOSTAS_PRONTAS } from "@/lib/respostas-prontas";
 
 // A barra de mensagem, no formato de aplicativo de conversa.
@@ -53,16 +53,45 @@ function Icone({
   );
 }
 
+/** De quanto em quanto tempo, no máximo, o "digitando…" é renovado. */
+const SINAL_MS = 3000;
+
 export default function CampoDeResposta({
   acao,
+  anotar,
+  sinalizar,
   conversa,
+  podeResponder = true,
 }: {
   /** A acao de servidor que grava a resposta. */
   acao: (dados: FormData) => Promise<void>;
+  /** A que grava a nota interna. */
+  anotar: (dados: FormData) => Promise<void>;
+  /** A que acende o "digitando…" do lado do visitante. */
+  sinalizar: (id: number) => Promise<void>;
   conversa: number;
+  /**
+   * Falso com a conversa fora da equipe: aí o campo só anota. Responder a
+   * quem está com o assistente, ou a uma conversa encerrada, seria falar por
+   * cima de quem está atendendo — ou com ninguém.
+   */
+  podeResponder?: boolean;
 }) {
   const [atalhos, setAtalhos] = useState(false);
   const [texto, setTexto] = useState("");
+  const [modo, setModo] = useState<"resposta" | "nota">(
+    podeResponder ? "resposta" : "nota"
+  );
+  const nota = modo === "nota" || !podeResponder;
+  const ultimoSinal = useRef(0);
+
+  function avisarQueDigita() {
+    if (nota) return;
+    const agora = Date.now();
+    if (agora - ultimoSinal.current < SINAL_MS) return;
+    ultimoSinal.current = agora;
+    void sinalizar(conversa).catch(() => {});
+  }
 
   function colar(trecho: string) {
     setTexto((atual) => {
@@ -88,10 +117,43 @@ export default function CampoDeResposta({
     // controlado: quem guarda o texto precisa ser quem o limpa depois de
     // enviar. Deixado na pagina, a mensagem enviada continuaria escrita no
     // campo e a pessoa mandaria a mesma coisa duas vezes.
+    <div className={`border-t border-contorno ${nota ? "bg-amber-400/5" : ""}`}>
+    {/* Responder ou anotar.
+
+        A nota interna mora no mesmo campo, e não num formulário à parte: é
+        no meio da conversa que se lembra de anotar. A cor muda junto com o
+        modo, para ninguém mandar ao cliente o que era recado para a equipe. */}
+    <div className="flex gap-1 px-3 pt-2">
+      {podeResponder && (
+        <button
+          type="button"
+          onClick={() => setModo("resposta")}
+          className={`rounded-full px-3 py-1 text-[0.7rem] transition-colors duration-300 ${
+            !nota ? "bg-destaque text-branco" : "text-tinta/50 hover:text-tinta"
+          }`}
+        >
+          Responder
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => setModo("nota")}
+        className={`rounded-full px-3 py-1 text-[0.7rem] transition-colors duration-300 ${
+          nota ? "bg-amber-500 text-preto" : "text-tinta/50 hover:text-tinta"
+        }`}
+      >
+        Nota interna
+      </button>
+      {nota && (
+        <span className="self-center pl-1 text-[0.65rem] text-tinta/40">
+          Só a equipe vê.
+        </span>
+      )}
+    </div>
     <form
-      action={acao}
+      action={nota ? anotar : acao}
       onSubmit={() => setTexto("")}
-      className="relative flex items-end gap-1 border-t border-contorno px-3 py-2.5"
+      className="relative flex items-end gap-1 px-3 py-2.5"
     >
       <input type="hidden" name="id" value={conversa} />
       {atalhos && (
@@ -161,9 +223,12 @@ export default function CampoDeResposta({
         name="texto"
         rows={1}
         value={texto}
-        onChange={(e) => setTexto(e.target.value)}
+        onChange={(e) => {
+          setTexto(e.target.value);
+          avisarQueDigita();
+        }}
         maxLength={2000}
-        placeholder="Digite uma mensagem…"
+        placeholder={nota ? "Anotação para a equipe…" : "Digite uma mensagem…"}
         onKeyDown={(evento) => {
           if (evento.key !== "Enter" || evento.shiftKey) return;
 
@@ -187,10 +252,12 @@ export default function CampoDeResposta({
 
       <button
         type="submit"
-        title="Enviar — ou tecle Enter"
-        aria-label="Enviar mensagem"
+        title={nota ? "Salvar nota — ou tecle Enter" : "Enviar — ou tecle Enter"}
+        aria-label={nota ? "Salvar nota interna" : "Enviar mensagem"}
         disabled={!texto.trim()}
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-destaque text-branco transition-opacity duration-300 disabled:opacity-30"
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-opacity duration-300 disabled:opacity-30 ${
+          nota ? "bg-amber-500 text-preto" : "bg-destaque text-branco"
+        }`}
       >
         <svg
           aria-hidden
@@ -206,5 +273,6 @@ export default function CampoDeResposta({
         </svg>
       </button>
     </form>
+    </div>
   );
 }

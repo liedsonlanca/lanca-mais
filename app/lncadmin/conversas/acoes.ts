@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { preparar, avisar, texto, inteiro } from "@/lib/painel";
-import { fecharConversa, gravarMensagem } from "@/lib/conversas";
+import { equipeDigitando, fecharConversa, gravarMensagem } from "@/lib/conversas";
 import { ESTADOS, barrar, guardarEstadoDaEquipe, liberar } from "@/lib/atendimento";
 
 // As ações da tela de conversas.
@@ -59,6 +59,38 @@ export async function responderNoChat(dados: FormData) {
   revalidatePath("/lncadmin/conversas");
   revalidatePath(`/lncadmin/conversas/${id}`);
   revalidatePath("/lncadmin");
+}
+
+/**
+ * Uma nota interna na conversa.
+ *
+ * Fica no fio, entre as mensagens, para quem pegar a conversa depois saber o
+ * que já foi combinado ("mandei proposta por e-mail", "liga depois das 18h").
+ * Nunca sai do painel: o visitante não recebe, o assistente não lê e o CRM
+ * não copia (ver o autor "nota" em lib/conversas.ts).
+ *
+ * Vale em qualquer estado, inclusive encerrada: anotar o desfecho de uma
+ * conversa fechada é justamente quando a nota mais serve.
+ */
+export async function anotarNaConversa(dados: FormData) {
+  await preparar();
+
+  const id = inteiro(dados, "id");
+  const nota = texto(dados, "texto").slice(0, 2000);
+
+  if (!id || !nota) {
+    await avisar("Escreva a nota antes de salvar.", "erro");
+    return;
+  }
+
+  await gravarMensagem(id, "nota", nota);
+  revalidatePath(`/lncadmin/conversas/${id}`);
+}
+
+/** Quem atende está digitando: acende o "digitando…" no chat do visitante. */
+export async function sinalizarDigitando(id: number) {
+  await preparar();
+  if (Number.isInteger(id) && id > 0) await equipeDigitando(id);
 }
 
 export async function encerrarConversa(dados: FormData) {

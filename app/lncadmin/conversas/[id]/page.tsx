@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
 import { horaDaAgencia } from "@/lib/horario";
-import { lerConversa } from "@/lib/conversas";
+import { equipeViu, lerConversa } from "@/lib/conversas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import CampoDeResposta from "@/components/admin/CampoDeResposta";
 import {
@@ -11,7 +11,10 @@ import {
   apagarConversa,
   barrarVisitante,
   liberarVisitante,
+  anotarNaConversa,
+  sinalizarDigitando,
 } from "../acoes";
+import SinaisDaConversa from "@/components/admin/SinaisDaConversa";
 import { conversaBarrada } from "@/lib/atendimento";
 import AcaoIrreversivel from "@/components/admin/AcaoIrreversivel";
 
@@ -35,6 +38,7 @@ const AUTORES = {
   cliente: { rotulo: "Visitante", classe: "text-tinta" },
   assistente: { rotulo: "Assistente", classe: "text-tinta/55" },
   equipe: { rotulo: "Equipe LANÇA+", classe: "text-destaque" },
+  nota: { rotulo: "Nota interna", classe: "text-amber-500" },
 } as const;
 
 const ESTADOS = {
@@ -108,6 +112,14 @@ export default async function AdminConversa({
           : estado.rotulo;
   const minha = conversa.estado === "equipe";
 
+  // Abrir a conversa é ler o que o visitante mandou: é isto que acende o
+  // "visto" do lado dele.
+  if (minha) await equipeViu(conversa.id);
+
+  const falas = mensagens.filter((m) => m.autor !== "nota");
+  const ultimaFala = falas[falas.length - 1];
+  const ultimoId = mensagens.reduce((maior, m) => Math.max(maior, m.id), 0);
+
   const soDigitos = conversa.contato.replace(/\D/g, "");
   const temTelefone = soDigitos.length >= 10;
 
@@ -153,6 +165,28 @@ export default async function AdminConversa({
               const autor = AUTORES[mensagem.autor];
               const daCasa = mensagem.autor !== "cliente";
 
+              // A nota interna no meio do fio, centrada e em outra cor: não
+              // é fala de nenhum dos lados.
+              if (mensagem.autor === "nota") {
+                return (
+                  <li key={mensagem.id} className="flex justify-center">
+                    <div className="max-w-[85%] rounded-xl border border-amber-500/30 bg-amber-400/10 px-3.5 py-2">
+                      <div className="flex items-baseline gap-2">
+                        <span className={`text-[0.7rem] font-medium ${autor.classe}`}>
+                          {autor.rotulo}
+                        </span>
+                        <span className="text-[0.65rem] text-tinta/30">
+                          {horaDaAgencia(mensagem.quando)} · só a equipe vê
+                        </span>
+                      </div>
+                      <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/75">
+                        {mensagem.texto}
+                      </p>
+                    </div>
+                  </li>
+                );
+              }
+
               /* Visitante a esquerda, agencia a direita.
 
                  E a convencao de todo aplicativo de conversa, e ela faz o
@@ -192,9 +226,21 @@ export default async function AdminConversa({
               rodapé — como em qualquer aplicativo de mensagem. Fora dele,
               como estava, era um segundo cartão disputando altura com o
               primeiro, e perdia: a conversa sumia. */}
-          {minha && (
-            <CampoDeResposta acao={responderNoChat} conversa={conversa.id} />
-          )}
+          <SinaisDaConversa
+            conversa={conversa.id}
+            ultimaConhecida={ultimoId}
+            nome={conversa.nome}
+            equipeFalouPorUltimo={ultimaFala?.autor === "equipe"}
+          />
+
+          {/* Com a conversa fora da equipe, o campo só anota. */}
+          <CampoDeResposta
+            acao={responderNoChat}
+            anotar={anotarNaConversa}
+            sinalizar={sinalizarDigitando}
+            conversa={conversa.id}
+            podeResponder={minha}
+          />
         </div>
 
         {!minha && (
