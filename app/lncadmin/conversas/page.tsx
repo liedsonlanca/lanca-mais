@@ -1,5 +1,9 @@
 import { painelLiberado } from "@/lib/admin";
 import { numerosDoAtendimento } from "@/lib/conversas";
+import { segredoTotp } from "@/lib/admin";
+import { sql } from "@/lib/db";
+import ApagarTodasAsConversas from "@/components/admin/ApagarTodasAsConversas";
+import { apagarTodasAsConversas } from "./acoes";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +16,17 @@ export const dynamic = "force-dynamic";
 export default async function ConversasSemEscolha() {
   if (!(await painelLiberado())) return null;
 
-  const n = await numerosDoAtendimento();
+  const [n, segredo, contagem] = await Promise.all([
+    numerosDoAtendimento(),
+    segredoTotp(),
+    sql
+      ? sql
+          .query("SELECT count(*)::int AS n FROM conversas", [])
+          .then((linhas) => linhas as Array<{ n: number }>)
+          .catch(() => [{ n: 0 }])
+      : Promise.resolve([{ n: 0 }]),
+  ]);
+  const total = contagem[0]?.n ?? 0;
 
   // Os números do mês, no lugar vazio da conversa não escolhida.
   //
@@ -97,6 +111,13 @@ export default async function ConversasSemEscolha() {
         </p>
       </div>
     </div>
+
+      {/* No fim, fechado numa gaveta: é a ação mais destrutiva do painel. */}
+      <ApagarTodasAsConversas
+        acao={apagarTodasAsConversas}
+        total={total}
+        temAutenticador={Boolean(segredo)}
+      />
     </div>
   );
 }

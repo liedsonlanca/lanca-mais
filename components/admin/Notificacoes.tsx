@@ -95,6 +95,16 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
   const [aberto, setAberto] = useState(false);
   const botao = useRef<HTMLButtonElement | null>(null);
 
+  // Esc fecha a lista, como fecha qualquer janelinha.
+  useEffect(() => {
+    if (!aberto) return;
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAberto(false);
+    };
+    document.addEventListener("keydown", aoTeclar);
+    return () => document.removeEventListener("keydown", aoTeclar);
+  }, [aberto]);
+
   // Onde a lista abre, medido no clique.
   //
   // Ela era `absolute` dentro da barra lateral — e a barra tem rolagem

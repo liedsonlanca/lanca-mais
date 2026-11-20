@@ -1,7 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { segredoTotp } from "@/lib/admin";
+import { codigoValido } from "@/lib/totp";
+import { limparTentativas, podeTentar, registrarFalha } from "@/lib/tentativas";
 import { after } from "next/server";
 import { avisarVisitantePorEmail } from "@/lib/email";
 import { lerEquipe } from "@/lib/conteudo";
@@ -291,4 +294,78 @@ export async function liberarVisitante(dados: FormData) {
   await avisar("Bloqueio desfeito. O visitante volta a conseguir escrever.");
 
   revalidatePath(`/lncadmin/conversas/${id}`);
+}
+
+/**
+ * Apaga TODAS as conversas, com mensagens, dados de contato e arquivos.
+ *
+ * ---------- Por que pede o código do autenticador ----------
+ *
+ * O painel tem uma senha só, que mais gente da equipe pode conhecer. Esta é
+ * a ação mais destrutiva dele, e quem decide usá-la é o dono: o código de
+ * seis dígitos sai do aplicativo autenticador do celular dele, e muda a cada
+ * trinta segundos. Sessão aberta esquecida num computador não basta.
+ *
+ * Sem a verificação em duas etapas ativa, a ação se recusa — sem código não
+ * há como saber quem está pedindo.
+ *
+ * Cinco tentativas por endereço a cada quinze minutos: seis dígitos se
+ * adivinham com paciência, e o freio tira a paciência de cena.
+ *
+ * Os bloqueios de visitante ficam: barrar alguém não é conversa, e apagar a
+ * lista reabriria a porta para quem foi barrado.
+ */
+export async function apagarTodasAsConversas(dados: FormData) {
+  const banco = await preparar();
+
+  const segredo = await segredoTotp();
+  if (!segredo) {
+    await avisar(
+      "Ative a verificação em duas etapas em Segurança para poder apagar tudo.",
+      "erro"
+    );
+    return;
+  }
+
+  const cabecalhos = await headers();
+  const origem =
+    cabecalhos.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    cabecalhos.get("x-real-ip") ||
+    "desconhecida";
+
+  if (!(await podeTentar("apagar-tudo", origem, 5)).permitido) {
+    await avisar("Muitas tentativas. Espere 15 minutos e tente de novo.", "erro");
+    return;
+  }
+
+  const codigo = texto(dados, "codigo").replace(/\D/g, "");
+  if (codigo.length !== 6 || !(await codigoValido(segredo, codigo))) {
+    await registrarFalha("apagar-tudo", origem);
+    await avisar("Código do autenticador incorreto. Nada foi apagado.", "erro");
+    return;
+  }
+  await limparTentativas("apagar-tudo", origem);
+
+  const anexos = (await banco.query(
+    "SELECT anexo_url FROM mensagens WHERE anexo_url <> ''",
+    []
+  )) as Array<{ anexo_url: string }>;
+
+  const apagadas = (await banco.query(
+    "DELETE FROM conversas RETURNING id",
+    []
+  )) as Array<{ id: number }>;
+
+  await Promise.all(anexos.map((a) => apagarArquivo(a.anexo_url)));
+
+  await avisar(
+    apagadas.length === 1
+      ? "1 conversa apagada, com mensagens, contatos e arquivos."
+      : `${apagadas.length} conversas apagadas, com mensagens, contatos e arquivos.`
+  );
+
+  revalidatePath("/lncadmin/conversas", "layout");
+  revalidatePath("/lncadmin/contatos");
+  revalidatePath("/lncadmin");
+  redirect("/lncadmin/conversas");
 }
