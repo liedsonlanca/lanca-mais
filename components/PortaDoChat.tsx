@@ -20,7 +20,10 @@ import { useSyncExternalStore } from "react";
 // lugar da página — e para essa pessoa o aviso não existe, então o chat não
 // aparece por cima.
 
-const TELAS_SEM_CHAT = ["/em-breve", "/manutencao"];
+// O painel também: o Chat devolvia nada lá dentro, mas só depois dos ganchos,
+// então seguia perguntando ao servidor e piscando o título da aba do painel
+// com a conversa de visitante guardada no mesmo navegador.
+const TELAS_SEM_CHAT = ["/em-breve", "/manutencao", "/lncadmin"];
 
 function temPrevia() {
   return document.cookie.split("; ").some((c) => c === "lanca_previa=1");
