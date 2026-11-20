@@ -1047,3 +1047,43 @@ export async function anexosDaConversa(conversa: number) {
   )) as Array<{ anexo_url: string }>;
   return linhas.map((l) => l.anexo_url);
 }
+
+/* ---------------- Prazo dos arquivos ---------------- */
+
+/**
+ * Por quanto tempo um arquivo do chat (imagem, PDF) fica guardado.
+ *
+ * Escolha da agência em 20/11/2026: arquivo de chat é coisa de momento — o
+ * print, a logo, a proposta — e quem precisa dele baixa na hora. Guardar
+ * documentos de clientes por mais tempo é risco sem uso. A mensagem continua
+ * no histórico, marcada como arquivo expirado, para o fio fazer sentido.
+ */
+const GUARDA_DE_ARQUIVOS = "5 days";
+
+export async function apagarArquivosVencidos() {
+  if (!sql) return 0;
+  try {
+    await garantirEsquema();
+    const linhas = (await sql.query(
+      `SELECT id, anexo_url FROM mensagens
+        WHERE anexo_url <> ''
+          AND criado_em < now() - interval '${GUARDA_DE_ARQUIVOS}'
+        LIMIT 500`,
+      []
+    )) as Array<{ id: number; anexo_url: string }>;
+    if (linhas.length === 0) return 0;
+
+    await Promise.all(linhas.map((l) => apagarArquivo(l.anexo_url)));
+
+    // "expirado" no lugar do tipo: a tela mostra o nome do arquivo e o aviso
+    // de que ele não está mais disponível, em vez de um link quebrado.
+    await sql.query(
+      `UPDATE mensagens SET anexo_url = '', anexo_tipo = 'expirado'
+        WHERE id = ANY($1::bigint[])`,
+      [linhas.map((l) => Number(l.id))]
+    );
+    return linhas.length;
+  } catch {
+    return 0;
+  }
+}

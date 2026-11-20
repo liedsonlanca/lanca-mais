@@ -1049,9 +1049,9 @@ export default function Chat() {
                     : "Equipe LANÇA+"}
                 </p>
               )}
-              {m.anexoUrl ? (
+              {m.anexoUrl || m.anexoTipo === "expirado" ? (
                 <AnexoDaMensagem
-                  url={m.anexoUrl}
+                  url={m.anexoUrl ?? ""}
                   tipo={m.anexoTipo ?? ""}
                   nome={m.texto}
                 />
@@ -1235,7 +1235,7 @@ export default function Chat() {
                 onClick={() => seletorDeArquivo.current?.click()}
                 disabled={enviandoArquivo}
                 aria-label="Enviar imagem ou PDF"
-                title="Enviar imagem ou PDF (até 4 MB)"
+                title="Enviar imagem ou PDF (até 4 MB, fica disponível por 5 dias)"
                 className="flex h-11 w-9 shrink-0 items-center justify-center rounded-xl text-tinta/50 transition-colors duration-300 hover:text-tinta disabled:opacity-40"
               >
                 {enviandoArquivo ? (

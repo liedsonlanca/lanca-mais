@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { apagarConversasAntigas, encerrarPorSilencio } from "@/lib/conversas";
+import {
+  apagarArquivosVencidos,
+  apagarConversasAntigas,
+  encerrarPorSilencio,
+} from "@/lib/conversas";
 
 // A faxina diária, chamada pela Vercel (ver vercel.json).
 //
@@ -9,7 +13,8 @@ import { apagarConversasAntigas, encerrarPorSilencio } from "@/lib/conversas";
 // encerramento normal pega carona no movimento do site, e uma conversa
 // esquecida num fim de semana sem visitas ficaria aberta até segunda — e
 // apaga as conversas encerradas há mais de um ano, como a Política de
-// Privacidade promete.
+// Privacidade promete. E apaga os arquivos do chat (imagens, PDFs) com mais
+// de 5 dias.
 //
 // ---------- Quem pode chamar ----------
 //
@@ -30,6 +35,7 @@ export async function GET(requisicao: Request) {
 
   const encerradas = await encerrarPorSilencio(true);
   const apagadas = await apagarConversasAntigas();
+  const arquivos = await apagarArquivosVencidos();
 
-  return NextResponse.json({ ok: true, encerradas, apagadas });
+  return NextResponse.json({ ok: true, encerradas, apagadas, arquivos });
 }

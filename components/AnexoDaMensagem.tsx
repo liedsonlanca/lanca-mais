@@ -14,6 +14,16 @@ export default function AnexoDaMensagem({
   tipo: string;
   nome: string;
 }) {
+  // Arquivo apagado pelo prazo de 5 dias (ver apagarArquivosVencidos).
+  if (tipo === "expirado" || !url) {
+    return (
+      <p className="flex items-center gap-2 rounded-xl border border-dashed border-contorno px-3 py-2 text-xs text-tinta/45">
+        <span className="min-w-0 truncate">{nome || "Arquivo"}</span>
+        <span className="shrink-0">· expirou (arquivos ficam 5 dias)</span>
+      </p>
+    );
+  }
+
   if (tipo.startsWith("image/")) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className="block">

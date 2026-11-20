@@ -244,7 +244,7 @@ export default function CampoDeResposta({
             }}
           />
           <Icone
-            titulo={enviandoArquivo ? "Enviando arquivo…" : "Anexar imagem ou PDF (até 4 MB)"}
+            titulo={enviandoArquivo ? "Enviando arquivo…" : "Anexar imagem ou PDF (até 4 MB, apagado depois de 5 dias)"}
             onClick={() => seletor.current?.click()}
             ativo={enviandoArquivo}
           >

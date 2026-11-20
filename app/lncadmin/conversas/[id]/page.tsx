@@ -216,10 +216,10 @@ export default async function AdminConversa({
                         {horaDaAgencia(mensagem.quando)}
                       </span>
                     </div>
-                    {mensagem.anexoUrl ? (
+                    {mensagem.anexoUrl || mensagem.anexoTipo === "expirado" ? (
                       <div className="mt-1.5">
                         <AnexoDaMensagem
-                          url={mensagem.anexoUrl}
+                          url={mensagem.anexoUrl ?? ""}
                           tipo={mensagem.anexoTipo ?? ""}
                           nome={mensagem.texto}
                         />

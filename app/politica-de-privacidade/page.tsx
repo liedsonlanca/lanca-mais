@@ -75,7 +75,8 @@ export default function PoliticaDePrivacidade() {
                 </strong>{" "}
                 — o seu nome, as mensagens da conversa e, se você quiser
                 atendimento da equipe, WhatsApp e e-mail. Também a nota e o
-                comentário, se você avaliar o atendimento.
+                comentário, se você avaliar o atendimento, e as imagens ou PDFs
+                que você enviar na conversa.
               </>,
               <>
                 <strong className="font-medium text-tinta">
@@ -237,7 +238,9 @@ export default function PoliticaDePrivacidade() {
             Mensagens de contato e conversas do chat ficam conosco enquanto
             durar a conversa comercial e, depois disso, pelo prazo necessário
             para cumprir obrigações legais. Passado esse prazo, são apagadas, e
-            você pode pedir antes que apaguemos a sua conversa. A contagem de
+            você pode pedir antes que apaguemos a sua conversa. Imagens e
+            arquivos enviados pelo chat são apagados automaticamente depois de
+            5 dias. A contagem de
             visitas não guarda nada que identifique você, e o código diário
             deixa de ter qualquer relação com o seu acesso no dia seguinte. Os dados de
             medição e marketing seguem os prazos de cada ferramenta, e param de
