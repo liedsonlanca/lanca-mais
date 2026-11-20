@@ -41,7 +41,7 @@ export default function PoliticaDeCookies() {
         lead="Uma lista honesta e curta, porque a lista é curta mesmo."
       />
 
-      <PaginaLegal atualizadoEm="4 de setembro de 2026">
+      <PaginaLegal atualizadoEm="20 de novembro de 2026">
         <Secao titulo="O que é um cookie">
           <p>
             É um pedacinho de informação que um site guarda no seu navegador
@@ -64,7 +64,9 @@ export default function PoliticaDeCookies() {
                   Acesso antecipado
                 </strong>{" "}
                 — lembra que você digitou a senha, enquanto o site ainda não
-                está aberto ao público. Dura 30 minutos parado.
+                está aberto ao público. Dura 30 minutos parado. Vem acompanhado
+                de um segundo aviso, que só diz &ldquo;sim&rdquo;, para o chat
+                saber que pode aparecer para você; ele vence junto.
               </>,
               <>
                 <strong className="font-medium text-tinta">
@@ -76,9 +78,43 @@ export default function PoliticaDeCookies() {
             ]}
           />
           <p>
-            Os dois guardam apenas um carimbo de tempo assinado. Não guardam a
-            senha, não guardam nome, não guardam e-mail.
+            Nenhum deles guarda a senha, o nome ou o e-mail: o de acesso e o
+            do painel guardam um carimbo de tempo assinado, e o aviso do chat
+            guarda só a palavra &ldquo;sim&rdquo;.
           </p>
+        </Secao>
+
+        <Secao titulo="O que fica guardado no navegador sem ser cookie">
+          <p>
+            Além dos cookies, o site usa o armazenamento local do navegador
+            para três lembretes. Eles ficam só no seu aparelho, não são
+            enviados a ninguém por conta própria e não acompanham você fora
+            daqui:
+          </p>
+          <Lista
+            itens={[
+              <>
+                <strong className="font-medium text-tinta">
+                  A sua escolha de cookies
+                </strong>{" "}
+                — para não perguntar de novo a cada página.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  A conversa aberta no chat
+                </strong>{" "}
+                — um código sorteado que liga o seu navegador à conversa, para
+                ela continuar se você mudar de página. Não contém o seu nome
+                nem as mensagens, e é apagado quando o atendimento termina.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  O som do chat
+                </strong>{" "}
+                — se você preferiu silenciar o aviso de mensagem nova.
+              </>,
+            ]}
+          />
         </Secao>
 
         <Secao titulo="Os que dependem de você">
@@ -111,8 +147,9 @@ export default function PoliticaDeCookies() {
             Cookie de sessão desaparece quando você fecha o navegador. Cookie
             persistente fica no aparelho até vencer o prazo dele ou até você
             apagar. Os dois nossos são persistentes, com prazo curto e
-            conferido no servidor: 30 minutos parado para a senha do site, e
-            uma jornada de trabalho para o painel.
+            conferido no servidor: 30 minutos parado para a senha do site (e
+            para o aviso do chat que vem com ela), e uma jornada de trabalho
+            para o painel.
           </p>
           <p>
             Os de medição e marketing seguem os prazos definidos pelo Google e
@@ -157,8 +194,8 @@ export default function PoliticaDeCookies() {
           />
           <p>
             Se bloquear tudo, o site continua funcionando. O que deixa de
-            funcionar é o acesso ao painel e a lembrança da senha de acesso
-            antecipado.
+            funcionar é o acesso ao painel, a lembrança da senha de acesso
+            antecipado e, nesse período, o chat para quem entrou pela senha.
           </p>
         </Secao>
 

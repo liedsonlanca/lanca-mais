@@ -22,7 +22,8 @@ export const dynamic = "force-dynamic";
 // Política de Privacidade.
 //
 // Descreve o que o site faz hoje, e não o que um modelo genérico costuma
-// prometer: o formulário de contato, os dois cookies necessários e os dois
+// prometer: o formulário de contato, o chat de atendimento (com o assistente
+// de IA), a contagem de visitas própria, os cookies necessários e os dois
 // rastreadores opcionais. Quando um novo tratamento de dados entrar no site,
 // esta página precisa entrar junto — documento desatualizado é pior do que
 // documento nenhum, porque afirma o que não é verdade.
@@ -37,7 +38,7 @@ export default function PoliticaDePrivacidade() {
         lead="O que coletamos, por quê, por quanto tempo, e como pedir para apagar."
       />
 
-      <PaginaLegal atualizadoEm="4 de setembro de 2026">
+      <PaginaLegal atualizadoEm="20 de novembro de 2026">
         <Secao titulo="Quem é o responsável">
           <p>
             {siteConfig.name}, inscrita no CNPJ {siteConfig.cnpj}, com endereço
@@ -56,7 +57,8 @@ export default function PoliticaDePrivacidade() {
         <Secao titulo="O que coletamos">
           <p>
             Navegar pelo site sem preencher nada e sem aceitar cookies não deixa
-            nenhum dado pessoal conosco.
+            conosco nada que diga quem você é: só a contagem de visitas descrita
+            abaixo, que não guarda endereço, nome nem cookie.
           </p>
           <Lista
             itens={[
@@ -66,6 +68,24 @@ export default function PoliticaDePrivacidade() {
                 </strong>{" "}
                 — nome, e-mail, telefone e a mensagem sobre o seu negócio. São
                 enviados por você, quando decide falar com a gente.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  O que você escreve no chat
+                </strong>{" "}
+                — o seu nome, as mensagens da conversa e, se você quiser
+                atendimento da equipe, WhatsApp e e-mail. Também a nota e o
+                comentário, se você avaliar o atendimento.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  Contagem de visitas
+                </strong>{" "}
+                — a página visitada e o site de onde você veio (só o domínio,
+                como &ldquo;instagram.com&rdquo;). Para contar pessoas e não
+                cliques, o servidor calcula um código a partir do endereço de
+                rede e do navegador, e descarta os dois na hora. Esse código
+                muda todo dia e não permite saber quem você é. Não usa cookie.
               </>,
               <>
                 <strong className="font-medium text-tinta">
@@ -86,7 +106,7 @@ export default function PoliticaDePrivacidade() {
         <Secao titulo="Com que base legal">
           <p>
             A Lei Geral de Proteção de Dados exige uma base legal para cada
-            tratamento. Aqui são três, e cada uma cobre uma coisa só:
+            tratamento. Aqui são quatro, e cada uma cobre uma coisa só:
           </p>
           <Lista
             itens={[
@@ -96,7 +116,16 @@ export default function PoliticaDePrivacidade() {
                 </strong>{" "}
                 (art. 7º, V) — para o que você escreve no formulário. Você pede
                 contato, nós respondemos e, se fizer sentido, apresentamos uma
-                proposta.
+                proposta. Vale também para a conversa no chat.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  Legítimo interesse
+                </strong>{" "}
+                (art. 7º, IX) — só para a contagem de visitas própria e para
+                proteger o chat de abuso. É o mínimo para saber se o site é
+                visitado e para barrar quem vem incomodar, sem cookie e sem
+                identificar ninguém.
               </>,
               <>
                 <strong className="font-medium text-tinta">Consentimento</strong>{" "}
@@ -111,16 +140,41 @@ export default function PoliticaDePrivacidade() {
             ]}
           />
           <p>
-            Não invocamos legítimo interesse para medir ou anunciar. É uma base
-            usada com frequência para isso, mas dispensaria o seu consentimento
-            justamente onde ele deveria valer, e a autoridade brasileira já
-            sinalizou que a leitura correta é a outra.
+            Não invocamos legítimo interesse para as ferramentas do Google e da
+            Meta. É uma base usada com frequência para isso, mas dispensaria o
+            seu consentimento justamente onde ele deveria valer, e a autoridade
+            brasileira já sinalizou que a leitura correta é a outra.
           </p>
           <p>
             Retirar o consentimento é tão simples quanto dar: o link{" "}
             <strong className="font-medium text-tinta">Gerenciar cookies</strong>{" "}
             no rodapé reabre a escolha.
           </p>
+        </Secao>
+
+        <Secao titulo="O chat e o assistente de IA">
+          <p>
+            O chat do site é atendido primeiro por um assistente de
+            inteligência artificial, que responde dúvidas sobre a{" "}
+            {siteConfig.name}. Quando você pede, ou quando o assunto pede, a
+            conversa passa para uma pessoa da equipe, que vê o que foi
+            conversado até ali para não fazer você repetir.
+          </p>
+          <Lista
+            itens={[
+              <>
+                Para responder, as mensagens da conversa são enviadas a um{" "}
+                <strong className="font-medium text-tinta">
+                  provedor de inteligência artificial
+                </strong>
+                , que as processa sob contrato e não as usa para treinar
+                modelos.
+              </>,
+              "Não escreva no chat senhas, dados de cartão, documentos ou informações de saúde. Nada disso é necessário para conversarmos.",
+              "Se a conversa ficar parada depois da nossa resposta, o assistente avisa antes e encerra o atendimento depois de 30 minutos. Depois de encerrada, o seu navegador esquece a conversa.",
+              "Quem usa o chat para ofender ou para spam pode ser impedido de continuar.",
+            ]}
+          />
         </Secao>
 
         <Secao titulo="Com quem compartilhamos">
@@ -138,6 +192,20 @@ export default function PoliticaDePrivacidade() {
                 — mantêm o site no ar e guardam as imagens e os vídeos do
                 portfólio. Eles operam a infraestrutura sob contrato, seguindo
                 as nossas instruções, e não usam nada disso para fins próprios.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  Provedor de inteligência artificial
+                </strong>{" "}
+                — recebe as mensagens do chat para gerar as respostas do
+                assistente, como descrito acima.
+              </>,
+              <>
+                <strong className="font-medium text-tinta">
+                  Sistema de gestão de clientes
+                </strong>{" "}
+                — recebe os pedidos do formulário, para a equipe dar
+                continuidade ao atendimento.
               </>,
               <>
                 <strong className="font-medium text-tinta">Google</strong> —
@@ -166,9 +234,12 @@ export default function PoliticaDePrivacidade() {
 
         <Secao titulo="Por quanto tempo guardamos">
           <p>
-            Mensagens de contato ficam conosco enquanto durar a conversa
-            comercial e, depois disso, pelo prazo necessário para cumprir
-            obrigações legais. Passado esse prazo, são apagadas. Os dados de
+            Mensagens de contato e conversas do chat ficam conosco enquanto
+            durar a conversa comercial e, depois disso, pelo prazo necessário
+            para cumprir obrigações legais. Passado esse prazo, são apagadas, e
+            você pode pedir antes que apaguemos a sua conversa. A contagem de
+            visitas não guarda nada que identifique você, e o código diário
+            deixa de ter qualquer relação com o seu acesso no dia seguinte. Os dados de
             medição e marketing seguem os prazos de cada ferramenta, e param de
             ser coletados assim que você retira o consentimento.
           </p>

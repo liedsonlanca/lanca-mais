@@ -42,7 +42,7 @@ export default function TermosDeUso() {
         lead="Curtas, porque o site é simples: ele apresenta o nosso trabalho e abre um canal de conversa."
       />
 
-      <PaginaLegal atualizadoEm="4 de setembro de 2026">
+      <PaginaLegal atualizadoEm="20 de novembro de 2026">
         <Secao titulo="Quem opera este site">
           <p>
             {siteConfig.name}, CNPJ {siteConfig.cnpj}, com sede em{" "}
@@ -99,6 +99,21 @@ export default function TermosDeUso() {
           </p>
         </Secao>
 
+        <Secao titulo="O chat">
+          <p>
+            O chat é atendido primeiro por um assistente de inteligência
+            artificial, e por uma pessoa da equipe quando você pede ou quando o
+            assunto pede. Ele existe para tirar dúvidas e encaminhar contato.
+          </p>
+          <Lista
+            itens={[
+              "As respostas do assistente são informativas e podem conter erros. Preço, prazo e escopo só valem quando confirmados pela equipe, em proposta",
+              "Use o chat para falar com a agência. Ofensas, spam ou tentativas de manipular o assistente podem levar ao bloqueio do acesso ao chat",
+              "Conversa parada é encerrada depois de 30 minutos sem resposta, com aviso antes. Para continuar, basta começar outra",
+            ]}
+          />
+        </Secao>
+
         <Secao titulo="Área de administração">
           <p>
             O site tem uma área restrita, usada pela equipe da{" "}
@@ -114,8 +129,8 @@ export default function TermosDeUso() {
 
         <Secao titulo="O que você nos envia">
           <p>
-            Ao preencher o formulário de contato, você declara que os dados são
-            seus e estão corretos. É o que nos permite responder ao lugar certo.
+            Ao preencher o formulário de contato ou se identificar no chat, você
+            declara que os dados são seus e estão corretos. É o que nos permite responder ao lugar certo.
           </p>
           <p>
             O que fazemos com esses dados está na{" "}

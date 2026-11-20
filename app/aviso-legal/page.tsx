@@ -50,7 +50,7 @@ export default function AvisoLegal() {
         lead="As condições de uso, e o que esperar do que está publicado aqui."
       />
 
-      <PaginaLegal atualizadoEm="4 de setembro de 2026">
+      <PaginaLegal atualizadoEm="20 de novembro de 2026">
         <Secao titulo="De quem é este site">
           <p>
             {siteConfig.name}, CNPJ {siteConfig.cnpj}, com sede em{" "}
@@ -76,6 +76,12 @@ export default function AvisoLegal() {
             neste site existem para explicar como pensamos e o que fazemos. Eles
             não são consultoria, nem parecer técnico, nem recomendação
             individual para o seu negócio.
+          </p>
+          <p>
+            O mesmo vale para as respostas do assistente de inteligência
+            artificial do chat: ele explica o que fazemos, mas pode errar, e o
+            que ele diz não é proposta nem compromisso. O que vale é o que a
+            equipe confirma, por escrito.
           </p>
           <p>
             Uma marca é um caso específico. O que vale para uma clínica de
