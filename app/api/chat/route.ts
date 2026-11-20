@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { avisarEquipe } from "@/lib/push";
+import { freioRapido } from "@/lib/freio-rapido";
 import { impressaoDoVisitante } from "@/lib/acessos";
 import { assistenteLigado, responder } from "@/lib/atendente";
 import {
@@ -277,6 +278,12 @@ export async function GET(requisicao: Request) {
   const chave = (searchParams.get("chave") ?? "").replace(/[^a-f0-9]/g, "");
   if (chave.length !== 32) {
     return NextResponse.json({ ok: false }, { status: 400 });
+  }
+
+  // O chat aberto pergunta a cada 3 s: 20 por minuto. 90 deixa folga para
+  // várias abas e corta o script que pergunta sem parar.
+  if (!freioRapido("chat-ler", origemDaRequisicao(requisicao), 90)) {
+    return NextResponse.json({ ok: false, motivo: "limite" }, { status: 429 });
   }
 
   // A faxina pega carona aqui: quem pergunta por mensagens novas ja esta

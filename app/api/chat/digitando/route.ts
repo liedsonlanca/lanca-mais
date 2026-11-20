@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { clienteDigitando } from "@/lib/conversas";
+import { freioRapido } from "@/lib/freio-rapido";
+import { origemDaRequisicao } from "@/lib/tentativas";
 
 // O visitante está digitando.
 //
@@ -8,11 +10,14 @@ import { clienteDigitando } from "@/lib/conversas";
 // "digitando…" no painel, e o que faz quem atende esperar a frase terminar
 // em vez de responder por cima.
 //
-// Sem freio por endereço: a chave é sorteada e impossível de adivinhar, o
-// pior que um abuso consegue é acender o próprio "digitando…", e a consulta
-// é um UPDATE por chave primária.
+// Freio em memória (lib/freio-rapido.ts): o chat manda no máximo 20 por
+// minuto; acima de 40 é script.
 
 export async function POST(requisicao: Request) {
+  if (!freioRapido("chat-digitando", origemDaRequisicao(requisicao), 40)) {
+    return new NextResponse(null, { status: 429 });
+  }
+
   let corpo: Record<string, unknown>;
   try {
     corpo = await requisicao.json();

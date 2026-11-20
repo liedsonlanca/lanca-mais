@@ -411,22 +411,36 @@ export default function Chat() {
   // pessoa abrisse o chat por conta própria — justamente o que ela não vai
   // fazer, porque nada a avisou.
   useEffect(() => {
-    // Chegou pelo link do e-mail: a conversa do link passa a ser a desta
-    // página, o chat abre sozinho e o código sai da barra de endereço (para
-    // não ficar no histórico nem ir junto num link copiado).
-    const doLink = new URLSearchParams(window.location.search)
-      .get("conversa")
-      ?.replace(/[^a-f0-9]/g, "");
-    if (doLink && doLink.length === 32) {
-      guardar(GUARDA, doLink);
-      guardar(GUARDA_CONVITE, "visto");
-      veioPorLink.current = true;
+    // Chegou pelo link do e-mail: o servidor confere a assinatura antes de
+    // o chat adotar a conversa do link (ver lib/assinatura.ts — sem isso,
+    // um link forjado faria a pessoa conversar dentro da conversa de um
+    // golpista). Os parâmetros saem da barra de endereço de qualquer jeito,
+    // para não ficarem no histórico nem irem junto num link copiado.
+    const busca = new URLSearchParams(window.location.search);
+    const doLink = busca.get("conversa");
+    if (doLink) {
+      const pedido = { conversa: doLink, t: busca.get("t") ?? "", v: busca.get("v") ?? "" };
       const limpa = new URL(window.location.href);
-      limpa.searchParams.delete("conversa");
+      for (const p of ["conversa", "t", "v"]) limpa.searchParams.delete(p);
       window.history.replaceState(null, "", limpa.toString());
-      // No quadro seguinte, e não no meio da montagem: abrir dispara a
-      // leitura da conversa, que precisa da chave já guardada acima.
-      requestAnimationFrame(() => setAberto(true));
+
+      void fetch("/api/chat/retomar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify(pedido),
+      })
+        .then((r) => r.json())
+        .then((r: { ok?: boolean }) => {
+          if (!r.ok) return;
+          // Zera o que havia de outra conversa nesta página antes de trocar.
+          limpar();
+          guardar(GUARDA, pedido.conversa);
+          guardar(GUARDA_CONVITE, "visto");
+          veioPorLink.current = true;
+          chave.current = pedido.conversa;
+          setAberto(true);
+        })
+        .catch(() => {});
     }
 
     chave.current = ler(GUARDA);

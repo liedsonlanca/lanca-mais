@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sql, garantirEsquema } from "@/lib/db";
 import {
   apagarArquivosVencidos,
   apagarConversasAntigas,
@@ -31,6 +32,34 @@ export async function GET(requisicao: Request) {
     requisicao.headers.get("authorization") !== `Bearer ${segredo}`
   ) {
     return new NextResponse(null, { status: 401 });
+  }
+
+  // No máximo uma faxina a cada 10 minutos, venha de onde vier.
+  //
+  // Sem CRON_SECRET a rota é pública, e quem a chamasse em laço faria o
+  // banco varrer mensagens e apagar arquivos sem parar. A reserva é um
+  // comando só (gravar se a última for velha), então duas chamadas juntas
+  // não passam as duas.
+  if (sql) {
+    await garantirEsquema();
+    const reservou = (await sql.query(
+      `INSERT INTO meta (chave, valor, em) VALUES ('faxina:ultima', '', now())
+       ON CONFLICT (chave) DO UPDATE SET em = now()
+         WHERE meta.em < now() - interval '10 minutes'
+       RETURNING chave`,
+      []
+    )) as Array<{ chave: string }>;
+    if (reservou.length === 0) {
+      return NextResponse.json({ ok: true, pulada: true });
+    }
+
+    // Os contadores do freio de tentativas vencem em 15 minutos, mas a
+    // linha ficava no banco para sempre — uma por endereço que já tentou
+    // algo. Um dia de folga e fora.
+    await sql.query(
+      "DELETE FROM meta WHERE chave LIKE 'tentativas:%' AND em < now() - interval '1 day'",
+      []
+    );
   }
 
   const encerradas = await encerrarPorSilencio(true);

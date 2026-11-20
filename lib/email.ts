@@ -1,5 +1,6 @@
 import { sql, garantirEsquema } from "@/lib/db";
 import { siteConfig } from "@/lib/site-config";
+import { assinarLinkDaConversa } from "@/lib/assinatura";
 
 // E-mail ao visitante quando a equipe responde e ele já saiu do chat.
 //
@@ -58,7 +59,12 @@ export async function avisarVisitantePorEmail(conversa: number, resposta: string
     if (!alvo) return;
 
     const primeiro = alvo.nome.split(/\s+/)[0] || "Olá";
-    const link = `${siteConfig.url.replace(/\/$/, "")}/?conversa=${alvo.chave}`;
+    // Link assinado: só ele reabre a conversa (ver lib/assinatura.ts).
+    const assinado = await assinarLinkDaConversa(alvo.chave);
+    if (!assinado) return;
+    const link =
+      `${siteConfig.url.replace(/\/$/, "")}/?` +
+      new URLSearchParams(assinado).toString();
     const assinatura = quem ? `${quem}, da ${siteConfig.name}` : `Equipe ${siteConfig.name}`;
 
     const html = `
