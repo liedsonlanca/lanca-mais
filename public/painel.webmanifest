@@ -1,0 +1,12 @@
+{
+  "name": "Painel LANÇA+",
+  "short_name": "LANÇA+",
+  "start_url": "/lncadmin/conversas",
+  "scope": "/lncadmin",
+  "display": "standalone",
+  "background_color": "#131211",
+  "theme_color": "#131211",
+  "icons": [
+    { "src": "/painel-icone.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

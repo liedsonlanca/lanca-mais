@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { RESPOSTAS_PRONTAS } from "@/lib/respostas-prontas";
 
 // A barra de mensagem, no formato de aplicativo de conversa.
@@ -84,6 +85,32 @@ export default function CampoDeResposta({
   );
   const nota = modo === "nota" || !podeResponder;
   const ultimoSinal = useRef(0);
+  const seletor = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
+  const [enviandoArquivo, setEnviandoArquivo] = useState(false);
+  const [erroArquivo, setErroArquivo] = useState("");
+
+  /** Manda um arquivo direto à rota de anexos, e recarrega o fio. */
+  async function anexar(arquivo: File) {
+    setErroArquivo("");
+    setEnviandoArquivo(true);
+    try {
+      const dados = new FormData();
+      dados.set("arquivo", arquivo);
+      const resposta = await fetch(`/api/lncadmin/conversas/${conversa}/anexo`, {
+        method: "POST",
+        body: dados,
+      });
+      const corpo = (await resposta.json().catch(() => ({}))) as { erro?: string };
+      if (!resposta.ok) setErroArquivo(corpo.erro ?? "O arquivo não foi.");
+      else router.refresh();
+    } catch {
+      setErroArquivo("O arquivo não foi. Tente de novo.");
+    } finally {
+      setEnviandoArquivo(false);
+      if (seletor.current) seletor.current.value = "";
+    }
+  }
 
   function avisarQueDigita() {
     if (nota) return;
@@ -144,6 +171,11 @@ export default function CampoDeResposta({
       >
         Nota interna
       </button>
+      {erroArquivo && (
+        <span role="alert" className="self-center pl-1 text-[0.65rem] text-destaque">
+          {erroArquivo}
+        </span>
+      )}
       {nota && (
         <span className="self-center pl-1 text-[0.65rem] text-tinta/40">
           Só a equipe vê.
@@ -196,6 +228,39 @@ export default function CampoDeResposta({
               ))}
             </div>
           </div>
+        </>
+      )}
+
+      {!nota && (
+        <>
+          <input
+            ref={seletor}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            className="hidden"
+            onChange={(e) => {
+              const arquivo = e.target.files?.[0];
+              if (arquivo) void anexar(arquivo);
+            }}
+          />
+          <Icone
+            titulo={enviandoArquivo ? "Enviando arquivo…" : "Anexar imagem ou PDF (até 4 MB)"}
+            onClick={() => seletor.current?.click()}
+            ativo={enviandoArquivo}
+          >
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+            >
+              <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+            </svg>
+          </Icone>
         </>
       )}
 

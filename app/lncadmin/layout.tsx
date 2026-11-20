@@ -15,6 +15,10 @@ import { imagem } from "@/lib/imagens";
 export const metadata: Metadata = {
   title: "Painel",
   robots: { index: false, follow: false },
+  // O painel pode ser instalado na tela de início, como aplicativo. No
+  // iPhone é a condição para receber os avisos do chat (push).
+  manifest: "/painel.webmanifest",
+  appleWebApp: { capable: true, title: "LANÇA+", statusBarStyle: "black" },
 };
 
 // O painel não é o site: cabeçalho, rodapé e botão do WhatsApp somem, pela

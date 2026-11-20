@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { avisarEquipe } from "@/lib/push";
 import { impressaoDoVisitante } from "@/lib/acessos";
 import { registrarEvento } from "@/lib/eventos";
 import {
@@ -148,6 +149,15 @@ export async function POST(requisicao: Request) {
     "assistente",
     `Obrigado, ${nomeFinal.split(/\s+/)[0]}. ${quando} por aqui ou no seu ` +
       `WhatsApp. Se quiser adiantar, pode escrever sua dúvida abaixo.`
+  );
+
+  after(() =>
+    avisarEquipe({
+      titulo: `${nomeFinal.split(/\s+/)[0]} deixou o contato no chat`,
+      texto: `WhatsApp ${whatsapp} · ${email}`,
+      url: `/lncadmin/conversas/${conversa.id}`,
+      tag: `conversa-${conversa.id}`,
+    })
   );
 
   await registrarEvento({

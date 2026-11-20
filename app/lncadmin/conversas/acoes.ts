@@ -1,9 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { after } from "next/server";
+import { avisarVisitantePorEmail } from "@/lib/email";
+import { lerEquipe } from "@/lib/conteudo";
+import { COOKIE_ATENDENTE, atendenteAtual } from "@/lib/quem-atende";
+import { apagarArquivo } from "@/lib/upload";
 import { redirect } from "next/navigation";
 import { preparar, avisar, texto, inteiro } from "@/lib/painel";
-import { equipeDigitando, fecharConversa, gravarMensagem } from "@/lib/conversas";
+import { anexosDaConversa, equipeDigitando, fecharConversa, gravarMensagem } from "@/lib/conversas";
 import { ESTADOS, barrar, guardarEstadoDaEquipe, liberar } from "@/lib/atendimento";
 
 // As ações da tela de conversas.
@@ -12,6 +18,26 @@ import { ESTADOS, barrar, guardarEstadoDaEquipe, liberar } from "@/lib/atendimen
 // ação de servidor é um endereço que aceita POST de qualquer lugar, e o
 // portão do layout do painel só decide o que a tela mostra — não impede a
 // ação de rodar. Quem guarda é esta linha.
+
+export async function escolherAtendente(dados: FormData) {
+  await preparar();
+  const nome = texto(dados, "nome");
+  const equipe = await lerEquipe();
+  const loja = await cookies();
+
+  if (nome && equipe.some((p) => p.nome === nome)) {
+    loja.set(COOKIE_ATENDENTE, nome, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+  } else {
+    loja.delete(COOKIE_ATENDENTE);
+  }
+  revalidatePath("/lncadmin/conversas", "layout");
+}
 
 export async function responderNoChat(dados: FormData) {
   const banco = await preparar();
@@ -46,7 +72,12 @@ export async function responderNoChat(dados: FormData) {
     return;
   }
 
-  await gravarMensagem(id, "equipe", resposta);
+  const quem = await atendenteAtual();
+  await gravarMensagem(id, "equipe", resposta, { autorNome: quem });
+
+  // Se a pessoa já saiu do chat, a resposta vai também por e-mail (quando o
+  // envio estiver configurado; ver lib/email.ts).
+  after(() => avisarVisitantePorEmail(id, resposta, quem.split(/\s+/)[0] ?? ""));
 
   // A conversa volta a "equipe" mesmo se estava fechada: respondê-la é
   // reabri-la, e deixar como fechada faria a próxima mensagem da pessoa cair
@@ -200,7 +231,11 @@ export async function apagarConversa(dados: FormData) {
   const id = inteiro(dados, "id");
   if (!id) return;
 
+  // Os arquivos anexados vão junto: apagar a conversa e deixar a logo ou o
+  // documento do cliente no armazenamento não seria apagar os dados dele.
+  const anexos = await anexosDaConversa(id);
   await banco.query("DELETE FROM conversas WHERE id = $1", [id]);
+  await Promise.all(anexos.map((url) => apagarArquivo(url)));
   await avisar("Conversa e dados apagados.");
 
   revalidatePath("/lncadmin/conversas");

@@ -1,4 +1,5 @@
 import { sql, garantirEsquema } from "@/lib/db";
+import { apagarArquivo } from "@/lib/upload";
 
 // O chat do site, do lado do banco.
 //
@@ -37,6 +38,11 @@ export type Mensagem = {
   autor: Autor;
   texto: string;
   quando: string;
+  /** Quem da equipe escreveu; vazio para as demais. */
+  autorNome?: string;
+  /** Endereço do arquivo anexado, e o tipo dele. Vazios sem anexo. */
+  anexoUrl?: string;
+  anexoTipo?: string;
 };
 
 export type Conversa = {
@@ -51,6 +57,8 @@ export type Conversa = {
   comentario: string;
   /** "equipe", "inatividade", ou vazio enquanto aberta. */
   fechadaPor: string;
+  /** Quem da equipe pegou a conversa, ou vazio. */
+  responsavel?: string;
   criadoEm: string;
   mexidoEm: string;
 };
@@ -143,16 +151,24 @@ export async function acharOuAbrir(chave: string, visitante: string) {
 export async function gravarMensagem(
   conversa: number,
   autor: Autor,
-  texto: string
+  texto: string,
+  extras: { autorNome?: string; anexoUrl?: string; anexoTipo?: string } = {}
 ) {
   if (!sql) return 0;
   await garantirEsquema();
 
   const linhas = (await sql.query(
-    `INSERT INTO mensagens (conversa, autor, texto)
-          VALUES ($1, $2, $3)
+    `INSERT INTO mensagens (conversa, autor, texto, autor_nome, anexo_url, anexo_tipo)
+          VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id`,
-    [conversa, autor, texto.slice(0, 2000)]
+    [
+      conversa,
+      autor,
+      texto.slice(0, 2000),
+      (extras.autorNome ?? "").slice(0, 80),
+      extras.anexoUrl ?? "",
+      extras.anexoTipo ?? "",
+    ]
   )) as Array<{ id: number }>;
 
   // A nota interna não mexe no relógio: ela não é fala com o visitante, e
@@ -166,9 +182,13 @@ export async function gravarMensagem(
       [conversa]
     );
   } else if (autor === "equipe") {
+    // O primeiro a responder vira o responsável pela conversa.
     await sql.query(
-      "UPDATE conversas SET mexido_em = now(), equipe_digitando_em = NULL WHERE id = $1",
-      [conversa]
+      `UPDATE conversas
+          SET mexido_em = now(), equipe_digitando_em = NULL,
+              responsavel = CASE WHEN responsavel = '' THEN $2 ELSE responsavel END
+        WHERE id = $1`,
+      [conversa, (extras.autorNome ?? "").slice(0, 80)]
     );
   } else if (autor !== "nota") {
     await sql.query("UPDATE conversas SET mexido_em = now() WHERE id = $1", [
@@ -202,14 +222,22 @@ export async function historico(
   // crescente devolveria as primeiras da conversa, que são justamente as que
   // menos importam para a próxima resposta.
   const linhas = (await sql.query(
-    `SELECT id, autor, texto, ${QUANDO} AS quando
+    `SELECT id, autor, texto, ${QUANDO} AS quando, autor_nome, anexo_url, anexo_tipo
        FROM mensagens
       WHERE conversa = $1
         AND ($3 OR autor <> 'nota')
       ORDER BY id DESC
       LIMIT $2`,
     [conversa, limite, comNotas]
-  )) as Array<{ id: number; autor: string; texto: string; quando: string }>;
+  )) as Array<{
+    id: number;
+    autor: string;
+    texto: string;
+    quando: string;
+    autor_nome: string;
+    anexo_url: string;
+    anexo_tipo: string;
+  }>;
 
   return linhas
     .map((l) => ({
@@ -217,6 +245,9 @@ export async function historico(
       autor: autorValido(l.autor),
       texto: l.texto,
       quando: l.quando,
+      autorNome: l.autor_nome ?? "",
+      anexoUrl: l.anexo_url ?? "",
+      anexoTipo: l.anexo_tipo ?? "",
     }))
     .reverse() satisfies Mensagem[];
 }
@@ -257,7 +288,7 @@ export async function mensagensDepois(
   }
 
   const linhas = (await sql.query(
-    `SELECT m.id, m.autor, m.texto,
+    `SELECT m.id, m.autor, m.texto, m.autor_nome, m.anexo_url, m.anexo_tipo,
             to_char(m.criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS quando,
             c.estado,
             (c.nome <> '' AND c.contato <> '' AND c.email <> '') AS tem_ficha,
@@ -280,6 +311,9 @@ export async function mensagensDepois(
     autor: string | null;
     texto: string | null;
     quando: string | null;
+    autor_nome: string | null;
+    anexo_url: string | null;
+    anexo_tipo: string | null;
     estado: string;
     tem_ficha: boolean;
     tem_nome: boolean;
@@ -297,6 +331,9 @@ export async function mensagensDepois(
       autor: autorValido(l.autor ?? ""),
       texto: l.texto ?? "",
       quando: l.quando ?? "",
+      autorNome: l.autor_nome ?? "",
+      anexoUrl: l.anexo_url ?? "",
+      anexoTipo: l.anexo_tipo ?? "",
     }));
 
   return {
@@ -538,7 +575,7 @@ export async function lerConversa(id: number) {
     const [cabeca, mensagens] = await Promise.all([
       sql.query(
         `SELECT id, chave, nome, contato, email, estado, nota, comentario, fechada_por,
-                ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em
+                responsavel, ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em
            FROM conversas WHERE id = $1`,
         [id]
       ),
@@ -559,6 +596,7 @@ export async function lerConversa(id: number) {
         nota: linha.nota == null ? null : Number(linha.nota),
         comentario: String(linha.comentario ?? ""),
         fechadaPor: String(linha.fechada_por ?? ""),
+        responsavel: String(linha.responsavel ?? ""),
         criadoEm: String(linha.criado_em),
         mexidoEm: String(linha.mexido_em),
       } satisfies Conversa,
@@ -976,6 +1014,17 @@ export async function apagarConversasAntigas() {
   if (!sql) return 0;
   try {
     await garantirEsquema();
+    // Os anexos primeiro: depois do DELETE as mensagens somem por cascata, e
+    // com elas o único registro de onde os arquivos estão.
+    const anexos = (await sql.query(
+      `SELECT m.anexo_url FROM mensagens m JOIN conversas c ON c.id = m.conversa
+        WHERE c.estado = 'fechada'
+          AND c.mexido_em < now() - interval '${GUARDA_DE_CONVERSAS}'
+          AND m.anexo_url <> ''`,
+      []
+    )) as Array<{ anexo_url: string }>;
+    await Promise.all(anexos.map((a) => apagarArquivo(a.anexo_url)));
+
     const linhas = (await sql.query(
       `DELETE FROM conversas
         WHERE estado = 'fechada'
@@ -987,4 +1036,14 @@ export async function apagarConversasAntigas() {
   } catch {
     return 0;
   }
+}
+
+/** Os anexos de uma conversa, para apagar os arquivos junto com ela. */
+export async function anexosDaConversa(conversa: number) {
+  if (!sql) return [] as string[];
+  const linhas = (await sql.query(
+    "SELECT anexo_url FROM mensagens WHERE conversa = $1 AND anexo_url <> ''",
+    [conversa]
+  )) as Array<{ anexo_url: string }>;
+  return linhas.map((l) => l.anexo_url);
 }

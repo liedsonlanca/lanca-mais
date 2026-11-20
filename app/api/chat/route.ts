@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { avisarEquipe } from "@/lib/push";
 import { impressaoDoVisitante } from "@/lib/acessos";
 import { assistenteLigado, responder } from "@/lib/atendente";
 import {
@@ -156,7 +157,21 @@ export async function POST(requisicao: Request) {
   // Voltar a responder depois de a pessoa pedir atendimento humano é o
   // comportamento mais irritante que um chat desses tem — ela já disse que
   // quer gente.
+  const quem = (conversa.nome || nomeDito || "Visitante").split(/\s+/)[0];
+
   if (conversa.estado === "equipe") {
+    // Avisa o celular da equipe, depois de responder ao visitante: o envio
+    // do push leva centenas de milissegundos e não precisa segurar o chat.
+    // A tag por conversa faz mensagens seguidas atualizarem um aviso só.
+    after(() =>
+      avisarEquipe({
+        titulo: `${quem} escreveu no chat`,
+        texto: pergunta,
+        url: `/lncadmin/conversas/${conversa.id}`,
+        tag: `conversa-${conversa.id}`,
+      })
+    );
+
     return NextResponse.json({
       ok: true,
       chave: conversa.chave,
@@ -216,6 +231,15 @@ export async function POST(requisicao: Request) {
       const id = await gravarMensagem(conversa.id, "assistente", fala);
       await passarParaEquipe(conversa.id);
       estado = "equipe";
+
+      after(() =>
+        avisarEquipe({
+          titulo: `${quem} quer falar com a equipe`,
+          texto: pergunta,
+          url: `/lncadmin/conversas/${conversa.id}`,
+          tag: `conversa-${conversa.id}`,
+        })
+      );
       resposta = {
         id,
         autor: "assistente",

@@ -339,6 +339,26 @@ const EVOLUCOES = [
   // segundos seguintes ao último toque no teclado, e um booleano ficaria
   // ligado para sempre quando a pessoa fecha a aba no meio da frase. Com o
   // horário, quem lê decide o que é "agora" (seis segundos).
+  // Os aparelhos da equipe que aceitaram receber aviso (notificação push).
+  // Um por navegador; o endereço é dado pelo serviço de push do navegador e
+  // é a chave natural. Aparelho que deixou de existir é apagado no primeiro
+  // envio que falhar com 404/410.
+  `CREATE TABLE IF NOT EXISTS aparelhos_push (
+     endereco   TEXT PRIMARY KEY,
+     p256dh     TEXT NOT NULL,
+     auth       TEXT NOT NULL,
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
+  // Quem da equipe escreveu a mensagem, para o visitante ver "Liédson ·
+  // LANÇA+" em vez de uma equipe sem rosto; e o anexo, quando houver.
+  `ALTER TABLE mensagens ADD COLUMN IF NOT EXISTS autor_nome TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE mensagens ADD COLUMN IF NOT EXISTS anexo_url TEXT NOT NULL DEFAULT ''`,
+  `ALTER TABLE mensagens ADD COLUMN IF NOT EXISTS anexo_tipo TEXT NOT NULL DEFAULT ''`,
+  // Quem da equipe pegou a conversa (o primeiro a responder).
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS responsavel TEXT NOT NULL DEFAULT ''`,
+  // Quando o visitante foi avisado por e-mail de resposta nova, para não
+  // mandar um e-mail a cada mensagem da equipe.
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS avisado_por_email_em TIMESTAMPTZ`,
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS cliente_digitando_em TIMESTAMPTZ`,
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS equipe_digitando_em TIMESTAMPTZ`,
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS cliente_viu_em TIMESTAMPTZ`,

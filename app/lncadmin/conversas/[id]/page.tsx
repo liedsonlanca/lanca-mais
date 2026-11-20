@@ -15,6 +15,7 @@ import {
   sinalizarDigitando,
 } from "../acoes";
 import SinaisDaConversa from "@/components/admin/SinaisDaConversa";
+import AnexoDaMensagem from "@/components/AnexoDaMensagem";
 import { conversaBarrada } from "@/lib/atendimento";
 import AcaoIrreversivel from "@/components/admin/AcaoIrreversivel";
 
@@ -207,15 +208,27 @@ export default async function AdminConversa({
                   >
                     <div className="flex items-baseline gap-2">
                       <span className={`text-[0.7rem] font-medium ${autor.classe}`}>
-                        {autor.rotulo}
+                        {mensagem.autor === "equipe" && mensagem.autorNome
+                          ? `${mensagem.autorNome.split(/\s+/)[0]} · Equipe`
+                          : autor.rotulo}
                       </span>
                       <span className="text-[0.65rem] text-tinta/30">
                         {horaDaAgencia(mensagem.quando)}
                       </span>
                     </div>
-                    <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/80">
-                      {mensagem.texto}
-                    </p>
+                    {mensagem.anexoUrl ? (
+                      <div className="mt-1.5">
+                        <AnexoDaMensagem
+                          url={mensagem.anexoUrl}
+                          tipo={mensagem.anexoTipo ?? ""}
+                          nome={mensagem.texto}
+                        />
+                      </div>
+                    ) : (
+                      <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/80">
+                        {mensagem.texto}
+                      </p>
+                    )}
                   </div>
                 </li>
               );
@@ -305,6 +318,7 @@ export default async function AdminConversa({
             valor={conversa.email}
             href={conversa.email ? `mailto:${conversa.email}` : undefined}
           />
+          <Dado rotulo="Responsável" valor={conversa.responsavel ?? ""} />
           <Dado rotulo="Começou" valor={horaDaAgencia(conversa.criadoEm)} />
 
           {conversa.nota !== null && (

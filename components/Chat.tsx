@@ -11,6 +11,7 @@ import {
 } from "react";
 import { assinarSom, guardarSom, somLigado, tocar } from "@/lib/som";
 import { siteConfig } from "@/lib/site-config";
+import AnexoDaMensagem from "@/components/AnexoDaMensagem";
 
 // O chat do site.
 //
@@ -44,6 +45,10 @@ type Mensagem = {
   texto: string;
   /** Quando foi gravada, em ISO. Ausente na saudação, que não é gravada. */
   quando?: string;
+  /** Quem da equipe escreveu. */
+  autorNome?: string;
+  anexoUrl?: string;
+  anexoTipo?: string;
 };
 
 /** A hora da mensagem, no relógio de quem lê. */
@@ -211,6 +216,17 @@ export default function Chat() {
   /** Se esta carga de página já leu a conversa do servidor uma vez. */
   const jaCarregou = useRef(false);
 
+  /**
+   * A conversa veio pelo link do e-mail ("Continuar a conversa"). Aí a
+   * pessoa quer ver a resposta, mesmo que o atendimento já tenha encerrado
+   * enquanto ela estava fora — a regra de recomeçar do zero não vale.
+   */
+  const veioPorLink = useRef(false);
+
+  const seletorDeArquivo = useRef<HTMLInputElement | null>(null);
+  const [enviandoArquivo, setEnviandoArquivo] = useState(false);
+  const [erroArquivo, setErroArquivo] = useState("");
+
   /** Quando o "digitando…" foi mandado pela última vez. */
   const ultimoSinal = useRef(0);
 
@@ -327,7 +343,7 @@ export default function Chat() {
        * com o chat aberto na frente da pessoa, ela vê o aviso e a avaliação,
        * que é o certo.
        */
-      if (primeiraLeitura && dados.estado === "fechada") {
+      if (primeiraLeitura && dados.estado === "fechada" && !veioPorLink.current) {
         limpar();
         return;
       }
@@ -395,6 +411,24 @@ export default function Chat() {
   // pessoa abrisse o chat por conta própria — justamente o que ela não vai
   // fazer, porque nada a avisou.
   useEffect(() => {
+    // Chegou pelo link do e-mail: a conversa do link passa a ser a desta
+    // página, o chat abre sozinho e o código sai da barra de endereço (para
+    // não ficar no histórico nem ir junto num link copiado).
+    const doLink = new URLSearchParams(window.location.search)
+      .get("conversa")
+      ?.replace(/[^a-f0-9]/g, "");
+    if (doLink && doLink.length === 32) {
+      guardar(GUARDA, doLink);
+      guardar(GUARDA_CONVITE, "visto");
+      veioPorLink.current = true;
+      const limpa = new URL(window.location.href);
+      limpa.searchParams.delete("conversa");
+      window.history.replaceState(null, "", limpa.toString());
+      // No quadro seguinte, e não no meio da montagem: abrir dispara a
+      // leitura da conversa, que precisa da chave já guardada acima.
+      requestAnimationFrame(() => setAberto(true));
+    }
+
     chave.current = ler(GUARDA);
 
     // Dados de contato que versões antigas do chat deixavam guardados.
@@ -542,6 +576,39 @@ export default function Chat() {
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({ chave: chave.current }),
     }).catch(() => {});
+  }
+
+  /** Manda uma imagem ou PDF. Só com a equipe na conversa. */
+  async function anexar(arquivo: File) {
+    if (!chave.current) return;
+    setErroArquivo("");
+    if (arquivo.size > 4 * 1024 * 1024) {
+      setErroArquivo("Arquivo grande demais. O limite é 4 MB.");
+      return;
+    }
+    setEnviandoArquivo(true);
+    try {
+      const dados = new FormData();
+      dados.set("chave", chave.current);
+      dados.set("arquivo", arquivo);
+      const resposta = await fetch("/api/chat/anexo", { method: "POST", body: dados });
+      const corpo = (await resposta.json().catch(() => ({}))) as {
+        ok?: boolean;
+        erro?: string;
+        mensagem?: Mensagem;
+      };
+      if (!resposta.ok || !corpo.ok) {
+        setErroArquivo(corpo.erro ?? "O arquivo não foi. Tente de novo.");
+        return;
+      }
+      if (corpo.mensagem) juntar([corpo.mensagem]);
+      setVistoPelaEquipe(false);
+    } catch {
+      setErroArquivo("O arquivo não foi. Tente de novo.");
+    } finally {
+      setEnviandoArquivo(false);
+      if (seletorDeArquivo.current) seletorDeArquivo.current.value = "";
+    }
   }
 
   /** O visitante encerra a conversa: vem a avaliação, depois o recomeço. */
@@ -976,12 +1043,23 @@ export default function Chat() {
             >
               {m.autor === "equipe" && (
                 <p className="mb-1 text-[0.7rem] font-medium text-destaque">
-                  Equipe LANÇA+
+                  {/* Com nome, a resposta tem rosto: "Liédson · LANÇA+". */}
+                  {m.autorNome
+                    ? `${m.autorNome.split(/\s+/)[0]} · LANÇA+`
+                    : "Equipe LANÇA+"}
                 </p>
               )}
-              <p className="whitespace-pre-line text-sm leading-relaxed text-tinta/85">
-                {m.texto}
-              </p>
+              {m.anexoUrl ? (
+                <AnexoDaMensagem
+                  url={m.anexoUrl}
+                  tipo={m.anexoTipo ?? ""}
+                  nome={m.texto}
+                />
+              ) : (
+                <p className="whitespace-pre-line text-sm leading-relaxed text-tinta/85">
+                  {m.texto}
+                </p>
+              )}
 
               {/* A hora, e o "visto" na última mensagem da pessoa.
 
@@ -1130,8 +1208,56 @@ export default function Chat() {
       ) : (
         <form
           onSubmit={enviar}
-          className="flex items-center gap-2 border-t border-contorno px-3 py-3"
+          className="flex flex-wrap items-center gap-2 border-t border-contorno px-3 py-3"
         >
+          {erroArquivo && (
+            <p role="alert" className="w-full px-1 text-xs text-destaque">
+              {erroArquivo}
+            </p>
+          )}
+
+          {/* O clipe só com a equipe na conversa: arquivo é para gente ver,
+              e o assistente não lê imagem nem PDF. */}
+          {estado === "equipe" && (
+            <>
+              <input
+                ref={seletorDeArquivo}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const arquivo = e.target.files?.[0];
+                  if (arquivo) void anexar(arquivo);
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => seletorDeArquivo.current?.click()}
+                disabled={enviandoArquivo}
+                aria-label="Enviar imagem ou PDF"
+                title="Enviar imagem ou PDF (até 4 MB)"
+                className="flex h-11 w-9 shrink-0 items-center justify-center rounded-xl text-tinta/50 transition-colors duration-300 hover:text-tinta disabled:opacity-40"
+              >
+                {enviandoArquivo ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-tinta/30 border-t-tinta/80" />
+                ) : (
+                  <svg
+                    aria-hidden
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                  >
+                    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                  </svg>
+                )}
+              </button>
+            </>
+          )}
+
           <input
             ref={campo}
             value={rascunho}

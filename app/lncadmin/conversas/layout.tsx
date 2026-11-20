@@ -5,7 +5,11 @@ import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import ListaDeConversas from "@/components/admin/ListaDeConversas";
 import SeletorDeAtendimento from "@/components/admin/SeletorDeAtendimento";
 import { ESTADOS, lerEstadoDaEquipe } from "@/lib/atendimento";
-import { definirEstadoDaEquipe } from "./acoes";
+import { definirEstadoDaEquipe, escolherAtendente } from "./acoes";
+import SeletorDeAtendente from "@/components/admin/SeletorDeAtendente";
+import AvisosNoAparelho from "@/components/admin/AvisosNoAparelho";
+import { lerEquipe } from "@/lib/conteudo";
+import { atendenteAtual } from "@/lib/quem-atende";
 
 export const dynamic = "force-dynamic";
 
@@ -33,9 +37,11 @@ export default async function LayoutDasConversas({
   // encerrarPorSilencio: abrir a tela é o que encerra as conversas mortas).
   await encerrarPorSilencio();
 
-  const [conversas, estadoDaEquipe] = await Promise.all([
+  const [conversas, estadoDaEquipe, equipe, atendente] = await Promise.all([
     listarConversas(),
     lerEstadoDaEquipe(),
+    lerEquipe(),
+    atendenteAtual(),
   ]);
   const noExpediente = equipeNoExpediente();
 
@@ -79,6 +85,17 @@ export default async function LayoutDasConversas({
             noExpediente ? "atendendo" : `volta ${quandoAEquipeVolta()}`
           }
         />
+      </div>
+
+      {/* Quem atende, e os avisos no aparelho: dois ajustes deste navegador,
+          lado a lado, numa linha só abaixo do cabeçalho. */}
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <SeletorDeAtendente
+          acao={escolherAtendente}
+          atual={atendente}
+          nomes={equipe.map((p) => p.nome)}
+        />
+        <AvisosNoAparelho />
       </div>
 
       {!assistenteLigado() && (

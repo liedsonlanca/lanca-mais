@@ -198,3 +198,74 @@ export async function apagarArquivo(url: string | null | undefined) {
     // idem
   }
 }
+
+/* ---------------- Anexos do chat ---------------- */
+
+/**
+ * Os tipos aceitos no chat, e o que cada um tem de trazer nos primeiros
+ * bytes.
+ *
+ * O tipo que o navegador declara é palpite do próprio navegador, e quem quer
+ * subir outra coisa declara o que quiser. Os bytes iniciais (a "assinatura"
+ * de cada formato) são o que o arquivo de fato é.
+ */
+const ASSINATURAS: Record<string, { ext: string; confere: (b: Uint8Array) => boolean }> = {
+  "image/jpeg": { ext: "jpg", confere: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
+  "image/png": {
+    ext: "png",
+    confere: (b) => b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47,
+  },
+  "image/webp": {
+    ext: "webp",
+    confere: (b) =>
+      String.fromCharCode(...b.slice(0, 4)) === "RIFF" &&
+      String.fromCharCode(...b.slice(8, 12)) === "WEBP",
+  },
+  "application/pdf": {
+    ext: "pdf",
+    confere: (b) => String.fromCharCode(...b.slice(0, 5)) === "%PDF-",
+  },
+};
+
+/** 4 MB: abaixo do teto de 4,5 MB do corpo de uma função da Vercel. */
+export const LIMITE_ANEXO = 4 * 1024 * 1024;
+
+/**
+ * Guarda um anexo do chat, passando pelo servidor.
+ *
+ * Diferente dos envios do painel, que vão direto do navegador para o R2: o
+ * anexo do chat vem de qualquer visitante, e a URL assinada não prende o
+ * tamanho. Passando por aqui, tamanho e conteúdo são conferidos antes de
+ * qualquer byte chegar ao armazenamento.
+ *
+ * O nome no bucket é um UUID inteiro, e não o nome do arquivo: o endereço é
+ * público, e só não ser adivinhável é o que protege o documento de um
+ * cliente.
+ */
+export async function guardarAnexo(arquivo: File) {
+  if (!armazenamentoConfigurado) return { erro: "Envio de arquivos indisponível." };
+  if (arquivo.size > LIMITE_ANEXO) return { erro: "Arquivo grande demais. O limite é 4 MB." };
+
+  const formato = ASSINATURAS[arquivo.type];
+  const bytes = new Uint8Array(await arquivo.arrayBuffer());
+  if (!formato || !formato.confere(bytes)) {
+    return { erro: "Formato não aceito. Envie JPG, PNG, WEBP ou PDF." };
+  }
+
+  const chave = `chat/${crypto.randomUUID()}.${formato.ext}`;
+  await cliente().send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: chave,
+      Body: bytes,
+      ContentType: arquivo.type,
+      // PDF abre no navegador, mas com o nome certo ao salvar.
+      ContentDisposition:
+        arquivo.type === "application/pdf"
+          ? `inline; filename="${(arquivo.name || "arquivo.pdf").replace(/[^\w.\- ]+/g, "_").slice(0, 80)}"`
+          : undefined,
+    })
+  );
+
+  return { url: urlPublica(chave), tipo: arquivo.type };
+}
