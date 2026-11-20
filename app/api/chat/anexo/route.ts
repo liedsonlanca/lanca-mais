@@ -62,6 +62,19 @@ export async function POST(requisicao: Request) {
 
   await registrarFalha("chat-anexo", origem);
 
+  // Dez arquivos por conversa: o bastante para logo, prints e um briefing,
+  // e um teto para quem quisesse usar o chat como depósito.
+  const jaEnviados = (await sql.query(
+    "SELECT count(*)::int AS n FROM mensagens WHERE conversa = $1 AND anexo_url <> ''",
+    [conversa.id]
+  )) as Array<{ n: number }>;
+  if ((jaEnviados[0]?.n ?? 0) >= 10) {
+    return NextResponse.json(
+      { ok: false, erro: "Limite de arquivos desta conversa atingido. Se precisar mandar mais, use o WhatsApp." },
+      { status: 400 }
+    );
+  }
+
   const guardado = await guardarAnexo(arquivo);
   if ("erro" in guardado) {
     return NextResponse.json({ ok: false, erro: guardado.erro }, { status: 400 });

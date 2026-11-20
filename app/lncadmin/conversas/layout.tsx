@@ -5,7 +5,8 @@ import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import ListaDeConversas from "@/components/admin/ListaDeConversas";
 import SeletorDeAtendimento from "@/components/admin/SeletorDeAtendimento";
 import { ESTADOS, lerEstadoDaEquipe } from "@/lib/atendimento";
-import { definirEstadoDaEquipe, escolherAtendente } from "./acoes";
+import { alternarAssistente, definirEstadoDaEquipe, escolherAtendente } from "./acoes";
+import { LIMITES, usoDoAssistente } from "@/lib/protecao-chat";
 import SeletorDeAtendente from "@/components/admin/SeletorDeAtendente";
 import AvisosNoAparelho from "@/components/admin/AvisosNoAparelho";
 import ColunaDaLista from "@/components/admin/ColunaDaLista";
@@ -44,6 +45,7 @@ export default async function LayoutDasConversas({
     lerEquipe(),
     atendenteAtual(),
   ]);
+  const uso = await usoDoAssistente();
   const noExpediente = equipeNoExpediente();
 
   return (
@@ -97,6 +99,36 @@ export default async function LayoutDasConversas({
           nomes={equipe.map((p) => p.nome)}
         />
         <AvisosNoAparelho />
+
+        {/* O botão de pânico, e quanto o assistente já respondeu hoje.
+
+            O número é o que mostra um ataque antes da conta chegar: 30
+            num dia comum, 300 numa tarde estranha. */}
+        <form action={alternarAssistente} className="flex items-center gap-2">
+          <input type="hidden" name="pausar" value={uso.pausado ? "0" : "1"} />
+          <button
+            type="submit"
+            title={
+              uso.pausado
+                ? "O assistente não responde; o chat indica o WhatsApp. Clique para religar."
+                : "Para o assistente na hora (use se alguém estiver enchendo o chat)."
+            }
+            className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-xs transition-colors duration-300 ${
+              uso.pausado
+                ? "border-red-700/40 bg-red-700/10 text-red-700 hover:bg-red-700/15"
+                : "border-contorno text-tinta/70 hover:border-salmon hover:text-tinta"
+            }`}
+          >
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${uso.pausado ? "bg-red-700" : "bg-emerald-600"}`}
+            />
+            {uso.pausado ? "Assistente pausado · religar" : "Assistente ligado · pausar"}
+          </button>
+          <span className="text-[0.7rem] text-tinta/45">
+            {uso.dia} de 500 respostas hoje · {uso.hora} nesta hora
+            {uso.hora >= LIMITES.respostasPorHora ? " (disjuntor aberto)" : ""}
+          </span>
+        </form>
       </div>
 
       {!assistenteLigado() && (

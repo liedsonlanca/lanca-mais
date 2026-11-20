@@ -1,6 +1,15 @@
 import { NextResponse, after } from "next/server";
 import { avisarEquipe } from "@/lib/push";
 import { freioRapido } from "@/lib/freio-rapido";
+import { sql } from "@/lib/db";
+import {
+  LIMITES,
+  barreiraParaOAssistente,
+  podeAbrirConversa,
+  podePassarParaEquipe,
+  recadoDaBarreira,
+  surtoAcabouDeAbrir,
+} from "@/lib/protecao-chat";
 import { impressaoDoVisitante } from "@/lib/acessos";
 import { assistenteLigado, responder } from "@/lib/atendente";
 import {
@@ -106,6 +115,26 @@ export async function POST(requisicao: Request) {
   const chaveEnviada = texto(corpo.chave, 64).replace(/[^a-f0-9]/g, "");
   const chave = chaveEnviada.length === 32 ? chaveEnviada : novaChave();
 
+  // Conversa nova (sem chave, chave desconhecida ou conversa encerrada)
+  // conta no limite do endereço, e ANTES de existir: barrada depois, ela
+  // ficaria no painel como uma linha vazia, sujando a lista da equipe.
+  const existente =
+    chaveEnviada.length === 32 && sql
+      ? ((await sql.query("SELECT estado FROM conversas WHERE chave = $1", [
+          chaveEnviada,
+        ])) as Array<{ estado: string }>)[0]
+      : undefined;
+  if ((!existente || existente.estado === "fechada") && !(await podeAbrirConversa(origem))) {
+    return NextResponse.json(
+      {
+        ok: false,
+        motivo: "limite-conversas",
+        erro: `Você já começou ${LIMITES.conversasPorEndereco} conversas hoje. Para continuar, chama no WhatsApp (83) 99106-0691.`,
+      },
+      { status: 429 }
+    );
+  }
+
   const visitante = await impressaoDoVisitante(
     origem,
     requisicao.headers.get("user-agent") ?? ""
@@ -193,6 +222,44 @@ export async function POST(requisicao: Request) {
   let estado: "assistente" | "equipe" = "assistente";
 
   const podeResponder = assistenteLigado() && quantas <= TETO_DE_MENSAGENS;
+
+  // A barreira antes do modelo (ver lib/protecao-chat.ts): pausa manual,
+  // disjuntor de surto, limite do endereço, mensagem repetida ou sem
+  // conteúdo. Barrada, a conversa recebe um recado com o WhatsApp e NÃO vai
+  // para a equipe — quem só estava gastando não ganha nada, e o celular de
+  // quem atende não vira sirene.
+  if (podeResponder) {
+    const anteriores = (await historico(conversa.id, 6))
+      .filter((m) => m.autor === "cliente" && m.id !== minha)
+      .map((m) => m.texto);
+    const barreira = await barreiraParaOAssistente({ origem, texto: pergunta, anteriores });
+
+    if (barreira) {
+      if (barreira === "surto" && (await surtoAcabouDeAbrir())) {
+        after(() =>
+          avisarEquipe({
+            titulo: "Movimento anormal no chat",
+            texto: "Muitas mensagens em pouco tempo. O assistente parou até a próxima hora; o chat indica o WhatsApp.",
+            url: "/lncadmin/conversas",
+            tag: "surto",
+          })
+        );
+      }
+      const fala = recadoDaBarreira(barreira);
+      const id = await gravarMensagem(conversa.id, "assistente", fala);
+      return NextResponse.json({
+        ok: true,
+        chave: conversa.chave,
+        estado: "assistente",
+        temFicha,
+        expediente: { aberto: equipeNoExpediente(), volta: quandoAEquipeVolta() },
+        novaConversa: Boolean(recomecou),
+        minha,
+        respostas: [{ id, autor: "assistente", texto: fala, quando: new Date().toISOString() }],
+      });
+    }
+  }
+
   const dito = podeResponder ? await responder(await historico(conversa.id)) : null;
 
   if (dito && !dito.chamarEquipe) {
@@ -227,6 +294,14 @@ export async function POST(requisicao: Request) {
         texto: fala,
         quando: new Date().toISOString(),
       };
+    } else if (!(await podePassarParaEquipe(origem))) {
+      // Este endereço já chamou a equipe vezes demais hoje. Também cobre o
+      // teto diário esgotado: sem isto, cada mensagem depois do teto virava
+      // um chamado para a equipe.
+      const fala =
+        "Já avisei a equipe sobre seus pedidos de hoje. Para falar agora, chama no WhatsApp (83) 99106-0691.";
+      const id = await gravarMensagem(conversa.id, "assistente", fala);
+      resposta = { id, autor: "assistente", texto: fala, quando: new Date().toISOString() };
     } else {
       const fala = dito?.texto || recadoDeEntrega();
       const id = await gravarMensagem(conversa.id, "assistente", fala);

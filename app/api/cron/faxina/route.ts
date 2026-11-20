@@ -57,7 +57,10 @@ export async function GET(requisicao: Request) {
     // linha ficava no banco para sempre — uma por endereço que já tentou
     // algo. Um dia de folga e fora.
     await sql.query(
-      "DELETE FROM meta WHERE chave LIKE 'tentativas:%' AND em < now() - interval '1 day'",
+      `DELETE FROM meta
+        WHERE (chave LIKE 'tentativas:%' OR chave LIKE 'chat-%:%'
+               OR chave LIKE 'assistente:hora:%' OR chave LIKE 'assistente:surto-avisado:%')
+          AND em < now() - interval '2 days'`,
       []
     );
   }

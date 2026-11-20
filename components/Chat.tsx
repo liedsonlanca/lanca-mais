@@ -190,6 +190,9 @@ export default function Chat() {
   } | null>(null);
   const [falhou, setFalhou] = useState(false);
 
+  /** O motivo que o servidor deu para recusar, quando deu (ex.: limite do dia). */
+  const [motivoFalha, setMotivoFalha] = useState("");
+
   /** Alguém da equipe está escrevendo agora. */
   const [equipeDigitando, setEquipeDigitando] = useState(false);
 
@@ -700,9 +703,11 @@ export default function Chat() {
       };
 
       if (!resposta.ok || !dados.ok) {
+        setMotivoFalha((dados as { erro?: string }).erro ?? "");
         setFalhou(true);
         return;
       }
+      setMotivoFalha("");
 
       if (dados.expediente) setExpediente(dados.expediente);
 
@@ -1176,8 +1181,8 @@ export default function Chat() {
 
       {falhou && (
         <p className="border-t border-contorno bg-fundo-alt px-4 py-2.5 text-xs leading-relaxed text-tinta/60">
-          A mensagem não foi. Tente de novo, ou chame no WhatsApp (83)
-          99106-0691.
+          {motivoFalha ||
+            "A mensagem não foi. Tente de novo, ou chame no WhatsApp (83) 99106-0691."}
         </p>
       )}
 
@@ -1540,7 +1545,8 @@ function FichaDeContato({
       });
 
       if (!resposta.ok) {
-        setErro("Não deu para enviar. Tente de novo.");
+        const corpo = (await resposta.json().catch(() => ({}))) as { erro?: string };
+        setErro(corpo.erro ?? "Não deu para enviar. Tente de novo.");
         return;
       }
 

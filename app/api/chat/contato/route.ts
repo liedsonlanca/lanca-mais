@@ -11,6 +11,7 @@ import {
 import { origemDaRequisicao, podeTentar, registrarFalha } from "@/lib/tentativas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import { estaBarrado } from "@/lib/atendimento";
+import { podeMandarFicha } from "@/lib/protecao-chat";
 
 // A ficha de contato do chat: nome e sobrenome, WhatsApp e e-mail.
 //
@@ -127,6 +128,20 @@ export async function POST(requisicao: Request) {
   }
 
   await registrarFalha("chat-contato", origem);
+
+  // Cada ficha vira lead no DGFLOW. Quatro por endereço por dia cobre quem
+  // corrige um dado e manda de novo, e impede quem quer encher o CRM de
+  // contato falso.
+  if (!(await podeMandarFicha(origem))) {
+    return NextResponse.json(
+      {
+        ok: false,
+        motivo: "limite",
+        erro: "Já recebemos seus dados hoje. Para falar agora, chama no WhatsApp (83) 99106-0691.",
+      },
+      { status: 429 }
+    );
+  }
 
   // Primeiro o banco, depois o CRM.
   //

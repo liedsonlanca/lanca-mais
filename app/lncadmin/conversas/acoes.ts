@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { segredoTotp } from "@/lib/admin";
 import { codigoValido } from "@/lib/totp";
+import { pausarAssistente } from "@/lib/protecao-chat";
 import { limparTentativas, podeTentar, registrarFalha } from "@/lib/tentativas";
 import { after } from "next/server";
 import { avisarVisitantePorEmail } from "@/lib/email";
@@ -368,4 +369,23 @@ export async function apagarTodasAsConversas(dados: FormData) {
   revalidatePath("/lncadmin/contatos");
   revalidatePath("/lncadmin");
   redirect("/lncadmin/conversas");
+}
+
+/**
+ * Pausa ou religa o assistente do chat.
+ *
+ * O botão de pânico: se alguém estiver enchendo o chat, um clique para de
+ * gastar e o chat passa a indicar o WhatsApp para todo mundo, sem passar
+ * nada para a equipe. Religar é o mesmo clique.
+ */
+export async function alternarAssistente(dados: FormData) {
+  await preparar();
+  const pausar = texto(dados, "pausar") === "1";
+  await pausarAssistente(pausar);
+  await avisar(
+    pausar
+      ? "Assistente pausado. O chat indica o WhatsApp para quem escrever."
+      : "Assistente ligado de novo."
+  );
+  revalidatePath("/lncadmin/conversas", "layout");
 }
