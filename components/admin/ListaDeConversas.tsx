@@ -74,7 +74,7 @@ export default function ListaDeConversas({
   });
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-1 flex-col">
       <div className="border-b border-contorno px-3 py-3">
         <div className="relative">
           <svg

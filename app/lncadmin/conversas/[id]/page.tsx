@@ -128,6 +128,14 @@ export default async function AdminConversa({
     <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[1fr_17rem]">
       {/* ---------------- O fio ---------------- */}
       <div className="flex min-h-0 min-w-0 flex-col">
+        {/* Só no celular: lá a lista some com a conversa aberta (ver
+            ColunaDaLista), e este é o caminho de volta. */}
+        <Link
+          href="/lncadmin/conversas"
+          className="mb-3 inline-flex min-h-10 items-center gap-1.5 self-start text-sm text-tinta/60 transition-colors duration-300 hover:text-tinta lg:hidden"
+        >
+          ← Conversas
+        </Link>
         {/* O cartao da conversa ocupa o que sobra, e a lista dentro dele e
             quem rola. A caixa de resposta fica embaixo, fixa: sem isto ela
             descia junto com o historico e saia da tela justamente quando se
@@ -246,6 +254,18 @@ export default async function AdminConversa({
             equipeFalouPorUltimo={ultimaFala?.autor === "equipe"}
           />
 
+          {/* Por que não dá para responder, numa linha só, dentro do cartão.
+
+              Era um cartão à parte embaixo da conversa, e numa tela baixa
+              ele roubava a altura do fio: sobravam duas mensagens à vista. */}
+          {!minha && (
+            <p className="border-t border-contorno px-4 pt-2.5 text-[0.7rem] leading-relaxed text-tinta/45">
+              {conversa.estado === "fechada"
+                ? "Conversa encerrada: só dá para anotar. Se a pessoa escrever de novo, abre uma conversa nova na lista."
+                : "Esta conversa está com o assistente: só dá para anotar. Ela volta para você se a pessoa pedir a equipe."}
+            </p>
+          )}
+
           {/* Com a conversa fora da equipe, o campo só anota. */}
           <CampoDeResposta
             acao={responderNoChat}
@@ -256,15 +276,6 @@ export default async function AdminConversa({
           />
         </div>
 
-        {!minha && (
-          <p
-            className={`${CARTAO} mt-4 shrink-0 p-5 text-sm leading-relaxed text-tinta/55`}
-          >
-            {conversa.estado === "fechada"
-              ? "Conversa encerrada. Para voltar a responder, é preciso que a pessoa escreva de novo — e aí ela abre uma conversa nova, que aparece na lista."
-              : "Esta conversa está com o assistente. Ele responde por aqui; ela volta para a sua fila se a pessoa pedir para falar com a equipe."}
-          </p>
-        )}
       </div>
 
       {/* ---------------- Os dados ---------------- */}

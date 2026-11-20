@@ -8,6 +8,7 @@ import { ESTADOS, lerEstadoDaEquipe } from "@/lib/atendimento";
 import { definirEstadoDaEquipe, escolherAtendente } from "./acoes";
 import SeletorDeAtendente from "@/components/admin/SeletorDeAtendente";
 import AvisosNoAparelho from "@/components/admin/AvisosNoAparelho";
+import ColunaDaLista from "@/components/admin/ColunaDaLista";
 import { lerEquipe } from "@/lib/conteudo";
 import { atendenteAtual } from "@/lib/quem-atende";
 
@@ -131,9 +132,9 @@ export default async function LayoutDasConversas({
           e o `0` é o mínimo que permite o conteúdo encolher — sem ele, o
           mínimo seria o tamanho do conteúdo e estaríamos no mesmo lugar. */}
       <div className="mt-5 grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[320px_1fr] lg:grid-rows-[minmax(0,1fr)]">
-        <aside className="overflow-hidden rounded-2xl border border-contorno bg-cartao lg:h-full">
+        <ColunaDaLista>
           <ListaDeConversas lista={conversas} />
-        </aside>
+        </ColunaDaLista>
 
         {/* A coluna do meio não rola; quem rola é a lista de mensagens
             dentro dela.

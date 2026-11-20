@@ -112,7 +112,12 @@ export default async function AdminLayout({
 
             Agora ela rola por dentro quando não couber, e o resto do painel
             fica onde está. */}
-        <aside className="border-b border-contorno bg-cartao lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r">
+        {/* relative z-30: a lateral "sticky" forma uma camada própria, e o
+            que é fixo lá dentro (a lista de notificações, o aviso de mensagem
+            nova) só sobe até a altura dela. Sem z-index, qualquer elemento
+            posicionado do conteúdo — o campo de busca das conversas — era
+            pintado por cima da lista aberta. */}
+        <aside className="relative z-30 border-b border-contorno bg-cartao lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="flex items-center justify-between gap-3 px-5 py-4 lg:py-6">
             <Link
               href="/lncadmin"

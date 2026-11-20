@@ -190,7 +190,9 @@ export default function MenuLateral() {
         const atual =
           secao.href === "/lncadmin"
             ? pathname === "/lncadmin"
-            : pathname.startsWith(secao.href);
+            : // Com a barra no fim: "/lncadmin/depoimentos" sem ela marcava
+              // também "Depoimentos em vídeo" (/lncadmin/depoimentos-video).
+              pathname === secao.href || pathname.startsWith(`${secao.href}/`);
 
         return (
           <Link

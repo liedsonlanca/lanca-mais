@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RESPOSTAS_PRONTAS } from "@/lib/respostas-prontas";
 
@@ -85,6 +85,16 @@ export default function CampoDeResposta({
   );
   const nota = modo === "nota" || !podeResponder;
   const ultimoSinal = useRef(0);
+
+  // Esc fecha as respostas rápidas, como fecha qualquer janelinha.
+  useEffect(() => {
+    if (!atalhos) return;
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAtalhos(false);
+    };
+    document.addEventListener("keydown", aoTeclar);
+    return () => document.removeEventListener("keydown", aoTeclar);
+  }, [atalhos]);
   const seletor = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
