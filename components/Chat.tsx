@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import {
+  Fragment,
   useCallback,
   useEffect,
   useRef,
@@ -133,6 +134,18 @@ export default function Chat() {
     "assistente"
   );
   const [temFicha, setTemFicha] = useState(false);
+
+  /**
+   * O nome, pedido antes da primeira mensagem.
+   *
+   * `nome` é o que a pessoa disse nesta página; `temNome` é o servidor
+   * dizendo que a conversa já tem um (quem recarregou no meio da conversa
+   * não precisa dizer de novo). Vai junto com a primeira mensagem, e é o que
+   * faz a conversa aparecer no painel com o nome da pessoa, e não como
+   * "Visitante sem nome".
+   */
+  const [nome, setNome] = useState("");
+  const [temNome, setTemNome] = useState(false);
   const [avaliada, setAvaliada] = useState(false);
 
   /** Nome e e-mail desta conversa, depois da ficha. Nunca vão para o armazenamento. */
@@ -199,6 +212,8 @@ export default function Chat() {
     setMensagens([SAUDACAO]);
     setEstado("assistente");
     setTemFicha(false);
+    setNome("");
+    setTemNome(false);
     setAvaliada(false);
     setContato(null);
     setFalhou(false);
@@ -242,6 +257,7 @@ export default function Chat() {
       const dados = (await resposta.json()) as {
         estado: "assistente" | "equipe" | "fechada" | null;
         temFicha?: boolean;
+        temNome?: boolean;
         avaliada?: boolean;
         expediente?: { aberto: boolean; volta: string };
         novas: Mensagem[];
@@ -291,6 +307,7 @@ export default function Chat() {
       }
 
       if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
+      if (typeof dados.temNome === "boolean" && dados.temNome) setTemNome(true);
 
       // Chegou resposta com o balão fechado: acende o aviso.
       //
@@ -394,6 +411,11 @@ export default function Chat() {
     return () => clearInterval(relogio);
   }, [aberto, buscar, estado]);
 
+  // Disse o nome: o cursor vai direto para o campo da primeira pergunta.
+  useEffect(() => {
+    if (nome) campo.current?.focus();
+  }, [nome]);
+
   // Rola para o fim quando chega mensagem, e quando o atendimento encerra: o
   // aviso de encerramento entra no fim da lista, e sem rolar ele ficava
   // escondido até a pessoa descer por conta própria.
@@ -465,7 +487,14 @@ export default function Chat() {
       const resposta = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=utf-8" },
-        body: JSON.stringify({ chave: chave.current, texto: pergunta }),
+        body: JSON.stringify({
+          chave: chave.current,
+          texto: pergunta,
+          // Em toda mensagem, e não só na primeira: o servidor só grava se a
+          // conversa ainda não tiver nome, e assim um envio que falhou não
+          // deixa a conversa sem ele.
+          nome: nome || undefined,
+        }),
       });
 
       const dados = (await resposta.json()) as {
@@ -525,6 +554,7 @@ export default function Chat() {
 
       if (dados.estado) setEstado(dados.estado);
       if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
+      if (nome) setTemNome(true);
       juntar(dados.respostas ?? []);
     } catch {
       setFalhou(true);
@@ -670,7 +700,14 @@ export default function Chat() {
 
   const assunto =
     mensagens.find((m) => m.autor === "cliente")?.texto.slice(0, 140) ?? "";
-  const whatsapp = linkDoWhatsApp(contato, assunto);
+  const whatsapp = linkDoWhatsApp(
+    contato ?? (nome ? { nome, email: "" } : null),
+    assunto
+  );
+
+  // Sem nome, a conversa não começa: o campo de mensagem só aparece depois.
+  const pedindoNome = estado !== "fechada" && !temNome && !nome;
+  const primeiroNome = nome.split(/\s+/)[0];
   const conversando =
     estado !== "fechada" && mensagens.some((m) => m.autor === "cliente");
 
@@ -813,9 +850,9 @@ export default function Chat() {
         )}
 
         <ul className="grid gap-3">
-          {mensagens.map((m) => (
+          {mensagens.map((m, i) => (
+            <Fragment key={m.id}>
             <li
-              key={m.id}
               className={
                 m.autor === "cliente"
                   ? "ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-salmon/15 px-3.5 py-2.5"
@@ -848,6 +885,18 @@ export default function Chat() {
                 </a>
               )}
             </li>
+
+            {/* A resposta ao nome, logo abaixo da saudação: a pessoa disse
+                como se chama e a conversa começa chamando-a assim. Escrita
+                aqui, e não gravada — como a saudação, não precisa pensar. */}
+            {i === 0 && primeiroNome && (
+              <li className="mr-auto max-w-[85%] rounded-2xl rounded-bl-md bg-fundo-alt px-3.5 py-2.5">
+                <p className="text-sm leading-relaxed text-tinta/85">
+                  Prazer, {primeiroNome}! Como posso te ajudar?
+                </p>
+              </li>
+            )}
+            </Fragment>
           ))}
 
           {enviando && (
@@ -913,12 +962,15 @@ export default function Chat() {
             </button>
           </div>
         )
+      ) : pedindoNome ? (
+        <PerguntaDoNome onPronto={setNome} />
       ) : pedindoFicha ? (
         <FichaDeContato
           // Passada como função, e não como valor: ler `ref.current` durante
           // o desenho entrega o que havia no desenho anterior, e a chave pode
           // ter acabado de nascer na primeira mensagem.
           obterChave={() => chave.current}
+          nomeConhecido={nome}
           onPronto={(dados) => {
             setContato(dados);
             setTemFicha(true);
@@ -1078,6 +1130,59 @@ function Avaliacao({
   );
 }
 
+/* ---------------- O nome, antes de tudo ---------------- */
+
+/**
+ * Nome e sobrenome, pedidos antes da primeira mensagem.
+ *
+ * Nome e sobrenome, e não só o primeiro nome: é a mesma regra da ficha de
+ * contato, e a ficha não pergunta de novo o que já foi dito aqui. Se o
+ * começo aceitasse "João", a ficha teria de cobrar o sobrenome depois — a
+ * pessoa responderia a mesma pergunta duas vezes.
+ */
+function PerguntaDoNome({ onPronto }: { onPronto: (nome: string) => void }) {
+  const [valor, setValor] = useState("");
+  const [erro, setErro] = useState("");
+
+  return (
+    <form
+      onSubmit={(evento) => {
+        evento.preventDefault();
+        const limpo = valor.trim().replace(/\s+/g, " ");
+        if (limpo.split(" ").filter((p) => p.length > 1).length < 2) {
+          setErro("Escreva nome e sobrenome.");
+          return;
+        }
+        onPronto(limpo.slice(0, 120));
+      }}
+      className="border-t border-contorno px-4 py-4"
+    >
+      <p className="text-sm font-medium text-tinta">Antes de começar, como você se chama?</p>
+
+      <div className="mt-3 flex gap-2">
+        <input
+          value={valor}
+          onChange={(e) => setValor(e.target.value)}
+          autoFocus
+          autoComplete="name"
+          maxLength={120}
+          placeholder="Nome e sobrenome"
+          aria-label="Nome e sobrenome"
+          className="min-h-11 flex-1 rounded-xl border border-contorno bg-fundo-alt px-3.5 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
+        />
+        <button
+          type="submit"
+          className="min-h-11 shrink-0 rounded-xl bg-salmon px-4 text-sm font-medium text-preto"
+        >
+          Começar
+        </button>
+      </div>
+
+      {erro && <p className="mt-2 text-xs text-destaque">{erro}</p>}
+    </form>
+  );
+}
+
 /* ---------------- A ficha ---------------- */
 
 /**
@@ -1092,12 +1197,15 @@ function Avaliacao({
  */
 function FichaDeContato({
   obterChave,
+  nomeConhecido,
   onPronto,
 }: {
   obterChave: () => string;
+  /** O nome dito no começo da conversa. Com ele, a ficha não pede de novo. */
+  nomeConhecido: string;
   onPronto: (dados: Contato) => void;
 }) {
-  const [nome, setNome] = useState("");
+  const [nome, setNome] = useState(nomeConhecido);
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -1155,11 +1263,13 @@ function FichaDeContato({
   return (
     <form onSubmit={mandar} className="border-t border-contorno px-4 py-4">
       <p className="text-xs leading-relaxed text-tinta/55">
-        Deixe seus dados que a equipe te procura. Respondemos aqui mesmo e no
-        seu WhatsApp.
+        {nomeConhecido
+          ? `${nomeConhecido.split(/\s+/)[0]}, deixe seu WhatsApp e e-mail que a equipe te procura. Respondemos aqui mesmo e no seu WhatsApp.`
+          : "Deixe seus dados que a equipe te procura. Respondemos aqui mesmo e no seu WhatsApp."}
       </p>
 
       <div className="mt-3 grid gap-2">
+        {!nomeConhecido && (
         <input
           value={nome}
           onChange={(e) => setNome(e.target.value)}
@@ -1170,6 +1280,7 @@ function FichaDeContato({
           aria-label="Nome e sobrenome"
           className="min-h-11 rounded-xl border border-contorno bg-fundo-alt px-3.5 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
         />
+        )}
 
         <input
           value={whatsapp}

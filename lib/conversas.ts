@@ -214,6 +214,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
             to_char(m.criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS quando,
             c.estado,
             (c.nome <> '' AND c.contato <> '' AND c.email <> '') AS tem_ficha,
+            (c.nome <> '') AS tem_nome,
             (c.nota IS NOT NULL) AS avaliada
        FROM conversas c
        LEFT JOIN mensagens m ON m.conversa = c.id AND m.id > $2
