@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Chat from "@/components/Chat";
+import PortaDoChat from "@/components/PortaDoChat";
 import BotaoVoltar from "@/components/BotaoVoltar";
 import Consentimento from "@/components/Consentimento";
 import JsonLd from "@/components/JsonLd";
@@ -104,7 +105,9 @@ export default async function RootLayout({
               que o site ainda não existe, com os contatos ali mesmo. Um chat
               por cima disso oferece atendimento sobre um site que a pessoa
               não viu. */}
-          {siteAberto && <Chat />}
+          <PortaDoChat abertoAoPublico={siteAberto}>
+            <Chat />
+          </PortaDoChat>
 
           {/* Monta os rastreadores por dentro, quando houver permissão.
               Fica no fim para não atrasar nada do que a pessoa veio ver. */}

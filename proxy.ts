@@ -65,6 +65,23 @@ export async function proxy(request: NextRequest) {
         secure: process.env.NODE_ENV === "production",
         path: "/",
       });
+
+      // Um aviso legível pelo navegador de que esta pessoa está vendo o site
+      // por dentro, pela senha de pré-visualização.
+      //
+      // Serve só para o chat aparecer para ela: com o site em "em breve", o
+      // layout não sabe quem passou pelo porteiro, e o chat ficava escondido
+      // justamente de quem está vendo o site de verdade. Não é credencial —
+      // quem o forjasse veria só o balão do chat, e as rotas do chat já são
+      // abertas. A credencial continua sendo o cookie acima, httpOnly.
+      resposta.cookies.set({
+        name: "lanca_previa",
+        value: "1",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: Math.floor(JANELA_ACESSO_MS / 1000),
+      });
     }
 
     return resposta;
