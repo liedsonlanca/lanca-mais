@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Contato } from "@/lib/contatos";
+import { diaDaAgencia } from "@/lib/horario";
 
 // A lista de quem chegou pelo site.
 //
@@ -15,15 +16,6 @@ import type { Contato } from "@/lib/contatos";
 
 const CHIP = "rounded-full px-2 py-0.5 text-[0.65rem]";
 
-function quandoLegivel(iso: string) {
-  const data = new Date(iso);
-  if (Number.isNaN(data.getTime())) return "";
-  return data.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-  });
-}
 
 export default function TabelaDeContatos({ lista }: { lista: Contato[] }) {
   const [busca, setBusca] = useState("");
@@ -122,7 +114,7 @@ export default function TabelaDeContatos({ lista }: { lista: Contato[] }) {
                   )}
 
                   <span className="text-[0.7rem] text-tinta/35">
-                    {quandoLegivel(contato.quando)}
+                    {diaDaAgencia(contato.quando)}
                   </span>
                 </div>
               </div>

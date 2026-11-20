@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { painelLiberado } from "@/lib/admin";
+import { horaDaAgencia } from "@/lib/horario";
 import { lerConversa } from "@/lib/conversas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import CampoDeResposta from "@/components/admin/CampoDeResposta";
@@ -7,7 +8,12 @@ import {
   responderNoChat,
   encerrarConversa,
   devolverAoAssistente,
+  apagarConversa,
+  barrarVisitante,
+  liberarVisitante,
 } from "../acoes";
+import { conversaBarrada } from "@/lib/atendimento";
+import AcaoIrreversivel from "@/components/admin/AcaoIrreversivel";
 
 export const dynamic = "force-dynamic";
 
@@ -37,16 +43,6 @@ const ESTADOS = {
   fechada: { rotulo: "Encerrada", classe: "text-tinta/40" },
 } as const;
 
-function horaLegivel(iso: string) {
-  const data = new Date(iso);
-  if (Number.isNaN(data.getTime())) return "";
-  return data.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function Dado({
   rotulo,
@@ -100,7 +96,16 @@ export default async function AdminConversa({
   }
 
   const { conversa, mensagens } = dados;
+  const barrado = await conversaBarrada(conversa.id);
   const estado = ESTADOS[conversa.estado];
+  const comoEncerrou =
+    conversa.estado !== "fechada"
+      ? estado.rotulo
+      : conversa.fechadaPor === "inatividade"
+        ? "Encerrada por inatividade"
+        : conversa.fechadaPor === "cliente"
+          ? "Encerrada pelo visitante"
+          : estado.rotulo;
   const minha = conversa.estado === "equipe";
 
   const soDigitos = conversa.contato.replace(/\D/g, "");
@@ -135,7 +140,7 @@ export default async function AdminConversa({
               </div>
             </div>
             <span className={`shrink-0 text-xs ${estado.classe}`}>
-              {estado.rotulo}
+              {comoEncerrou}
             </span>
           </div>
 
@@ -171,7 +176,7 @@ export default async function AdminConversa({
                         {autor.rotulo}
                       </span>
                       <span className="text-[0.65rem] text-tinta/30">
-                        {horaLegivel(mensagem.quando)}
+                        {horaDaAgencia(mensagem.quando)}
                       </span>
                     </div>
                     <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-tinta/80">
@@ -219,7 +224,12 @@ export default async function AdminConversa({
           <p className="mt-2 text-center text-sm font-semibold text-tinta">
             {conversa.nome || "Visitante sem nome"}
           </p>
-          <p className={`text-xs ${estado.classe}`}>{estado.rotulo}</p>
+          <p className={`text-xs ${estado.classe}`}>{comoEncerrou}</p>
+          {barrado && (
+            <p className="mt-1 rounded-full bg-fundo-alt px-2 py-0.5 text-[0.65rem] text-tinta/50">
+              Visitante barrado
+            </p>
+          )}
         </div>
 
         <div className={`${CARTAO} grid gap-4 p-5`}>
@@ -249,7 +259,7 @@ export default async function AdminConversa({
             valor={conversa.email}
             href={conversa.email ? `mailto:${conversa.email}` : undefined}
           />
-          <Dado rotulo="Começou" valor={horaLegivel(conversa.criadoEm)} />
+          <Dado rotulo="Começou" valor={horaDaAgencia(conversa.criadoEm)} />
 
           {conversa.nota !== null && (
             <div>
@@ -314,6 +324,56 @@ export default async function AdminConversa({
             </form>
           )}
         </div>
+
+        {/* Atras de uma gaveta, e nao soltos ao lado dos outros: estes dois
+            nao se desfazem. Apagar e DELETE, e barrar fecha a porta para a
+            pessoa. Dois cliques deliberados, e o segundo diz o que faz. */}
+        <details className="group">
+          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-xs text-tinta/40 transition-colors duration-300 hover:text-tinta">
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3.5 w-3.5 transition-transform duration-300 group-open:rotate-90"
+            >
+              <path d="m9 6 6 6-6 6" />
+            </svg>
+            Mais ações
+          </summary>
+
+          <div className="mt-3 grid gap-2">
+            {barrado ? (
+              <AcaoIrreversivel
+                acao={liberarVisitante}
+                id={conversa.id}
+                titulo="Desfazer bloqueio"
+                descricao="O visitante volta a conseguir escrever no chat. A conversa continua encerrada."
+                pergunta=""
+              />
+            ) : (
+              <AcaoIrreversivel
+                acao={barrarVisitante}
+                id={conversa.id}
+                titulo="Barrar este visitante"
+                descricao="Encerra a conversa e impede novas mensagens por este navegador."
+                pergunta={`Barrar ${conversa.nome || "este visitante"}? A conversa é encerrada e ele não consegue mais escrever por este navegador. Dá para desfazer depois.`}
+              />
+            )}
+
+            <AcaoIrreversivel
+              acao={apagarConversa}
+              id={conversa.id}
+              titulo="Apagar conversa e dados"
+              descricao="Some com as mensagens, o nome, o WhatsApp e o e-mail. Não há como desfazer."
+              pergunta={`Apagar a conversa de ${conversa.nome || "este visitante"} com todas as mensagens e dados de contato? Não há como desfazer.`}
+              perigo
+            />
+          </div>
+        </details>
       </aside>
     </div>
   );

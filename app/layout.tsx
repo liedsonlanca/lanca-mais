@@ -14,6 +14,7 @@ import ScrollTopOnNavigate from "@/components/motion/ScrollTopOnNavigate";
 import MidiaProtegida from "@/components/MidiaProtegida";
 import Medidor from "@/components/Medidor";
 import { siteConfig, siteUrl } from "@/lib/site-config";
+import { siteEstaAberto } from "@/lib/modo-site";
 import { lerImagens } from "@/lib/conteudo";
 import { imagem } from "@/lib/imagens";
 
@@ -68,6 +69,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // A mesma pergunta que o porteiro (proxy.ts) faz, e não só o modo do
+  // banco: SITE_PUBLICO=1 e a contagem regressiva vencida também abrem o
+  // site, e com o site aberto o chat tem de estar lá.
+  const siteAberto = await siteEstaAberto();
   const imagens = await lerImagens();
   const marcaClara = imagem(imagens, "marca-clara");
   const marcaEscura = imagem(imagens, "marca-escura");
@@ -93,7 +98,13 @@ export default async function RootLayout({
           </main>
           <Footer marca={marcaClara} />
           <WhatsAppButton />
-          <Chat />
+          {/* O chat só no site aberto.
+
+              Na tela de "em breve" ele não cabe: aquela página é um aviso de
+              que o site ainda não existe, com os contatos ali mesmo. Um chat
+              por cima disso oferece atendimento sobre um site que a pessoa
+              não viu. */}
+          {siteAberto && <Chat />}
 
           {/* Monta os rastreadores por dentro, quando houver permissão.
               Fica no fim para não atrasar nada do que a pessoa veio ver. */}

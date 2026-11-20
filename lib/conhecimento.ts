@@ -146,10 +146,63 @@ o pedido entra na fila e alguém responde na abertura seguinte. Se for
 urgente, o WhatsApp (83) 99106-0691 é o caminho.
 `.trim();
 
+/**
+ * O mapa do site.
+ *
+ * ---------- Por que isto faltava ----------
+ *
+ * Perguntaram "como entro em contato com a equipe?" e o assistente, em vez
+ * de responder, chamou gente — porque a resposta não estava escrita em lugar
+ * nenhum. Perguntaram qual serviço o site mais vende e ele disse que não
+ * sabia, quando a home destaca dois.
+ *
+ * Um atendente que não conhece a própria casa devolve tudo para a equipe, e
+ * aí ele não serve para nada: o trabalho dele é justamente não precisar
+ * incomodar ninguém.
+ */
+const MAPA_DO_SITE = `
+Páginas do site (lancamais.com):
+
+- / — início. Traz o posicionamento da agência, o trilho com a produção,
+  os nichos atendidos e os números.
+- /servicos — todas as frentes reunidas.
+- /servicos/marketing-pessoal, /servicos/marketing-empresarial,
+  /servicos/consultoria, /servicos/audiovisual, /servicos/trafego-pago,
+  /servicos/identidade-visual, /servicos/desenvolvimento-web,
+  /servicos/arquitetura — uma página por frente, com entregáveis e
+  diferenciais.
+- /portfolio — trabalhos realizados.
+- /sobre — a agência e a equipe.
+- /diagnostico — o diagnóstico gratuito, que é por onde o trabalho começa.
+- /contato — formulário de orçamento e os canais diretos.
+- /blog — textos da agência.
+
+Os dois destaques da home são Marketing Pessoal e Marketing Empresarial.
+Isso é destaque de apresentação, e não ranking de vendas: se perguntarem
+qual é "o mais vendido", diga que o site destaca esses dois e pergunte qual
+faz sentido para o caso da pessoa, em vez de dizer que não sabe.
+`.trim();
+
+/** Os canais, com o endereço exato. É a pergunta mais direta que chega. */
+const CONTATO = `
+Como falar com a LANÇA+:
+
+- WhatsApp: (83) 99106-0691 — é o canal mais rápido.
+- E-mail: contato@lancamais.com
+- Instagram: @lanca.mais
+- Formulário de orçamento: página /contato do site.
+- Diagnóstico gratuito: página /diagnostico.
+
+Quando alguém perguntar como entra em contato, responda com estes canais.
+Isso é informação que você tem; não é motivo para chamar a equipe.
+`.trim();
+
 /** Tudo junto, na ordem em que o modelo lê. */
 export const CONHECIMENTO = [
   `## Quem é a LANÇA+\n${QUEM_SOMOS}`,
+  `## Como falar com a agência\n${CONTATO}`,
   `## Horário de atendimento\n${HORARIO}`,
+  `## O site por dentro\n${MAPA_DO_SITE}`,
   `## Serviços\n${SERVICOS}`,
   `## Como o trabalho começa\n${COMO_COMECA}`,
   `## Perguntas frequentes\n${PERGUNTAS}`,

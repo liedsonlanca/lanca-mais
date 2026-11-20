@@ -7,6 +7,8 @@ import {
   historico,
   mensagensDepois,
   novaChave,
+  definirNome,
+  encerrarPorSilencio,
   passarParaEquipe,
   quantasMensagens,
   recomecarConversa,
@@ -15,6 +17,7 @@ import {
 } from "@/lib/conversas";
 import { origemDaRequisicao, podeTentar, registrarFalha } from "@/lib/tentativas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
+import { comoEstaOAtendimento, estaBarrado } from "@/lib/atendimento";
 
 // O chat do site: uma rota para mandar mensagem, outra para buscar resposta.
 //
@@ -116,6 +119,15 @@ export async function POST(requisicao: Request) {
       ? await recomecarConversa(achada, visitante)
       : null;
 
+  // Barrado: responde como se tivesse dado certo e nao grava nada.
+  //
+  // Dizer "voce foi bloqueado" ensina a pessoa a trocar de navegador e
+  // voltar. Silencio nao ensina nada, e e o que faz quem veio incomodar
+  // perder o interesse.
+  if (await estaBarrado(chave, visitante)) {
+    return NextResponse.json({ ok: true, chave, estado: "assistente", minha: 0, respostas: [] });
+  }
+
   const conversa = recomecou ?? achada;
   if (!conversa) {
     // Sem banco não há conversa, e fingir que houve seria perder a mensagem
@@ -124,6 +136,14 @@ export async function POST(requisicao: Request) {
   }
 
   await registrarFalha("chat", origem);
+
+  // O nome vem junto da primeira mensagem, dito na abertura do chat.
+  //
+  // Guardado aqui, e nao so no navegador: no painel, "Visitante sem nome" e
+  // uma conversa que ninguem sabe de quem e — e o nome e a unica coisa que
+  // transforma uma linha da lista numa pessoa.
+  const nomeDito = texto(corpo.nome, 120);
+  if (nomeDito) await definirNome(conversa.id, nomeDito);
 
   const minha = await gravarMensagem(conversa.id, "cliente", pergunta);
 
@@ -169,18 +189,40 @@ export async function POST(requisicao: Request) {
     };
   } else {
     // Três caminhos chegam aqui: o assistente pediu para passar, ele falhou,
-    // ou ele nem existe. O visitante vê a mesma coisa nos três, porque para
-    // ele a diferença não existe — o que importa é que alguém vai responder.
-    const fala = dito?.texto || recadoDeEntrega();
-    const id = await gravarMensagem(conversa.id, "assistente", fala);
-    await passarParaEquipe(conversa.id);
-    estado = "equipe";
-    resposta = {
-      id,
-      autor: "assistente",
-      texto: fala,
-      quando: new Date().toISOString(),
-    };
+    // ou ele nem existe.
+    //
+    // Mas passar depende de ter para quem. Fora do horário — ou com a equipe
+    // marcada como ausente no painel — a conversa NÃO é encaminhada: a
+    // pessoa recebe o horário e os canais, em vez de ficar esperando numa
+    // fila que ninguém vai olhar até amanhã.
+    const atendimento = await comoEstaOAtendimento();
+
+    if (!atendimento.atendendo) {
+      // O que o assistente escreveu continua valendo; o recado do horário
+      // entra depois dele, e não no lugar dele.
+      const fala = [dito?.texto, atendimento.recado]
+        .filter(Boolean)
+        .join("\n\n");
+
+      const id = await gravarMensagem(conversa.id, "assistente", fala);
+      resposta = {
+        id,
+        autor: "assistente",
+        texto: fala,
+        quando: new Date().toISOString(),
+      };
+    } else {
+      const fala = dito?.texto || recadoDeEntrega();
+      const id = await gravarMensagem(conversa.id, "assistente", fala);
+      await passarParaEquipe(conversa.id);
+      estado = "equipe";
+      resposta = {
+        id,
+        autor: "assistente",
+        texto: fala,
+        quando: new Date().toISOString(),
+      };
+    }
   }
 
   return NextResponse.json({
@@ -213,8 +255,13 @@ export async function GET(requisicao: Request) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 
+  // A faxina pega carona aqui: quem pergunta por mensagens novas ja esta
+  // falando com o banco, e uma consulta a mais nao se sente. Sem tarefa
+  // agendada para configurar, monitorar e esquecer.
+  void encerrarPorSilencio();
+
   const depois = Number(searchParams.get("depois") ?? 0);
-  const { estado, temFicha, avaliada, novas } = await mensagensDepois(
+  const { estado, temFicha, temNome, avaliada, novas } = await mensagensDepois(
     chave,
     Number.isFinite(depois) && depois > 0 ? depois : 0
   );
@@ -232,6 +279,7 @@ export async function GET(requisicao: Request) {
       ok: true,
       estado,
       temFicha,
+      temNome,
       avaliada,
       novas,
       expediente: {

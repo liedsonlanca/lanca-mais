@@ -1,8 +1,11 @@
 import { painelLiberado } from "@/lib/admin";
 import { assistenteLigado } from "@/lib/atendente";
-import { listarConversas } from "@/lib/conversas";
+import { encerrarPorSilencio, listarConversas } from "@/lib/conversas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import ListaDeConversas from "@/components/admin/ListaDeConversas";
+import SeletorDeAtendimento from "@/components/admin/SeletorDeAtendimento";
+import { ESTADOS, lerEstadoDaEquipe } from "@/lib/atendimento";
+import { definirEstadoDaEquipe } from "./acoes";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +29,14 @@ export default async function LayoutDasConversas({
   // não impede este de rodar, só escolhe se o mostra.
   if (!(await painelLiberado())) return null;
 
-  const conversas = await listarConversas();
+  // A faxina antes da lista, para a lista já sair limpa (ver
+  // encerrarPorSilencio: abrir a tela é o que encerra as conversas mortas).
+  await encerrarPorSilencio();
+
+  const [conversas, estadoDaEquipe] = await Promise.all([
+    listarConversas(),
+    lerEstadoDaEquipe(),
+  ]);
   const noExpediente = equipeNoExpediente();
 
   return (
@@ -53,13 +63,22 @@ export default async function LayoutDasConversas({
             Quem atende precisa saber se está dentro do horário anunciado ao
             visitante — é isso que decide se uma conversa parada há vinte
             minutos é um problema ou é a madrugada. */}
-        <p className="text-xs text-tinta/45">
-          {noExpediente ? (
-            <span className="text-destaque">● No horário de atendimento</span>
-          ) : (
-            <>Fora do horário — a equipe volta {quandoAEquipeVolta()}</>
-          )}
-        </p>
+        {/* O estado do atendimento, escolhido a mao.
+
+            O horario fixo acerta o caso comum e erra os extremos: a reuniao
+            de tres horas numa terca de manha e o sabado de lancamento nao
+            cabem numa tabela. "Automatico" e o padrao e segue o horario; os
+            outros tres cobrem o dia que nao foi como o combinado.
+
+            O assistente le isto antes de encaminhar qualquer conversa. */}
+        <SeletorDeAtendimento
+          acao={definirEstadoDaEquipe}
+          atual={estadoDaEquipe}
+          opcoes={ESTADOS}
+          agora={
+            noExpediente ? "atendendo" : `volta ${quandoAEquipeVolta()}`
+          }
+        />
       </div>
 
       {!assistenteLigado() && (

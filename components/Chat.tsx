@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { assinarSom, guardarSom, somLigado, tocar } from "@/lib/som";
+import { siteConfig } from "@/lib/site-config";
 
 // O chat do site.
 //
@@ -26,6 +27,11 @@ import { assinarSom, guardarSom, somLigado, tocar } from "@/lib/som";
 // explicar tudo de novo, que é o motivo mais comum de alguém desistir de um
 // chat de site.
 //
+// Mas só enquanto o atendimento está aberto. Encerrado, o navegador esquece
+// tudo: a chave, as mensagens e os dados. A próxima conversa começa do zero
+// e pede os dados de novo — foi o que a agência pediu, e é o certo num
+// computador que mais de uma pessoa usa.
+//
 // Armazenamento pode falhar: aba privada, site bloqueado. Toda leitura e
 // escrita vão em try/catch, e sem ele o chat funciona igual, só não lembra.
 
@@ -41,28 +47,34 @@ const GUARDA = "lanca:chat";
 const GUARDA_CONVITE = "lanca:chat-convite";
 
 /**
- * Os dados da pessoa, guardados no navegador dela a pedido dela.
+ * Onde versões antigas do chat guardavam nome, WhatsApp e e-mail.
  *
- * Servem para a próxima conversa começar com a ficha preenchida. Ficam só
- * aqui: o servidor já tem os mesmos dados na conversa, então isto não é
- * espalhar informação, é não cobrar duas vezes.
+ * O chat não guarda mais nada disso. A chave continua aqui só para apagar o
+ * que tiver ficado de antes, na primeira visita depois da mudança.
  */
 const GUARDA_DADOS = "lanca:chat-dados";
 
-type DadosSalvos = { nome: string; whatsapp: string; email: string };
+/** O contato da pessoa nesta conversa, só em memória, para o link do WhatsApp. */
+type Contato = { nome: string; email: string };
 
-function lerDados(): DadosSalvos | null {
-  try {
-    const cru = localStorage.getItem(GUARDA_DADOS);
-    if (!cru) return null;
-    const d = JSON.parse(cru) as Partial<DadosSalvos>;
-    if (!d?.nome || !d?.whatsapp || !d?.email) return null;
-    return { nome: d.nome, whatsapp: d.whatsapp, email: d.email };
-  } catch {
-    // Armazenamento recusado ou conteúdo estragado: segue sem lembrar.
-    return null;
-  }
+/**
+ * O link do WhatsApp com a mensagem já escrita.
+ *
+ * Nome, e-mail e assunto vão no texto para quem atende no WhatsApp não
+ * começar perguntando o que a pessoa já disse no chat. Cada linha só entra
+ * se houver o dado: mensagem com "Nome: " em branco parece formulário
+ * quebrado.
+ */
+function linkDoWhatsApp(contato: Contato | null, assunto: string) {
+  const linhas = ["Olá! Vim pelo chat do site da LANÇA+."];
+  if (contato?.nome) linhas.push(`Nome: ${contato.nome}`);
+  if (contato?.email) linhas.push(`E-mail: ${contato.email}`);
+  if (assunto) linhas.push(`Assunto: ${assunto}`);
+  if (linhas.length === 1) linhas.push("Gostaria de falar com a equipe.");
+  return `https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(linhas.join("\n"))}`;
 }
+
+const LINK_DO_INSTAGRAM = `https://www.instagram.com/${siteConfig.instagram.replace(/^@/, "")}/`;
 
 const SAUDACAO: Mensagem = {
   id: 0,
@@ -122,10 +134,14 @@ export default function Chat() {
   );
   const [temFicha, setTemFicha] = useState(false);
   const [avaliada, setAvaliada] = useState(false);
-  const [dadosSalvos, setDadosSalvos] = useState<DadosSalvos | null>(null);
 
-  /** Começou limpo por cima de um atendimento que ninguém avaliou. */
-  const [notaPendente, setNotaPendente] = useState(false);
+  /** Nome e e-mail desta conversa, depois da ficha. Nunca vão para o armazenamento. */
+  const [contato, setContato] = useState<Contato | null>(null);
+
+  /** Acabou de avaliar e recomeçar: um obrigado no topo da conversa nova. */
+  const [agradecido, setAgradecido] = useState(false);
+
+  const [encerrando, setEncerrando] = useState(false);
 
   /** Quantas mensagens chegaram enquanto o balao estava fechado. */
   const [naoLidas, setNaoLidas] = useState(0);
@@ -157,31 +173,37 @@ export default function Chat() {
   const fim = useRef<HTMLDivElement | null>(null);
   const campo = useRef<HTMLInputElement | null>(null);
 
-  /**
-   * O piso: ids até aqui não entram mais na tela.
-   *
-   * Serve ao recomeço limpo. A chave continua guardada — é ela que faz a
-   * próxima mensagem herdar nome, WhatsApp e e-mail — mas as mensagens do
-   * atendimento encerrado não devem voltar a aparecer, nem na carga da
-   * página nem na busca periódica seguinte.
-   */
+  /** O piso: ids até aqui não entram mais na tela. */
   const pisoDeId = useRef(0);
 
   /** Se esta carga de página já leu a conversa do servidor uma vez. */
   const jaCarregou = useRef(false);
 
-  /** Se esta carga de página começou limpa por cima de um atendimento findo. */
-  const recomecado = useRef(false);
-
   /**
-   * A chave do atendimento que será avaliado.
+   * Esquece a conversa inteira e volta à saudação.
    *
-   * Guardada à parte porque a nota é do atendimento anterior, e a chave
-   * corrente passa a ser outra assim que a pessoa escreve a primeira
-   * mensagem da conversa nova. Sem isto, avaliar depois de escrever
-   * carimbaria a nota na conversa errada.
+   * Roda depois da avaliação, e ao reabrir a página com o atendimento já
+   * encerrado. Apaga a chave do navegador: sem ela, a próxima mensagem abre
+   * uma conversa nova no servidor, sem nome, WhatsApp nem e-mail da anterior.
    */
-  const chaveParaNota = useRef("");
+  const limpar = useCallback(() => {
+    try {
+      localStorage.removeItem(GUARDA);
+      localStorage.removeItem(GUARDA_DADOS);
+    } catch {
+      // Sem armazenamento, não havia o que apagar.
+    }
+    chave.current = "";
+    pisoDeId.current = 0;
+    jaCarregou.current = false;
+    setMensagens([SAUDACAO]);
+    setEstado("assistente");
+    setTemFicha(false);
+    setAvaliada(false);
+    setContato(null);
+    setFalhou(false);
+    setNaoLidas(0);
+  }, []);
 
   // O id da última mensagem conhecida, para pedir só o que vier depois.
   const ultima = mensagens.reduce((maior, m) => Math.max(maior, m.id), 0);
@@ -242,68 +264,30 @@ export default function Chat() {
 
       const novas = dados.novas ?? [];
 
-      /* ---------- Recarregou depois de encerrado: começa limpo ----------
+      /* ---------- Reabriu a página depois de encerrado: começa do zero ----------
        *
-       * Atendimento findo é assunto findo. Abrir a página no dia seguinte e
-       * encontrar a conversa de ontem com "a equipe encerrou" no fim não
-       * convida ninguém a nada — é um bilhete velho preso na porta.
+       * Atendimento findo é assunto findo. A pessoa saiu da página com a
+       * conversa encerrada, então volta para uma conversa nova, sem o
+       * histórico e sem os dados de antes.
        *
-       * Enquanto o atendimento está em andamento, com o assistente ou com a
-       * equipe, recarregar não perde nada: ali a conversa continua, e quem
-       * recarregou foi a página, não a pessoa.
-       *
-       * A distinção é esta: encerrada **e** é a primeira leitura desta carga
-       * de página. Se a equipe encerrar com o chat aberto na frente da
-       * pessoa, isso não é primeira leitura — ela vê o aviso, que é o certo.
-       *
-       * A chave fica guardada de propósito: é ela que faz a próxima mensagem
-       * abrir uma conversa nova já com os dados dela.
+       * Só na primeira leitura desta carga de página: se a equipe encerrar
+       * com o chat aberto na frente da pessoa, ela vê o aviso e a avaliação,
+       * que é o certo.
        */
       if (primeiraLeitura && dados.estado === "fechada") {
-        pisoDeId.current = novas.reduce(
-          (maior, m) => Math.max(maior, m.id),
-          pisoDeId.current
-        );
-        recomecado.current = true;
-
-        if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
-
-        // A avaliação do atendimento que acabou, pedida mesmo começando
-        // limpo.
-        //
-        // Sem isto ela quase nunca seria pedida: a equipe encerra depois que
-        // a pessoa já saiu, e quem volta cai justamente neste caminho. Fica
-        // a pergunta sozinha, sem o histórico antigo em volta — é um convite
-        // de duas estrelas, não a conversa de ontem ressuscitada.
-        if (!dados.avaliada) {
-          chaveParaNota.current = chave.current;
-          setNotaPendente(true);
-        }
-
+        limpar();
         return;
       }
 
       if (dados.estado) {
         // O encerramento também é notícia que vem de fora, então apita como
-        // uma mensagem apita. Sem o toque, quem está com a aba atrás de
-        // outra janela continua esperando uma resposta que não vem mais.
-        //
-        // A comparação fica aqui, e não dentro do `setEstado`: função de
-        // atualização tem de ser pura, e o React pode chamá-la duas vezes em
-        // desenvolvimento — o bipe sairia dobrado.
-        // Depois de um recomeço limpo o servidor continua dizendo "fechada"
-        // até a pessoa escrever. Mostrar o aviso de encerramento numa tela
-        // que acabou de começar do zero seria dizer que acabou algo que ela
-        // nem viu começar.
-        const visivel =
-          dados.estado === "fechada" && recomecado.current
-            ? "assistente"
-            : dados.estado;
-
-        if (visivel === "fechada" && estado !== "fechada") {
+        // uma mensagem apita. A comparação fica aqui, e não dentro do
+        // `setEstado`: função de atualização tem de ser pura, e o React pode
+        // chamá-la duas vezes em desenvolvimento — o bipe sairia dobrado.
+        if (dados.estado === "fechada" && estado !== "fechada") {
           tocar("mensagem");
         }
-        setEstado(visivel);
+        setEstado(dados.estado);
       }
 
       if (typeof dados.temFicha === "boolean") setTemFicha(dados.temFicha);
@@ -325,7 +309,7 @@ export default function Chat() {
     } catch {
       // Rede instável: a próxima rodada tenta de novo.
     }
-  }, [aberto, estado, juntar, ultima]);
+  }, [aberto, estado, juntar, limpar, ultima]);
 
   /**
    * O convite, depois de trinta segundos de página.
@@ -355,6 +339,13 @@ export default function Chat() {
   // fazer, porque nada a avisou.
   useEffect(() => {
     chave.current = ler(GUARDA);
+
+    // Dados de contato que versões antigas do chat deixavam guardados.
+    try {
+      localStorage.removeItem(GUARDA_DADOS);
+    } catch {
+      // Nada a apagar.
+    }
 
     // E pergunta uma vez na hora, sem esperar a primeira rodada do relógio.
     //
@@ -403,20 +394,16 @@ export default function Chat() {
     return () => clearInterval(relogio);
   }, [aberto, buscar, estado]);
 
-  // Rola para o fim quando chega mensagem.
+  // Rola para o fim quando chega mensagem, e quando o atendimento encerra: o
+  // aviso de encerramento entra no fim da lista, e sem rolar ele ficava
+  // escondido até a pessoa descer por conta própria.
   useEffect(() => {
     if (aberto) fim.current?.scrollIntoView({ block: "end" });
-  }, [aberto, mensagens, enviando]);
+  }, [aberto, mensagens, enviando, estado]);
 
   function abrir() {
     setConvidando(false);
     guardar(GUARDA_CONVITE, "visto");
-
-    // Os dados guardados são lidos aqui, num clique, e não durante o
-    // desenho da tela: ler armazenamento no meio de um render é impuro, o
-    // React desaprova com razão, e o valor ainda chegaria diferente entre o
-    // HTML do servidor e o primeiro desenho no navegador.
-    setDadosSalvos(lerDados());
 
     // Abriu, leu: o aviso de mensagem nova perde a razão de existir no
     // mesmo instante.
@@ -429,6 +416,30 @@ export default function Chat() {
     guardarSom(novo);
     // Toca ao ligar, para a pessoa ouvir o que acabou de escolher.
     if (novo) tocar("mensagem");
+  }
+
+  /** O visitante encerra a conversa: vem a avaliação, depois o recomeço. */
+  async function encerrar() {
+    if (!chave.current || encerrando) return;
+    setEncerrando(true);
+    try {
+      const resposta = await fetch("/api/chat/encerrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({ chave: chave.current }),
+      });
+      if (resposta.ok) {
+        setEstado("fechada");
+        setAvaliada(false);
+        void buscar();
+      } else {
+        setFalhou(true);
+      }
+    } catch {
+      setFalhou(true);
+    } finally {
+      setEncerrando(false);
+    }
   }
 
   async function enviar(evento: React.FormEvent) {
@@ -475,7 +486,14 @@ export default function Chat() {
 
       if (dados.expediente) setExpediente(dados.expediente);
 
+      setAgradecido(false);
+
       if (dados.chave) {
+        // A conversa nasceu (ou continua) nesta página: a próxima leitura
+        // não é a "primeira" de uma página reaberta. Sem isto, encerrar logo
+        // depois caía na regra de quem reabre a página com a conversa já
+        // encerrada, e o chat recomeçava sem pedir a avaliação.
+        jaCarregou.current = true;
         chave.current = dados.chave;
         guardar(GUARDA, dados.chave);
       }
@@ -485,8 +503,6 @@ export default function Chat() {
         // outra conversa. A tela recomeça: deixar o histórico antigo em cima
         // faria a pessoa achar que a equipe continua lendo aquilo, e no
         // painel aquilo é outro assunto, já fechado.
-        //
-        // Os dados dela vão junto no servidor, então a ficha não volta.
         setMensagens([
           SAUDACAO,
           {
@@ -496,10 +512,9 @@ export default function Chat() {
           },
         ]);
 
-        // A conversa é outra: o piso e a marca de recomeço eram do
-        // atendimento anterior e não valem mais.
+        // A conversa é outra: o piso e os dados eram do atendimento anterior.
         pisoDeId.current = 0;
-        recomecado.current = false;
+        setContato(null);
       } else if (dados.minha) {
         // Troca o id provisório pelo do banco, senão a busca periódica traria
         // a mesma mensagem de novo e ela apareceria duas vezes.
@@ -646,6 +661,19 @@ export default function Chat() {
 
   const pedindoFicha = estado === "equipe" && !temFicha;
 
+  // Encerrado e sem nota: a avaliação toma o lugar do campo de mensagem.
+  //
+  // Ela ficava no fim da lista, visível só rolando, e o campo continuava
+  // ali embaixo — a pessoa escrevia por cima de um atendimento encerrado sem
+  // nem ver que havia uma pergunta. No rodapé ela é a única coisa a fazer.
+  const aguardandoNota = estado === "fechada" && !avaliada;
+
+  const assunto =
+    mensagens.find((m) => m.autor === "cliente")?.texto.slice(0, 140) ?? "";
+  const whatsapp = linkDoWhatsApp(contato, assunto);
+  const conversando =
+    estado !== "fechada" && mensagens.some((m) => m.autor === "cliente");
+
   return (
     <div
       // data-lenis-prevent: a rolagem suave do site captura a roda do mouse
@@ -683,7 +711,20 @@ export default function Chat() {
           </p>
         </div>
 
-        <div className="-mr-1 -mt-1 flex shrink-0">
+        <div className="-mr-1 -mt-1 flex shrink-0 items-center">
+          {conversando && (
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm("Encerrar este atendimento?")) void encerrar();
+              }}
+              disabled={encerrando}
+              className="mr-1 min-h-9 rounded-xl px-2 text-xs text-tinta/50 transition-colors duration-300 hover:bg-fundo-alt hover:text-tinta disabled:opacity-50"
+            >
+              {encerrando ? "Encerrando…" : "Encerrar"}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={trocarSom}
@@ -732,6 +773,32 @@ export default function Chat() {
         </div>
       </div>
 
+      {/* Os canais, sempre à mão.
+
+          O WhatsApp vai com a mensagem pronta — nome, e-mail e o assunto que
+          a pessoa trouxe para o chat —, para quem atende lá não recomeçar
+          do zero. */}
+      <div className="flex gap-2 border-b border-contorno px-4 py-2">
+        <a
+          href={whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-contorno px-3 text-xs text-tinta/70 transition-colors duration-300 hover:border-salmon hover:text-tinta"
+        >
+          <IconeWhatsApp />
+          WhatsApp
+        </a>
+        <a
+          href={LINK_DO_INSTAGRAM}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-contorno px-3 text-xs text-tinta/70 transition-colors duration-300 hover:border-salmon hover:text-tinta"
+        >
+          <IconeInstagram />
+          Instagram
+        </a>
+      </div>
+
       {/* aria-live para quem usa leitor de tela ouvir a resposta chegar, em
           vez de ter de voltar e varrer a lista procurando o que mudou. */}
       <div
@@ -739,6 +806,12 @@ export default function Chat() {
         aria-live="polite"
         aria-atomic="false"
       >
+        {agradecido && (
+          <p role="status" className="mb-3 text-center text-xs text-tinta/45">
+            Obrigado pela avaliação! Esta é uma conversa nova.
+          </p>
+        )}
+
         <ul className="grid gap-3">
           {mensagens.map((m) => (
             <li
@@ -757,6 +830,23 @@ export default function Chat() {
               <p className="whitespace-pre-line text-sm leading-relaxed text-tinta/85">
                 {m.texto}
               </p>
+
+              {/* Falou em WhatsApp, entrega o botão.
+
+                  O número escrito no texto obriga a pessoa a copiar, trocar
+                  de aplicativo e colar. O botão abre a conversa direto, com a
+                  mensagem já escrita. */}
+              {m.autor !== "cliente" && /whatsapp/i.test(m.texto) && (
+                <a
+                  href={whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex min-h-9 items-center gap-1.5 rounded-full bg-salmon px-3 text-xs font-medium text-preto transition-opacity duration-300 hover:opacity-90"
+                >
+                  <IconeWhatsApp />
+                  Chamar no WhatsApp
+                </a>
+              )}
             </li>
           ))}
 
@@ -781,41 +871,13 @@ export default function Chat() {
             A nota é centrada e sem balão de propósito: é recado do sistema,
             e não fala de ninguém. E diz como voltar, porque conversa
             encerrada não é porta trancada. */}
-        {(estado === "fechada" || notaPendente) && (
-          <div className="mt-4 border-t border-contorno pt-4">
-            {estado === "fechada" && (
-              <p
-                role="status"
-                className="text-center text-xs leading-relaxed text-tinta/45"
-              >
-                A equipe encerrou este atendimento.
-                <br />
-                Se precisar de mais alguma coisa, é só escrever aqui embaixo —
-                a gente começa uma conversa nova, sem você repetir seus dados.
-              </p>
-            )}
-
-            {/* A avaliação, pedida aqui e não por e-mail no dia seguinte.
-
-                Pesquisa que chega depois mede quem ficou com raiva e quem
-                ficou encantado; o meio-termo, que é a maioria, nunca
-                responde. No fim da conversa a pessoa ainda está aqui, e são
-                duas estrelas de distância. */}
-            {!avaliada && (
-              <Avaliacao
-                titulo={
-                  estado === "fechada"
-                    ? "Como foi o atendimento?"
-                    : "Como foi o seu último atendimento?"
-                }
-                // Sem `onPronto` que desmonte o bloco: quem fecha o assunto
-                // é o próprio componente, com o "obrigado". Desmontando
-                // aqui, a pessoa clicava em enviar e o bloco sumia sem dizer
-                // nada — parece que a avaliação se perdeu.
-                obterChave={() => chaveParaNota.current || chave.current}
-              />
-            )}
-          </div>
+        {estado === "fechada" && (
+          <p
+            role="status"
+            className="mt-4 border-t border-contorno pt-4 text-center text-xs leading-relaxed text-tinta/45"
+          >
+            Este atendimento foi encerrado.
+          </p>
         )}
 
         <div ref={fim} />
@@ -828,14 +890,37 @@ export default function Chat() {
         </p>
       )}
 
-      {pedindoFicha ? (
+      {estado === "fechada" ? (
+        aguardandoNota ? (
+          <div className="border-t border-contorno px-4 pb-4">
+            <Avaliacao
+              titulo="Como foi o atendimento?"
+              obterChave={() => chave.current}
+              onConcluir={() => {
+                limpar();
+                setAgradecido(true);
+              }}
+            />
+          </div>
+        ) : (
+          <div className="border-t border-contorno px-4 py-3">
+            <button
+              type="button"
+              onClick={limpar}
+              className="flex min-h-11 w-full items-center justify-center rounded-xl bg-salmon text-sm font-medium text-preto"
+            >
+              Começar nova conversa
+            </button>
+          </div>
+        )
+      ) : pedindoFicha ? (
         <FichaDeContato
           // Passada como função, e não como valor: ler `ref.current` durante
           // o desenho entrega o que havia no desenho anterior, e a chave pode
           // ter acabado de nascer na primeira mensagem.
           obterChave={() => chave.current}
-          salvos={dadosSalvos}
-          onPronto={() => {
+          onPronto={(dados) => {
+            setContato(dados);
             setTemFicha(true);
             void buscar();
           }}
@@ -900,13 +985,15 @@ export default function Chat() {
 function Avaliacao({
   titulo,
   obterChave,
+  onConcluir,
 }: {
   titulo: string;
   obterChave: () => string;
+  /** Depois da nota (com ou sem comentário): o chat recomeça do zero. */
+  onConcluir: () => void;
 }) {
   const [nota, setNota] = useState(0);
   const [comentario, setComentario] = useState("");
-  const [enviado, setEnviado] = useState(false);
 
   async function mandar(valor: number, texto: string) {
     try {
@@ -921,18 +1008,11 @@ function Avaliacao({
     }
   }
 
-  if (enviado) {
-    return (
-      <p className="mt-3 text-center text-xs text-tinta/45">
-        Obrigado pela avaliação.
-      </p>
-    );
-  }
-
   return (
     <div className="mt-4">
-      <p className="text-center text-xs text-tinta/55">
-        {titulo}
+      <p className="text-center text-sm font-medium text-tinta">{titulo}</p>
+      <p className="mt-0.5 text-center text-xs text-tinta/45">
+        Avalie para começar uma nova conversa.
       </p>
 
       <div className="mt-2 flex justify-center gap-1">
@@ -958,7 +1038,7 @@ function Avaliacao({
               stroke="currentColor"
               strokeWidth="1.4"
               strokeLinejoin="round"
-              className={`h-6 w-6 ${valor <= nota ? "text-salmon" : "text-tinta/30"}`}
+              className={`h-7 w-7 ${valor <= nota ? "text-salmon" : "text-tinta/30"}`}
             >
               <path d="m12 3 2.6 5.6 6.4.8-4.7 4.3 1.2 6.3L12 17l-5.5 3 1.2-6.3L3 9.4l6.4-.8z" />
             </svg>
@@ -966,14 +1046,17 @@ function Avaliacao({
         ))}
       </div>
 
+      {/* A nota já foi gravada no clique da estrela; o comentário é bônus.
+          Os dois botões levam ao mesmo lugar, a conversa nova. */}
       {nota > 0 && (
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            void mandar(nota, comentario.trim());
-            setEnviado(true);
+            const texto = comentario.trim();
+            if (texto) void mandar(nota, texto);
+            onConcluir();
           }}
-          className="mt-3 flex gap-2"
+          className="mt-3 grid gap-2"
         >
           <input
             value={comentario}
@@ -981,13 +1064,13 @@ function Avaliacao({
             maxLength={500}
             placeholder="Quer contar o porquê? (opcional)"
             aria-label="Comentário sobre o atendimento"
-            className="min-h-11 flex-1 rounded-xl border border-contorno bg-fundo-alt px-3.5 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
+            className="min-h-11 rounded-xl border border-contorno bg-fundo-alt px-3.5 text-sm text-tinta outline-none transition-colors duration-300 placeholder:text-tinta/35 focus:border-salmon"
           />
           <button
             type="submit"
-            className="min-h-11 shrink-0 rounded-xl border border-contorno px-4 text-sm text-tinta/70 transition-colors duration-300 hover:text-tinta"
+            className="flex min-h-11 items-center justify-center rounded-xl bg-salmon text-sm font-medium text-preto"
           >
-            Enviar
+            {comentario.trim() ? "Enviar e começar nova conversa" : "Começar nova conversa"}
           </button>
         </form>
       )}
@@ -1009,25 +1092,16 @@ function Avaliacao({
  */
 function FichaDeContato({
   obterChave,
-  salvos,
   onPronto,
 }: {
   obterChave: () => string;
-  salvos: DadosSalvos | null;
-  onPronto: () => void;
+  onPronto: (dados: Contato) => void;
 }) {
-  const [nome, setNome] = useState(salvos?.nome ?? "");
-  const [whatsapp, setWhatsapp] = useState(salvos?.whatsapp ?? "");
-  const [email, setEmail] = useState(salvos?.email ?? "");
+  const [nome, setNome] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
-
-  // Marcado por padrão, e dito com todas as letras ao lado.
-  //
-  // Quem já pediu para guardar na vez passada chega com os campos cheios e
-  // só confirma; quem não quer, desmarca uma vez e nunca mais vê os dados
-  // voltarem. Guardar nada é o oposto de um site que lembra de você.
-  const [guardarDados, setGuardarDados] = useState(true);
 
   async function mandar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -1069,24 +1143,8 @@ function FichaDeContato({
         return;
       }
 
-      // Guardado só no navegador dela, e só se ela quis. O servidor já tem
-      // os mesmos dados na conversa — isto não espalha informação, apenas
-      // evita cobrar duas vezes a mesma coisa da mesma pessoa.
-      try {
-        if (guardarDados) {
-          localStorage.setItem(
-            GUARDA_DADOS,
-            JSON.stringify({ nome: nome.trim(), whatsapp, email: email.trim() })
-          );
-        } else {
-          localStorage.removeItem(GUARDA_DADOS);
-        }
-      } catch {
-        // Aba privada: vale para esta visita, e pronto.
-      }
-
       tocar("mensagem");
-      onPronto();
+      onPronto({ nome: nome.trim(), email: email.trim() });
     } catch {
       setErro("Não deu para enviar. Tente de novo.");
     } finally {
@@ -1142,16 +1200,6 @@ function FichaDeContato({
         />
       </div>
 
-      <label className="mt-3 flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-tinta/50">
-        <input
-          type="checkbox"
-          checked={guardarDados}
-          onChange={(e) => setGuardarDados(e.target.checked)}
-          className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--salmon)]"
-        />
-        Salvar meus dados neste navegador para a próxima conversa
-      </label>
-
       {/* O horário dito aqui, no momento em que ele passa a importar.
 
           Antes disso é informação solta; aqui a pessoa acabou de pedir para
@@ -1172,5 +1220,34 @@ function FichaDeContato({
         {enviando ? "Enviando…" : "Pedir atendimento"}
       </button>
     </form>
+  );
+}
+
+/* ---------------- Ícones dos canais ---------------- */
+
+function IconeWhatsApp() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+      <path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm8.4-18.2A11.8 11.8 0 0 0 1.9 17.9L.2 24l6.3-1.6A11.8 11.8 0 0 0 24 12c0-3.2-1.2-6.1-3.5-8.4z" />
+    </svg>
+  );
+}
+
+function IconeInstagram() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3.5 w-3.5"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <path d="M17.5 6.5h.01" />
+    </svg>
   );
 }

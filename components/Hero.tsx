@@ -134,7 +134,11 @@ export default function Hero({ numeros, vitrine, depoimentos, marca }: Props) {
       .map((peca, i) => {
         let d = (i - indice + n) % n;
         if (d > n / 2) d -= n;
-        return { peca, d, chave: peca.src };
+        // O vídeo antes da capa: peça de vídeo não tem capa (o primeiro
+        // quadro faz esse papel), e com `src` vazio todas as peças de vídeo
+        // ficavam com a mesma chave "". O React se perdia em qual cartão era
+        // qual, e o giro deixava de saber o que animar.
+        return { peca, d, chave: peca.video || peca.src || `peca-${i}` };
       })
       .filter(({ d }) => Math.abs(d) <= 2);
   }, [pecas, indice]);

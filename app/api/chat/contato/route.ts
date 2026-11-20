@@ -9,6 +9,7 @@ import {
 } from "@/lib/conversas";
 import { origemDaRequisicao, podeTentar, registrarFalha } from "@/lib/tentativas";
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
+import { estaBarrado } from "@/lib/atendimento";
 
 // A ficha de contato do chat: nome e sobrenome, WhatsApp e e-mail.
 //
@@ -55,6 +56,9 @@ export async function POST(requisicao: Request) {
     return NextResponse.json({ ok: false, motivo: "chave" }, { status: 400 });
   }
 
+  // O nome pode vir vazio: o chat pergunta no comeco, e quando ele ja esta
+  // guardado na conversa a ficha nem mostra o campo. Quem pulou aquela etapa
+  // continua tendo de preencher aqui.
   const nome = texto(corpo.nome, 120);
   const whatsapp = texto(corpo.whatsapp, 25).replace(/\D/g, "");
   const email = texto(corpo.email, 160);
@@ -68,8 +72,6 @@ export async function POST(requisicao: Request) {
   // Nome e sobrenome: duas palavras de verdade. "João" sozinho não serve
   // para quem vai atender, e é o que a pessoa digita quando ninguém pede o
   // resto.
-  const nomeCompleto = nome.split(/\s+/).filter((p) => p.length > 1).length >= 2;
-
   // E-mail checado de leve — arroba, ponto depois, sem espaço. Expressão
   // rigorosa recusa endereço válido, e recusar o e-mail certo de um cliente
   // é pior do que aceitar um errado.
@@ -78,13 +80,12 @@ export async function POST(requisicao: Request) {
   // Dez dígitos é fixo com DDD; onze, celular. Menos que isso não liga.
   const whatsappValido = whatsapp.length >= 10 && whatsapp.length <= 13;
 
-  if (!nomeCompleto || !emailValido || !whatsappValido) {
+  if (!emailValido || !whatsappValido) {
     return NextResponse.json(
       {
         ok: false,
         motivo: "campos",
         falhas: {
-          nome: !nomeCompleto,
           email: !emailValido,
           whatsapp: !whatsappValido,
         },
@@ -98,9 +99,30 @@ export async function POST(requisicao: Request) {
     requisicao.headers.get("user-agent") ?? ""
   );
 
+  // Barrado: a mesma resposta de quem deu certo, e nada gravado nem enviado
+  // ao CRM. Pelo mesmo motivo do chat — avisar ensina a dar a volta.
+  if (await estaBarrado(chaveEnviada, visitante)) {
+    return NextResponse.json({ ok: true });
+  }
+
   const conversa = await acharOuAbrir(chaveEnviada, visitante);
   if (!conversa) {
     return NextResponse.json({ ok: false, motivo: "config" }, { status: 503 });
+  }
+
+  // O nome que vale: o que veio na ficha, ou o que a conversa ja tinha.
+  const nomeFinal = nome || conversa.nome;
+  // Nome e sobrenome: duas palavras de verdade. "João" sozinho não serve
+  // para quem vai atender, e é o que a pessoa digita quando ninguém pede o
+  // resto.
+  if (
+    !nomeFinal ||
+    nomeFinal.split(/\s+/).filter((parte) => parte.length > 1).length < 2
+  ) {
+    return NextResponse.json(
+      { ok: false, motivo: "campos", falhas: { nome: true } },
+      { status: 400 }
+    );
   }
 
   await registrarFalha("chat-contato", origem);
@@ -110,7 +132,7 @@ export async function POST(requisicao: Request) {
   // Esta ordem importa: o CRM é de outra pessoa e pode estar fora do ar, e
   // nesse caso o dado não pode se perder. Gravado aqui, ele aparece no
   // painel mesmo que o webhook falhe — e a equipe atende por aqui.
-  await passarParaEquipe(conversa.id, { nome, contato: whatsapp, email });
+  await passarParaEquipe(conversa.id, { nome: nomeFinal, contato: whatsapp, email });
 
   // A confirmação diz quando, e não só que.
   //
@@ -124,7 +146,7 @@ export async function POST(requisicao: Request) {
   await gravarMensagem(
     conversa.id,
     "assistente",
-    `Obrigado, ${nome.split(/\s+/)[0]}. ${quando} por aqui ou no seu ` +
+    `Obrigado, ${nomeFinal.split(/\s+/)[0]}. ${quando} por aqui ou no seu ` +
       `WhatsApp. Se quiser adiantar, pode escrever sua dúvida abaixo.`
   );
 
@@ -134,7 +156,7 @@ export async function POST(requisicao: Request) {
     caminho: "/chat",
     // Só o nome no aviso: telefone e e-mail já estão na ficha, e repeti-los
     // numa lista que fica aberta na tela do painel só espalha o dado.
-    detalhe: nome,
+    detalhe: nomeFinal,
   });
 
   const endereco = process.env.DGFLOW_WEBHOOK_URL;
@@ -149,7 +171,7 @@ export async function POST(requisicao: Request) {
         // adivinhou a codificação, e adivinhou errado.
         headers: { "Content-Type": "application/json; charset=utf-8" },
         body: JSON.stringify({
-          nome,
+          nome: nomeFinal,
           whatsapp,
           email,
           servico: "Chat do site",

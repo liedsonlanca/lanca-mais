@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import type { Notificacao } from "@/lib/eventos";
+import { quantoFaz } from "@/lib/horario";
+import { tocar } from "@/lib/som";
 
 // O sino do painel.
 //
@@ -24,22 +27,12 @@ const CORES: Record<Notificacao["estado"], string> = {
   saiu: "text-tinta/35",
   lead: "text-destaque",
   chat: "text-destaque",
+  respondida: "text-tinta/35",
 };
 
-function quandoLegivel(iso: string) {
-  const minutos = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutos < 1) return "agora";
-  if (minutos < 60) return `há ${minutos} min`;
-  const horas = Math.round(minutos / 60);
-  if (horas < 24) return `há ${horas} h`;
-  return new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-  });
-}
 
 function Icone({ estado }: { estado: Notificacao["estado"] }) {
-  if (estado === "chat") {
+  if (estado === "chat" || estado === "respondida") {
     return (
       <svg
         aria-hidden
@@ -100,6 +93,61 @@ function Icone({ estado }: { estado: Notificacao["estado"] }) {
 
 export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
   const [aberto, setAberto] = useState(false);
+  const botao = useRef<HTMLButtonElement | null>(null);
+
+  // Onde a lista abre, medido no clique.
+  //
+  // Ela era `absolute` dentro da barra lateral — e a barra tem rolagem
+  // própria, que corta tudo o que passa da largura dela. A lista de 320px
+  // saía de uma barra de 256px e ficava cortada, parecendo estar atrás do
+  // painel. `fixed` escapa do corte; a posição vem do próprio sino.
+  const [posicao, setPosicao] = useState<{ top: number; left: number } | null>(
+    null
+  );
+
+  // O pop-up de mensagem nova.
+  //
+  // O sino só muda quando alguém olha para ele. Mensagem de cliente é a
+  // única notícia que não pode esperar alguém olhar: ela salta no canto da
+  // tela, com som, e leva direto à conversa num clique.
+  //
+  // "Nova" é a que não estava na lista anterior. Na primeira leitura tudo é
+  // anterior — abrir o painel não dispara um pop-up para cada mensagem do
+  // dia.
+  const vistas = useRef<Set<string> | null>(null);
+  const [recente, setRecente] = useState<Notificacao | null>(null);
+
+  useEffect(() => {
+    const chats = lista.filter((n) => n.estado === "chat");
+    if (vistas.current === null) {
+      vistas.current = new Set(chats.map((n) => n.chave));
+      return;
+    }
+    const novas = chats.filter((n) => !vistas.current!.has(n.chave));
+    for (const n of chats) vistas.current.add(n.chave);
+    if (novas.length === 0) return;
+
+    setRecente(novas[0]);
+    tocar("mensagem");
+    const relogio = setTimeout(() => setRecente(null), 10_000);
+    return () => clearTimeout(relogio);
+  }, [lista]);
+
+  function alternar() {
+    if (aberto) {
+      setAberto(false);
+      return;
+    }
+    const caixa = botao.current?.getBoundingClientRect();
+    if (caixa) {
+      const largura = Math.min(320, window.innerWidth - 32);
+      setPosicao({
+        top: caixa.bottom + 4,
+        left: Math.max(16, Math.min(caixa.left, window.innerWidth - largura - 16)),
+      });
+    }
+    setAberto(true);
+  }
   // O contador conta o que tem gente do outro lado esperando: quem está no
   // diagnóstico neste instante e quem pediu atendimento no chat. Avisos de
   // quem já saiu não entram — número que não pede ação nenhuma ensina a
@@ -129,9 +177,46 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
 
   return (
     <div className="relative">
+      {recente && (
+        <div
+          role="status"
+          className="fixed bottom-6 right-6 z-[70] w-[min(340px,calc(100vw-3rem))] rounded-2xl border border-contorno bg-cartao p-4 shadow-[0_30px_70px_-30px_rgba(10,10,8,0.45)]"
+        >
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 text-destaque">
+              <Icone estado="chat" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-tinta">{recente.titulo}</p>
+              <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-tinta/60">
+                {recente.texto}
+              </p>
+              {recente.href && (
+                <Link
+                  href={recente.href}
+                  onClick={() => setRecente(null)}
+                  className="mt-2 inline-flex min-h-9 items-center rounded-full bg-salmon px-3 text-xs font-medium text-preto"
+                >
+                  Abrir conversa
+                </Link>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setRecente(null)}
+              aria-label="Fechar aviso"
+              className="-mr-1 -mt-1 flex h-8 w-8 items-center justify-center rounded-lg text-tinta/40 hover:text-tinta"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <button
+        ref={botao}
         type="button"
-        onClick={() => setAberto((v) => !v)}
+        onClick={alternar}
         aria-expanded={aberto}
         aria-label={
           agora > 0
@@ -172,7 +257,7 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
             aria-hidden
             tabIndex={-1}
             onClick={() => setAberto(false)}
-            className="fixed inset-0 z-40 cursor-default"
+            className="fixed inset-0 z-[60] cursor-default"
           />
 
           {/* Abre para a direita, e nao para a esquerda.
@@ -181,7 +266,9 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
               a direita, um painel de 320px saia da tela e ficava cortado. A
               largura tambem deixou de ser fixa — em telefone estreito, 320px
               passam da tela sozinhos. */}
-          <div className="absolute left-0 z-50 mt-1 w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.35)]">
+          <div
+            style={posicao ?? undefined}
+            className="fixed z-[61] w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-contorno bg-cartao shadow-[0_30px_70px_-30px_rgba(10,10,8,0.35)]">
             <div className="border-b border-contorno px-4 py-3">
               <p className="text-sm font-semibold text-tinta">Notificações</p>
               <p className="mt-0.5 text-xs text-tinta/45">
@@ -189,19 +276,27 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
               </p>
             </div>
 
-            <ul className="max-h-[360px] overflow-y-auto">
+            <ul className="max-h-[min(360px,calc(100vh-14rem))] overflow-y-auto">
               {lista.length === 0 && (
                 <li className="px-4 py-6 text-sm text-tinta/50">
                   Nada ainda. Os avisos aparecem quando alguém abrir o
-                  diagnóstico ou pedir um orçamento.
+                  diagnóstico, pedir um orçamento ou escrever no chat.
                 </li>
               )}
 
               {lista.map((n) => (
                 <li
                   key={n.chave}
-                  className="flex gap-3 border-b border-contorno px-4 py-3 last:border-b-0"
+                  className="relative flex gap-3 border-b border-contorno px-4 py-3 transition-colors duration-300 last:border-b-0 hover:bg-fundo-alt"
                 >
+                  {n.href && (
+                    <Link
+                      href={n.href}
+                      onClick={() => setAberto(false)}
+                      aria-label={`${n.titulo}: abrir a conversa`}
+                      className="absolute inset-0"
+                    />
+                  )}
                   <span
                     className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center ${CORES[n.estado]}`}
                   >
@@ -214,7 +309,7 @@ export default function Notificacoes({ lista }: { lista: Notificacao[] }) {
                       {n.texto}
                     </p>
                     <p className="mt-1 text-[0.7rem] text-tinta/35">
-                      {quandoLegivel(n.quando)}
+                      {quantoFaz(n.quando)}
                     </p>
                   </div>
                 </li>

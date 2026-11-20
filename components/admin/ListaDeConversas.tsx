@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { ConversaNaLista } from "@/lib/conversas";
+import { quantoFaz } from "@/lib/horario";
 
 // A coluna de conversas, à esquerda da tela.
 //
@@ -31,17 +32,6 @@ const ESTADOS: Record<
   fechada: { rotulo: "Encerrada", classe: "bg-fundo-alt text-tinta/35" },
 };
 
-function quandoLegivel(iso: string) {
-  const minutos = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutos < 1) return "agora";
-  if (minutos < 60) return `${minutos} min`;
-  const horas = Math.round(minutos / 60);
-  if (horas < 24) return `${horas} h`;
-  return new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-  });
-}
 
 function Inicial({ nome }: { nome: string }) {
   const letras = nome
@@ -167,7 +157,7 @@ export default function ListaDeConversas({
                       {conversa.nome || "Visitante sem nome"}
                     </p>
                     <span className="shrink-0 text-[0.7rem] text-tinta/35">
-                      {quandoLegivel(conversa.mexidoEm)}
+                      {quantoFaz(conversa.mexidoEm)}
                     </span>
                   </div>
 

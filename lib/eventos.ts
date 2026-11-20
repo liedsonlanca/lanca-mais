@@ -63,8 +63,10 @@ export async function registrarEvento(dados: {
 
 export type Notificacao = {
   chave: string;
-  estado: "agora" | "saiu" | "lead" | "chat";
+  estado: "agora" | "saiu" | "lead" | "chat" | "respondida";
   titulo: string;
+  /** Para onde o clique leva, quando há um lugar certo para ir. */
+  href?: string;
   texto: string;
   quando: string;
 };
@@ -131,19 +133,32 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
          LIMIT 10
       `),
 
-      // As conversas do chat que estão esperando a equipe.
+      // Cada mensagem de cliente numa conversa que está com a equipe.
       //
-      // Vem da tabela, e não de um evento gravado: o aviso precisa dizer o
-      // que *está* pendente agora, e não que alguém pediu atendimento há
-      // seis horas. Respondida a conversa, o aviso sai da lista sozinho —
-      // com evento, ele ficaria lá até alguém apagar.
+      // ---------- Por que por mensagem, e não por conversa ----------
+      //
+      // A primeira versão dava uma linha por conversa esperando, e a linha só
+      // mudava de hora quando chegava mensagem nova. Quem olhava o sino via
+      // sempre os mesmos avisos "se mexendo", nunca um aviso novo — e não
+      // sabia que a pessoa tinha escrito de novo, nem o quê.
+      //
+      // Agora cada mensagem é um aviso, com o começo do texto. As que já têm
+      // resposta da equipe depois delas ficam na lista, apagadas, e saem do
+      // contador: o número diz o que ainda espera alguém.
       sql.query(`
-        SELECT c.id, c.nome,
-               to_char(c.mexido_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS quando
-          FROM conversas c
-         WHERE c.estado = 'equipe'
-         ORDER BY c.mexido_em DESC
-         LIMIT 10
+        SELECT m.id, m.conversa, c.nome, left(m.texto, 90) AS texto,
+               to_char(m.criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS quando,
+               m.id > coalesce((
+                 SELECT max(e.id) FROM mensagens e
+                  WHERE e.conversa = m.conversa AND e.autor = 'equipe'
+               ), 0) AS pendente
+          FROM mensagens m
+          JOIN conversas c ON c.id = m.conversa
+         WHERE m.autor = 'cliente'
+           AND c.estado = 'equipe'
+           AND m.criado_em > now() - interval '24 hours'
+         ORDER BY m.id DESC
+         LIMIT 15
       `),
     ]);
 
@@ -239,17 +254,20 @@ export async function lerNotificacoes(): Promise<Notificacao[]> {
 
     for (const linha of conversas as Array<{
       id: number;
+      conversa: number;
       nome: string | null;
+      texto: string;
       quando: string;
+      pendente: boolean;
     }>) {
+      const quem = linha.nome?.split(/\s+/)[0] || "Visitante";
       avisos.push({
-        chave: `c-${linha.id}`,
-        estado: "chat",
-        titulo: "Conversa esperando no chat",
-        texto: linha.nome
-          ? `${linha.nome} pediu para falar com a equipe.`
-          : "Alguém pediu para falar com a equipe.",
+        chave: `m-${linha.id}`,
+        estado: linha.pendente ? "chat" : "respondida",
+        titulo: linha.pendente ? "Nova mensagem no chat" : "Mensagem respondida",
+        texto: `${quem}: “${linha.texto}”`,
         quando: linha.quando,
+        href: `/lncadmin/conversas/${linha.conversa}`,
       });
     }
 

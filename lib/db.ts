@@ -234,6 +234,8 @@ const TABELAS = [
      -- Nula enquanto ninguém avaliou, e não zero: zero seria uma nota.
      nota       INTEGER,
      comentario TEXT NOT NULL DEFAULT '',
+     -- 'equipe' ou 'inatividade'. Vazio enquanto a conversa está aberta.
+     fechada_por TEXT NOT NULL DEFAULT '',
      criado_em  TIMESTAMPTZ NOT NULL DEFAULT now(),
      mexido_em  TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
@@ -256,6 +258,17 @@ const TABELAS = [
 
   `CREATE INDEX IF NOT EXISTS mensagens_por_conversa
      ON mensagens (conversa, id)`,
+
+  // Quem foi barrado no chat.
+  //
+  // Guarda a chave da conversa e a impressão do visitante. Barra quem veio
+  // incomodar e vai embora; não barra quem está decidido, porque a impressão
+  // troca de dia e a chave vive no navegador. Ver lib/atendimento.ts.
+  `CREATE TABLE IF NOT EXISTS bloqueios (
+     chave      TEXT PRIMARY KEY,
+     visitante  TEXT NOT NULL DEFAULT '',
+     criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+   )`,
 
   // Os pedidos de orçamento do formulário.
   //
@@ -304,6 +317,14 @@ const EVOLUCOES = [
   // não acrescenta coluna a tabela que já está lá.
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS nota INTEGER`,
   `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS comentario TEXT NOT NULL DEFAULT ''`,
+  // Quem encerrou: a equipe ou o relógio.
+  //
+  // "Encerrada" sem dizer por quem faz parecer que alguém decidiu encerrar,
+  // quando na verdade a conversa morreu sozinha de silêncio. São dois fatos
+  // diferentes, e quem lê a lista precisa distinguir um do outro — uma
+  // conversa que apagou por inatividade pode ser um cliente que ficou sem
+  // resposta boa, e isso merece outro olhar.
+  `ALTER TABLE conversas ADD COLUMN IF NOT EXISTS fechada_por TEXT NOT NULL DEFAULT ''`,
   // Ajuste fino do tamanho de cada logo, em porcentagem.
   //
   // Arquivos de logo chegam com proporções e margens internas diferentes: um

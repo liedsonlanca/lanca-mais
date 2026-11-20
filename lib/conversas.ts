@@ -42,6 +42,8 @@ export type Conversa = {
   /** A nota de 1 a 5, ou null enquanto ninguém avaliou. */
   nota: number | null;
   comentario: string;
+  /** "equipe", "inatividade", ou vazio enquanto aberta. */
+  fechadaPor: string;
   criadoEm: string;
   mexidoEm: string;
 };
@@ -93,7 +95,7 @@ export async function acharOuAbrir(chave: string, visitante: string) {
     `INSERT INTO conversas (chave, visitante)
           VALUES ($1, $2)
      ON CONFLICT (chave) DO UPDATE SET mexido_em = now()
-       RETURNING id, chave, nome, contato, email, estado, nota, comentario,
+       RETURNING id, chave, nome, contato, email, estado, nota, comentario, fechada_por,
                  ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em`,
     [chave, visitante]
   )) as Array<{
@@ -105,6 +107,7 @@ export async function acharOuAbrir(chave: string, visitante: string) {
     estado: string;
     nota: number | null;
     comentario: string;
+    fechada_por: string;
     criado_em: string;
     mexido_em: string;
   }>;
@@ -121,6 +124,7 @@ export async function acharOuAbrir(chave: string, visitante: string) {
     estado: linha.estado as Conversa["estado"],
     nota: linha.nota === null ? null : Number(linha.nota),
     comentario: linha.comentario ?? "",
+    fechadaPor: linha.fechada_por ?? "",
     criadoEm: linha.criado_em,
     mexidoEm: linha.mexido_em,
   } satisfies Conversa;
@@ -197,6 +201,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
   const vazio = {
     estado: null as Conversa["estado"] | null,
     temFicha: false,
+    temNome: false,
     avaliada: false,
     novas: [] as Mensagem[],
   };
@@ -223,6 +228,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
     quando: string | null;
     estado: string;
     tem_ficha: boolean;
+    tem_nome: boolean;
     avaliada: boolean;
   }>;
 
@@ -240,6 +246,7 @@ export async function mensagensDepois(chave: string, depoisDe: number) {
   return {
     estado: linhas[0].estado as Conversa["estado"],
     temFicha: Boolean(linhas[0].tem_ficha),
+    temNome: Boolean(linhas[0].tem_nome),
     avaliada: Boolean(linhas[0].avaliada),
     novas,
   };
@@ -295,12 +302,20 @@ export async function recomecarConversa(anterior: Conversa, visitante: string) {
 
   const chave = novaChave();
 
+  // Sem os dados da anterior, de propósito.
+  //
+  // Antes a conversa nova herdava nome, WhatsApp e e-mail, para a pessoa não
+  // repetir. A agência preferiu o contrário: atendimento encerrado é assunto
+  // encerrado, e a próxima conversa começa do zero, com dados novos — quem
+  // escreve pode nem ser a mesma pessoa, num computador de família ou de
+  // escritório. `anterior` continua no parâmetro para quem chama não mudar.
+  void anterior;
   const linhas = (await sql.query(
-    `INSERT INTO conversas (chave, visitante, nome, contato, email)
-          VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, chave, nome, contato, email, estado, nota, comentario,
+    `INSERT INTO conversas (chave, visitante)
+          VALUES ($1, $2)
+       RETURNING id, chave, nome, contato, email, estado, nota, comentario, fechada_por,
                  ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em`,
-    [chave, visitante, anterior.nome, anterior.contato, anterior.email]
+    [chave, visitante]
   )) as Array<Record<string, unknown>>;
 
   const linha = linhas[0];
@@ -315,6 +330,7 @@ export async function recomecarConversa(anterior: Conversa, visitante: string) {
     estado: String(linha.estado) as Conversa["estado"],
     nota: linha.nota == null ? null : Number(linha.nota),
     comentario: String(linha.comentario ?? ""),
+    fechadaPor: String(linha.fechada_por ?? ""),
     criadoEm: String(linha.criado_em),
     mexidoEm: String(linha.mexido_em),
   } satisfies Conversa;
@@ -376,12 +392,19 @@ export async function avaliarConversa(
 }
 
 /** Marca a conversa como encerrada pela agência. */
-export async function fecharConversa(conversa: number) {
+export async function fecharConversa(
+  conversa: number,
+  por: "equipe" | "cliente" = "equipe"
+) {
   if (!sql) return;
   await garantirEsquema();
+  // A equipe (botão do painel ou barrar) ou o próprio visitante. O relógio
+  // encerra por outro caminho, em `encerrarPorSilencio`, e marca o dele.
   await sql.query(
-    "UPDATE conversas SET estado = 'fechada', mexido_em = now() WHERE id = $1",
-    [conversa]
+    `UPDATE conversas
+        SET estado = 'fechada', fechada_por = $2, mexido_em = now()
+      WHERE id = $1`,
+    [conversa, por]
   );
 }
 
@@ -405,7 +428,7 @@ export async function listarConversas(limite = 50): Promise<ConversaNaLista[]> {
     // ida é uma volta de rede. DISTINCT ON é do Postgres e resolve "a última
     // linha de cada grupo" sem subconsulta aninhada.
     const linhas = (await sql.query(
-      `SELECT c.id, c.chave, c.nome, c.contato, c.email, c.estado, c.nota, c.comentario,
+      `SELECT c.id, c.chave, c.nome, c.contato, c.email, c.estado, c.nota, c.comentario, c.fechada_por,
               to_char(c.criado_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS criado_em,
               to_char(c.mexido_em AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS mexido_em,
               coalesce(r.n, 0)::int AS mensagens,
@@ -435,6 +458,7 @@ export async function listarConversas(limite = 50): Promise<ConversaNaLista[]> {
       estado: String(l.estado) as Conversa["estado"],
       nota: l.nota == null ? null : Number(l.nota),
       comentario: String(l.comentario ?? ""),
+      fechadaPor: String(l.fechada_por ?? ""),
       criadoEm: String(l.criado_em),
       mexidoEm: String(l.mexido_em),
       mensagens: Number(l.mensagens ?? 0),
@@ -455,7 +479,7 @@ export async function lerConversa(id: number) {
 
     const [cabeca, mensagens] = await Promise.all([
       sql.query(
-        `SELECT id, chave, nome, contato, email, estado, nota, comentario,
+        `SELECT id, chave, nome, contato, email, estado, nota, comentario, fechada_por,
                 ${QUANDO} AS criado_em, ${MEXIDO} AS mexido_em
            FROM conversas WHERE id = $1`,
         [id]
@@ -476,6 +500,7 @@ export async function lerConversa(id: number) {
         estado: String(linha.estado) as Conversa["estado"],
         nota: linha.nota == null ? null : Number(linha.nota),
         comentario: String(linha.comentario ?? ""),
+        fechadaPor: String(linha.fechada_por ?? ""),
         criadoEm: String(linha.criado_em),
         mexidoEm: String(linha.mexido_em),
       } satisfies Conversa,
@@ -497,5 +522,131 @@ export async function conversasEsperando() {
     return linhas[0]?.n ?? 0;
   } catch {
     return 0;
+  }
+}
+
+/* ---------------- Encerramento por silêncio ---------------- */
+
+/**
+ * Quanto tempo de silêncio encerra cada tipo de conversa.
+ *
+ * ---------- A armadilha, e por que existem dois prazos ----------
+ *
+ * A regra ingênua seria "conversa parada há X horas, encerra". Ela perderia
+ * dinheiro: uma conversa parada **esperando a equipe** é um lead que ninguém
+ * atendeu ainda, e encerrá-la por tempo é apagar o pedido de quem procurou a
+ * agência. Quanto mais tempo ela espera, pior — e a regra ingênua fecharia
+ * justamente as mais esquecidas.
+ *
+ * Então o que decide não é o tempo parado: é **quem falou por último**.
+ *
+ * - Última fala do visitante, ou do assistente passando a bola: alguém da
+ *   LANÇA+ deve uma resposta. Nunca encerra, por mais que demore.
+ * - Última fala da equipe: a agência fez a parte dela e a pessoa não voltou.
+ *   Aí sim, encerra.
+ * - Última fala do assistente numa conversa que nunca saiu dele: a pessoa
+ *   tirou a dúvida e foi embora. Encerra mais cedo, porque não há ninguém
+ *   esperando do lado de cá.
+ */
+const SILENCIO_COM_ASSISTENTE = "6 hours";
+const SILENCIO_DEPOIS_DA_EQUIPE = "24 hours";
+
+/**
+ * Encerra o que morreu de silêncio, e devolve quantas encerrou.
+ *
+ * ---------- Por que não há tarefa agendada ----------
+ *
+ * Isto roda quando alguém abre o painel e quando o chat pergunta por
+ * mensagens novas — ou seja, no movimento normal do site. Uma tarefa
+ * agendada seria mais uma peça para configurar, monitorar e esquecer, para
+ * fazer o que duas consultas baratas fazem de carona.
+ *
+ * O efeito é o mesmo: ninguém vê uma conversa velha aberta, porque para ver
+ * é preciso abrir a tela — e abrir a tela é o que limpa.
+ */
+/** Quando a faxina rodou pela última vez, nesta instância do servidor. */
+let ultimaFaxina = 0;
+
+export async function encerrarPorSilencio() {
+  if (!sql) return 0;
+
+  // No máximo uma vez por minuto.
+  //
+  // Ela pega carona em cada pergunta do chat por mensagens novas — e cada
+  // chat aberto pergunta de 5 em 5 segundos. Sem este freio, cem pessoas no
+  // site seriam vinte varreduras da tabela de mensagens por segundo, para
+  // encerrar conversas cujo prazo se mede em horas. Um minuto de atraso no
+  // encerramento não se nota; vinte varreduras por segundo, o banco nota.
+  const agora = Date.now();
+  if (agora - ultimaFaxina < 60_000) return 0;
+  ultimaFaxina = agora;
+
+  try {
+    await garantirEsquema();
+
+    const linhas = (await sql.query(
+      `WITH ultima AS (
+         SELECT DISTINCT ON (conversa) conversa, autor
+           FROM mensagens
+          ORDER BY conversa, id DESC
+       )
+       UPDATE conversas c
+          SET estado = 'fechada',
+              fechada_por = 'inatividade',
+              mexido_em = now()
+         FROM ultima u
+        WHERE u.conversa = c.id
+          AND c.estado <> 'fechada'
+          -- Só quando a última palavra foi da LANÇA+: se foi do visitante,
+          -- a agência deve resposta e a conversa não pode sumir.
+          AND u.autor <> 'cliente'
+          AND (
+            (c.estado = 'assistente'
+               AND u.autor = 'assistente'
+               AND c.mexido_em < now() - interval '${SILENCIO_COM_ASSISTENTE}')
+            OR
+            (c.estado = 'equipe'
+               AND u.autor = 'equipe'
+               AND c.mexido_em < now() - interval '${SILENCIO_DEPOIS_DA_EQUIPE}')
+          )
+        RETURNING c.id`,
+      []
+    )) as Array<{ id: number }>;
+
+    if (linhas.length === 0) return 0;
+
+    // Uma despedida em cada uma.
+    //
+    // Sem isso, quem voltasse ao chat encontraria a conversa encerrada sem
+    // nada explicando — e no painel o fio terminaria no meio, como se
+    // alguém tivesse desligado na cara da pessoa.
+    await sql.query(
+      `INSERT INTO mensagens (conversa, autor, texto)
+       SELECT id, 'assistente',
+              'Vou encerrar este atendimento por aqui, já que ficamos um tempo sem falar. Se precisar de qualquer coisa, é só escrever de novo — começamos uma conversa nova.'
+         FROM conversas WHERE id = ANY($1::bigint[])`,
+      [linhas.map((l) => Number(l.id))]
+    );
+
+    return linhas.length;
+  } catch {
+    // Faxina é acessório: falhar aqui não pode derrubar quem só queria ler a
+    // lista de conversas.
+    return 0;
+  }
+}
+
+/** Guarda o nome dito no começo da conversa, sem apagar o que já havia. */
+export async function definirNome(conversa: number, nome: string) {
+  if (!sql || !nome) return;
+  try {
+    await sql.query(
+      `UPDATE conversas
+          SET nome = COALESCE(NULLIF(nome, ''), $2)
+        WHERE id = $1`,
+      [conversa, nome.slice(0, 120)]
+    );
+  } catch {
+    // O nome é conveniência; a conversa vale mais do que ele.
   }
 }
