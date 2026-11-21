@@ -12,6 +12,7 @@ import {
 import { assinarSom, guardarSom, somLigado, tocar } from "@/lib/som";
 import { siteConfig } from "@/lib/site-config";
 import AnexoDaMensagem from "@/components/AnexoDaMensagem";
+import { arrumarNome, problemaNoNome } from "@/lib/nome";
 
 // O chat do site.
 //
@@ -1446,12 +1447,13 @@ function PerguntaDoNome({ onPronto }: { onPronto: (nome: string) => void }) {
     <form
       onSubmit={(evento) => {
         evento.preventDefault();
-        const limpo = valor.trim().replace(/\s+/g, " ");
-        if (limpo.split(" ").filter((p) => p.length > 1).length < 2) {
-          setErro("Escreva nome e sobrenome.");
+        // Pega o nome inventado óbvio ("oin oi", "asd asd"); ver lib/nome.ts.
+        const problema = problemaNoNome(valor);
+        if (problema) {
+          setErro(problema);
           return;
         }
-        onPronto(limpo.slice(0, 120));
+        onPronto(arrumarNome(valor));
       }}
       className="border-t border-contorno px-4 py-4"
     >
@@ -1515,8 +1517,9 @@ function FichaDeContato({
 
     // As mesmas três checagens do servidor, aqui para avisar sem ida e
     // volta. A que vale é a de lá — esta é cortesia com quem digita.
-    if (nome.trim().split(/\s+/).filter((p) => p.length > 1).length < 2) {
-      setErro("Escreva nome e sobrenome.");
+    const problemaNome = problemaNoNome(nome);
+    if (problemaNome) {
+      setErro(problemaNome);
       return;
     }
     const digitos = whatsapp.replace(/\D/g, "");

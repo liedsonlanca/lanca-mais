@@ -1,6 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { avisarEquipe } from "@/lib/push";
 import { freioRapido } from "@/lib/freio-rapido";
+import { arrumarNome, problemaNoNome } from "@/lib/nome";
 import { sql } from "@/lib/db";
 import {
   LIMITES,
@@ -173,8 +174,12 @@ export async function POST(requisicao: Request) {
   // Guardado aqui, e nao so no navegador: no painel, "Visitante sem nome" e
   // uma conversa que ninguem sabe de quem e — e o nome e a unica coisa que
   // transforma uma linha da lista numa pessoa.
+  // Conferido aqui também (lib/nome.ts): o navegador é de quem digita, e
+  // quem manda direto para esta rota pularia a conferência da tela.
   const nomeDito = texto(corpo.nome, 120);
-  if (nomeDito) await definirNome(conversa.id, nomeDito);
+  if (nomeDito && !problemaNoNome(nomeDito)) {
+    await definirNome(conversa.id, arrumarNome(nomeDito));
+  }
 
   const minha = await gravarMensagem(conversa.id, "cliente", pergunta);
 

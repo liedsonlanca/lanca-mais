@@ -12,6 +12,7 @@ import { origemDaRequisicao, podeTentar, registrarFalha } from "@/lib/tentativas
 import { equipeNoExpediente, quandoAEquipeVolta } from "@/lib/expediente";
 import { estaBarrado } from "@/lib/atendimento";
 import { podeMandarFicha } from "@/lib/protecao-chat";
+import { arrumarNome, problemaNoNome } from "@/lib/nome";
 
 // A ficha de contato do chat: nome e sobrenome, WhatsApp e e-mail.
 //
@@ -113,16 +114,14 @@ export async function POST(requisicao: Request) {
   }
 
   // O nome que vale: o que veio na ficha, ou o que a conversa ja tinha.
-  const nomeFinal = nome || conversa.nome;
+  const nomeFinal = arrumarNome(nome || conversa.nome || "");
   // Nome e sobrenome: duas palavras de verdade. "João" sozinho não serve
   // para quem vai atender, e é o que a pessoa digita quando ninguém pede o
   // resto.
-  if (
-    !nomeFinal ||
-    nomeFinal.split(/\s+/).filter((parte) => parte.length > 1).length < 2
-  ) {
+  const problemaNome = problemaNoNome(nomeFinal);
+  if (problemaNome) {
     return NextResponse.json(
-      { ok: false, motivo: "campos", falhas: { nome: true } },
+      { ok: false, motivo: "campos", falhas: { nome: true }, erro: problemaNome },
       { status: 400 }
     );
   }
