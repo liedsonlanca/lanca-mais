@@ -71,6 +71,11 @@ export default function DiagnosticoPage() {
     >
       <SinalDeLead caminho="/diagnostico" />
 
+      {/* O questionário vem de outro endereço, dentro do quadro, e a página
+          ficava sem título principal para o Google e para leitores de
+          tela. Este existe só para eles: na tela, quem fala é o quadro. */}
+      <h1 className="sr-only">Diagnóstico de marketing da LANÇA+</h1>
+
       <iframe
         src={siteConfig.diagnosticoUrl}
         title="Diagnóstico LANÇA+"
